@@ -1906,21 +1906,17 @@ export const formatPlayer = async (Player: any) => {
 
   player["challengesCompleted"] = Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0);
 
-  var winstreakHidden = false;
-
-  if (Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined) winstreakHidden = true;
-
   player["APISettings"] = {
-    onlineStatusHidden: !Player?.lastLogin,
-    winstreaksHidden: winstreakHidden,
+    onlineStatus: Player?.lastLogin,
+    winstreaks: !(Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined),
   };
 
   player["rewards"] = {
-    rewardStreak: Player?.rewardScore || 0,
-    highestRewardStreak: Player?.rewardHighScore || 0,
+    streak: Player?.rewardScore || 0,
+    highestStreak: Player?.rewardHighScore || 0,
     claimedTotal: Player?.totalRewards || 0,
     claimedDaily: Player?.totalDailyRewards || 0,
-    rewardTokens: Player?.adsense_tokens || 0,
+    tokens: Player?.adsense_tokens || 0,
   };
 
   player["socialMedia"] = {
@@ -1959,4 +1955,81 @@ export const formatPlayer = async (Player: any) => {
   };
 
   return player;
+};
+
+export const formatGuild = (Guild: any) => {
+  const getLevel = (EXP: number) => {
+    const reqs = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000, 2500000, 2500000, 3000000];
+    var level = 0;
+    for (var i = 0; i <= 1000; i++) {
+      var req = 0;
+      if (i >= reqs.length) {
+        req = reqs[reqs.length - 1];
+      } else {
+        req = reqs[i];
+      }
+      if (EXP - req < 0) return ((level + EXP / req) * 100) / 100;
+      level += 1;
+      EXP -= req;
+    }
+    return 1000;
+  };
+
+  const guild: any = {
+    ID: Guild._id,
+    created: Guild?.created ? Math.floor(Guild.created / 1000) : null,
+    name: Guild.name,
+    description: Guild?.description || null,
+    publiclyListed: Guild?.publiclyListed || false,
+    tag: Guild?.tag || null,
+    tagColor: Guild?.tagColor || null,
+    EXP: Guild?.exp || 0,
+    EXPHistory: {},
+    level: getLevel(Guild?.exp || 0),
+    ranks: [],
+    memberCount: 0,
+    members: [],
+    preferredGames: Guild?.preferredGames || [],
+    EXPPerGame: Guild?.guildExpByGameType || {},
+    achievements: {
+      experienceKings: Guild?.achievements?.EXPERIENCE_KINGS || 0,
+      winners: Guild?.achievements?.WINNERS || 0,
+      onlinePlayers: Guild?.achievements?.ONLINE_PLAYERS || 0,
+    },
+  };
+
+  if (Guild?.ranks) {
+    for (const rank of Guild.ranks.sort((a: any, b: any) => parseFloat(b.priority) - parseFloat(a.priority))) {
+      guild.ranks.push({
+        name: rank.name,
+        tag: rank.tag,
+        default: rank.default,
+        created: rank?.created ? Math.floor(rank.created / 1000) : null,
+        priority: rank.priority,
+      });
+    }
+  }
+
+  if (Guild?.members) {
+    for (const member of Guild.members) {
+      const currentMember = {
+        UUID: formatUUID(member.uuid),
+        rank: member.rank,
+        joined: member?.joined ? Math.floor(member.joined / 1000) : null,
+        questParticipation: member?.questParticipation || 0,
+        EXPHistory: member?.expHistory || {},
+        mutedTill: member?.mutedTill || null,
+      };
+      guild.members.push(currentMember);
+      guild.memberCount++;
+
+      for (const day of Object.keys(currentMember.EXPHistory)) {
+        if (guild.EXPHistory[day] === undefined) {
+          guild.EXPHistory[day] = 0;
+        }
+        guild.EXPHistory[day] += currentMember.EXPHistory[day];
+      }
+    }
+  }
+  return guild;
 };
