@@ -1906,8 +1906,6 @@ export const formatPlayer = async (Player: any) => {
 
   player["challengesCompleted"] = Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0);
 
-  console.log(player["questsCompleted"], player["challengesCompleted"]);
-
   var winstreakHidden = false;
 
   if (Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined) winstreakHidden = true;
