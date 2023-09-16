@@ -10,12 +10,12 @@ An API focused on Minecraft related data
 
 ### ⚒️ Requirements
 
-- [`Node.js`]: For running code (`v20`)
-- [`pnpm`]: Installing packages and running scripts (`npm install -g pnpm`)
-- [`MongoDB`]: For Persistent data ([`Atlas`])
-- [`Redis`]: For Caching ([`Redis Cloud`])
+- [`Node.js`](https://nodejs.org/en/download/current/): For running code (`v20`)
+- [`pnpm`](https://pnpm.io/): Installing packages and running scripts (`npm install -g pnpm`)
+- [`MongoDB`](https://www.mongodb.com/): For Persistent data
+- [`Redis`](https://redis.io/): For Caching
 
-- [`Hypixel API-Key`]: For requesting Hypixel data, Visit the [Hypixel Developer Portal](https://developer.hypixel.net/)
+- [`Hypixel API-Key`](https://developer.hypixel.net/): For requesting Hypixel data, visit the [Hypixel Developer Portal](https://developer.hypixel.net/)
 
 ### 🚀 Running
 
