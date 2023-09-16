@@ -13,7 +13,6 @@
         "patch"
       ],
       "matchCurrentVersion": "!/^0/",
-      "automerge": true,
       "commitMessagePrefix": "chore(deps):",
       "matchFileNames": [
         "apps/*",
@@ -21,7 +20,15 @@
       ],
       "includePaths": [
         "package.json"
-      ]
+      ],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": [
+        "@packages/",
+        "@pixelic/"
+      ],
+      "enabled": false
     }
   ]
 }
