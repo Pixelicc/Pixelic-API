@@ -56,55 +56,39 @@ const parsePlusPlusColor = (plusPlusColor: string, rank: string) => {
 };
 
 const formatBedwars = (bedwars: any) => {
-  const EASY_LEVELS = 4;
-  const EASY_LEVELS_XP = 7000;
-  const XP_PER_PRESTIGE = 96 * 5000 + EASY_LEVELS_XP;
-  const LEVELS_PER_PRESTIGE = 100;
-  const HIGHEST_PRESTIGE = 30;
+  const easyLevels = 4;
+  const easyLevelsEXP = 7000;
+  const XPPerPrestige = 96 * 5000 + easyLevelsEXP;
+  const levelsPerPrestige = 100;
+  const highestPrestige = 50;
 
-  const getExpForLevel = (level: number) => {
+  const getEXPForLevel = (level: number) => {
     if (level === 0) return 0;
-
-    var respectedLevel = getLevelRespectingPrestige(level);
-    if (respectedLevel > EASY_LEVELS) {
-      return 5000;
-    }
-
-    switch (respectedLevel) {
-      case 1:
-        return 500;
-      case 2:
-        return 1000;
-      case 3:
-        return 2000;
-      case 4:
-        return 3500;
-    }
+    const respectedLevel = getLevelRespectingPrestige(level);
+    if (respectedLevel > easyLevels) return 5000;
+    if (respectedLevel === 1) return 1000;
+    if (respectedLevel === 2) return 2000;
+    if (respectedLevel === 3) return 3500;
+    if (respectedLevel === 4) return 500;
     return 5000;
   };
 
   const getLevelRespectingPrestige = (level: number) => {
-    if (level > HIGHEST_PRESTIGE * LEVELS_PER_PRESTIGE) {
-      return level - HIGHEST_PRESTIGE * LEVELS_PER_PRESTIGE;
-    } else {
-      return level % LEVELS_PER_PRESTIGE;
-    }
+    if (level > highestPrestige * levelsPerPrestige) return level - highestPrestige * levelsPerPrestige;
+    return level % levelsPerPrestige;
   };
 
-  const getLevelForExp = (exp: number) => {
-    var prestiges = Math.floor(exp / XP_PER_PRESTIGE);
-    var level = prestiges * LEVELS_PER_PRESTIGE;
-    var expWithoutPrestiges = exp - prestiges * XP_PER_PRESTIGE;
-
-    for (let i = 1; i <= EASY_LEVELS; ++i) {
-      var expForEasyLevel = getExpForLevel(i);
-      if (expWithoutPrestiges < expForEasyLevel) {
-        break;
-      }
+  const getLevelForEXP = (EXP: number) => {
+    const prestiges = Math.floor(EXP / XPPerPrestige);
+    var level = prestiges * levelsPerPrestige;
+    var EXPWithoutPrestiges = EXP - prestiges * XPPerPrestige;
+    for (let i = 1; i <= easyLevels; ++i) {
+      const EXPForEasyLevel = getEXPForLevel(i);
+      if (EXPWithoutPrestiges < EXPForEasyLevel) break;
       level++;
-      expWithoutPrestiges -= expForEasyLevel;
+      EXPWithoutPrestiges -= EXPForEasyLevel;
     }
-    return level + expWithoutPrestiges / 5000;
+    return level + EXPWithoutPrestiges / 5000;
   };
 
   const hypixelModes = ["", "eight_one_", "eight_two_", "four_three_", "four_four_", "two_four_", "eight_two_lucky_", "four_four_lucky_", "eight_two_rush_", "four_four_rush_", "eight_two_ultimate_", "four_four_ultimate_", "eight_two_armed_", "four_four_armed_", "eight_two_voidless_", "four_four_voidless_", "castle_"];
@@ -113,7 +97,7 @@ const formatBedwars = (bedwars: any) => {
   const stats: any = {};
 
   stats["EXP"] = bedwars?.Experience || 0;
-  stats["level"] = getLevelForExp(stats["EXP"]);
+  stats["level"] = getLevelForEXP(stats["EXP"]);
   stats["coins"] = bedwars?.coins || 0;
   stats["chests"] = bedwars?.bedwars_boxes || 0;
 
@@ -159,20 +143,17 @@ const formatBedwars = (bedwars: any) => {
 };
 
 const formatSkywars = (skywars: any) => {
-  const getLevelForExp = (EXP: number) => {
-    var xps = [0, 20, 70, 150, 250, 500, 1000, 2000, 3500, 6000, 10000, 15000];
-    let exactLevel = 0;
-    if (EXP >= 15000) {
-      exactLevel = (EXP - 15000) / 10000 + 12;
-    } else {
-      for (var i = 0; i < xps.length; i++) {
-        if (EXP < xps[i]) {
-          exactLevel = i + (EXP - xps[i - 1]) / (xps[i] - xps[i - 1]);
-          break;
-        }
+  const getLevelForEXP = (EXP: number) => {
+    const reqs = [0, 20, 70, 150, 250, 500, 1000, 2000, 3500, 6000, 10000, 15000];
+    if (EXP >= 15000) return (EXP - 15000) / 10000 + 12;
+    var level = 0;
+    for (var i = 0; i < reqs.length; i++) {
+      if (EXP < reqs[i]) {
+        level = i + (EXP - reqs[i - 1]) / (reqs[i] - reqs[i - 1]);
+        break;
       }
     }
-    return exactLevel;
+    return level;
   };
 
   const hypixelModes = ["", "_solo", "_team"];
@@ -181,7 +162,7 @@ const formatSkywars = (skywars: any) => {
   const stats: any = {};
 
   stats["EXP"] = skywars?.skywars_experience || 0;
-  stats["level"] = getLevelForExp(stats["EXP"]);
+  stats["level"] = getLevelForEXP(stats["EXP"]);
   stats["coins"] = skywars?.coins || 0;
   stats["tokens"] = skywars?.cosmetic_tokens || 0;
   stats["souls"] = skywars?.souls || 0;
@@ -828,7 +809,7 @@ const formatDuels = (duels: any) => {
 };
 
 const formatSkyblock = (skyblock: any) => {
-  var profiles = [];
+  const profiles = [];
   for (const profile of Object.keys(skyblock?.profiles || {})) {
     profiles.push({ ID: formatUUID(skyblock.profiles[profile]["profile_id"]), cuteName: skyblock.profiles[profile]["cute_name"] });
   }
@@ -1248,19 +1229,19 @@ const formatMurderMystery = (murderMystery: any) => {
 };
 
 const formatPit = async (pit: any) => {
-  async function getData(rawData: any) {
-    if (rawData == null) {
+  const getData = async (rawData: any) => {
+    if (rawData === null) {
       return {};
     }
-    async function getNbt(string: string) {
+    const getNBT = async (string: string) => {
       const buffer = Buffer.from(string);
-      const parsedNbt = await parseNbt(buffer);
-      return nbt.simplify(parsedNbt)["i"];
-    }
+      const parsedNBT = await parseNbt(buffer);
+      return nbt.simplify(parsedNBT)["i"];
+    };
     var data = [];
-    const RawData = await getNbt(rawData || "");
+    const RawData = await getNBT(rawData || "");
     for (const item in RawData) {
-      if (Object.keys(RawData[item]).length != 0) {
+      if (Object.keys(RawData[item]).length !== 0) {
         const nbt = RawData[item]["tag"];
         const getEnchants = (Data: any) => {
           if (Data == null) {
@@ -1289,12 +1270,12 @@ const formatPit = async (pit: any) => {
       }
     }
     return data;
-  }
+  };
   const getFavorites = (Data: any) => {
     if (Data === null) {
       return {};
     }
-    var data = [];
+    const data = [];
     for (const ID of Data) {
       if (ID === 0) {
         data.push({});
@@ -1548,17 +1529,17 @@ const formatCopsAndCrims = (MCGO: any) => {
       },
     },
     selectedCosmetics: {
-      carbine: MCGO?.selectedCarbineDev,
-      creeperHelmet: MCGO?.selectedCreeperHelmetDev,
-      creeperChestplate: MCGO?.selectedCreeperChestplateDev,
-      knife: MCGO?.selectedKnifeDev,
-      magnum: MCGO?.selectedMagnumDev,
-      ocelotHelmet: MCGO?.selectedOcelotHelmetDev,
-      ocelotChestplate: MCGO?.selectedOcelotChestplateDev,
-      pistol: MCGO?.selectedPistolDev,
-      rifle: MCGO?.selectedRifleDev,
-      shotgun: MCGO?.selectedShotgunDev,
-      smg: MCGO?.selectedSmgDev,
+      carbine: MCGO?.selectedCarbineDev || null,
+      creeperHelmet: MCGO?.selectedCreeperHelmetDev || null,
+      creeperChestplate: MCGO?.selectedCreeperChestplateDev || null,
+      knife: MCGO?.selectedKnifeDev || null,
+      magnum: MCGO?.selectedMagnumDev || null,
+      ocelotHelmet: MCGO?.selectedOcelotHelmetDev || null,
+      ocelotChestplate: MCGO?.selectedOcelotChestplateDev || null,
+      pistol: MCGO?.selectedPistolDev || null,
+      rifle: MCGO?.selectedRifleDev || null,
+      shotgun: MCGO?.selectedShotgunDev || null,
+      smg: MCGO?.selectedSmgDev || null,
     },
   };
 };
@@ -1641,13 +1622,13 @@ const formatQuake = (quake: any) => {
       headshots: quake?.headshots_teams || 0,
     },
     selectedCosmetics: {
-      barrel: quake?.barrel?.toLowerCase() || null,
-      case: quake?._case?.toLowerCase() || null,
-      killsound: quake?.killsound?.toLowerCase() || null,
-      muzzle: quake?.muzzle?.toLowerCase() || null,
-      sight: quake?.sight?.toLowerCase() || null,
-      trigger: quake?.trigger?.toLowerCase() || null,
-      beam: quake?.beam?.toLowerCase() || null,
+      barrel: quake?.barrel || null,
+      case: quake?._case || null,
+      killsound: quake?.killsound || null,
+      muzzle: quake?.muzzle || null,
+      sight: quake?.sight || null,
+      trigger: quake?.trigger || null,
+      beam: quake?.beam || null,
     },
     votes: {
       apex: quake?.votes_Apex || 0,
@@ -1850,27 +1831,24 @@ const formatVampireZ = (vampireZ: any) => {
 };
 
 const formatWoolwars = (woolGames: any) => {
-  const getExpReq = (level: number) => {
+  const getEXPReq = (level: number) => {
     const progress = level % 100;
     if (progress > 4) return 5000;
-
     const levels = [level >= 100 ? 5000 : 0, 1000, 2000, 3000, 4000];
-
     return levels[progress];
   };
 
-  const getWoolwarsStar = (exp: number) => {
-    const prestiges = Math.floor(exp / 490_000);
-    let level = prestiges * 100;
-    let remainingExp = exp - prestiges * 490_000;
-
+  const getWoolwarsStar = (EXP: number) => {
+    const prestiges = Math.floor(EXP / 490_000);
+    var level = prestiges * 100;
+    var remainingEXP = EXP - prestiges * 490_000;
     for (let i = 0; i < 5; ++i) {
-      const expForNextLevel = getExpReq(i);
-      if (remainingExp < expForNextLevel) break;
+      const EXPForNextLevel = getEXPReq(i);
+      if (remainingEXP < EXPForNextLevel) break;
       level++;
-      remainingExp -= expForNextLevel;
+      remainingEXP -= EXPForNextLevel;
     }
-    return level + remainingExp / getExpReq(level + 1);
+    return level + remainingEXP / getEXPReq(level + 1);
   };
 
   return {
@@ -1923,14 +1901,12 @@ export const formatPlayer = async (Player: any) => {
   player["ranksGifted"] = Player?.giftingMeta?.ranksGiven || 0;
 
   for (const quests in Player?.quests || {}) {
-    for (const questCompletion in Player.quests[quests].completions) {
-      player["questsCompleted"]++;
-    }
+    player["questsCompleted"] += Player?.quests[quests]?.completions?.length || 0;
   }
 
-  for (const challenge in Player?.challenges?.["all_time"] || {}) {
-    player["challengesCompleted"] += Player.challenges["all_time"][challenge];
-  }
+  player["challengesCompleted"] = Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0);
+
+  console.log(player["questsCompleted"], player["challengesCompleted"]);
 
   var winstreakHidden = false;
 
