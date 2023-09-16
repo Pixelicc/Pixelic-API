@@ -1,0 +1,20 @@
+{
+  "name": "@packages/hypixel",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "swc src --config-file ../../.swcrc --out-dir dist"
+  },
+  "dependencies": {
+    "@packages/logger": "*",
+    "@packages/mojang": "*",
+    "@packages/mongo": "*",
+    "@packages/redis": "*",
+    "@packages/utils": "*",
+    "axios-retry": "^3.7.0",
+    "bottleneck": "^2.19.5",
+    "minecraft-items": "^0.4.3"
+  }
+}

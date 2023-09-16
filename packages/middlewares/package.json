@@ -1,0 +1,23 @@
+{
+  "name": "@packages/middlewares",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "swc src --config-file ../../.swcrc --out-dir dist"
+  },
+  "dependencies": {
+    "ulidx": "^2.1.0",
+    "@packages/utils": "*",
+    "@packages/logger": "*",
+    "@packages/redis": "*",
+    "@packages/mongo": "*",
+    "@pixelic/types": "*",
+    "@sentry/node": "^7.65.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/uuid": "^9.0.2"
+  }
+}

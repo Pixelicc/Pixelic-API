@@ -1,0 +1,10 @@
+{
+  "name": "@pixelic/types",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "src/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "swc src --config-file ../.swcrc --out-dir dist"
+  }
+}

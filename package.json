@@ -1,0 +1,21 @@
+{
+  "name": "pixelic-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pixelicc/pixelic-api.git"
+  },
+  "scripts": {
+    "build": "turbo run build --parallel --cache-dir=.turbo --no-daemon",
+    "api": "pnpm --filter api",
+    "bot": "pnpm --filter bot"
+  },
+  "devDependencies": {
+    "@swc/cli": "latest",
+    "@swc/core": "latest",
+    "turbo": "latest",
+    "typescript": "latest"
+  }
+}

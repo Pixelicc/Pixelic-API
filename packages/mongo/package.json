@@ -1,0 +1,15 @@
+{
+  "name": "@packages/mongo",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "swc src --config-file ../../.swcrc --out-dir dist"
+  },
+  "dependencies": {
+    "@packages/utils": "*",
+    "@pixelic/types": "*",
+    "mongoose": "^7.4.4"
+  }
+}
