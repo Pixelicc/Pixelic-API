@@ -26,6 +26,6 @@ An API focused on Minecraft related data
 
 - The codebase is split into apps and packages
 - Set up a `config.js` file in the root of the project following the `config.schema.js` file (copy paste it over and fill it in)
-- Use `pnpm install` to install the required packages,
-- Use `pnpm build` to build all packages and apps,
-- Use `pnpm {appName} start` to run an app, eg `pnpm api start` to run the Core-API
+- Use `pnpm install` to install the required packages
+- Use `pnpm build` to build all packages and apps
+- Use `pnpm {appName} start` to run an app, eg `pnpm api start` to run the API
