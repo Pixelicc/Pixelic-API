@@ -12,11 +12,14 @@
       "automerge": true
     },
     {
-      "packagePatterns": [
-        "apps/*/package.json",
-        "packages/*/package.json"
+      "matchFileNames": [
+        "apps/*",
+        "packages/*"
       ],
-      "enabled": true
+      "includePaths": [
+        "package.json"
+      ],
+      "automerge": true
     }
   ]
 }
