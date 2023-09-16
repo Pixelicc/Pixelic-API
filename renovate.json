@@ -3,6 +3,9 @@
   "extends": [
     "config:recommended"
   ],
+  "labels": [
+    "dependencies"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -11,17 +14,14 @@
       ],
       "matchCurrentVersion": "!/^0/",
       "automerge": true,
-      "commitMessagePrefix": "chore(deps):"
-    },
-    {
+      "commitMessagePrefix": "chore(deps):",
       "matchFileNames": [
         "apps/*",
         "packages/*"
       ],
       "includePaths": [
         "package.json"
-      ],
-      "automerge": true
+      ]
     }
   ]
 }
