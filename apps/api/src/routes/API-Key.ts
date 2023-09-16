@@ -1,8 +1,8 @@
 import express from "express";
-import { authorization, ratelimit } from "@packages/middlewares";
-import redis from "@packages/redis";
-import { formatUUID, generateUUID } from "@packages/utils";
-import { APIKeyModel } from "@packages/mongo";
+import { authorization, ratelimit } from "@pixelic/middlewares";
+import redis from "@pixelic/redis";
+import { formatUUID, generateUUID } from "@pixelic/utils";
+import { APIKeyModel } from "@pixelic/mongo";
 import { APIKeyMongo, APIKeyRedis } from "@pixelic/types";
 import { decodeTime } from "ulidx";
 

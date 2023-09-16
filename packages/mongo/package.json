@@ -1,5 +1,5 @@
 {
-  "name": "@packages/mongo",
+  "name": "@pixelic/mongo",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "src/index.ts",
@@ -8,7 +8,7 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
-    "@packages/utils": "*",
+    "@pixelic/utils": "*",
     "@pixelic/types": "*",
     "mongoose": "^7.4.4"
   }

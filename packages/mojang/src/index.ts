@@ -1,10 +1,10 @@
 import Bottleneck from "bottleneck";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import log from "@packages/logger";
-import { config, validateUUID, validateUsername } from "@packages/utils";
-import redis from "@packages/redis";
-import { formatUUID } from "@packages/utils";
+import log from "@pixelic/logger";
+import { config, validateUUID, validateUsername } from "@pixelic/utils";
+import redis from "@pixelic/redis";
+import { formatUUID } from "@pixelic/utils";
 
 const limiter = new Bottleneck({
   reservoir: 600,

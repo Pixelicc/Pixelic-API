@@ -1,4 +1,4 @@
-import { parseUUID } from "@packages/mojang";
+import { parseUUID } from "@pixelic/mojang";
 import { requestHypixel } from "./requestHandler.js";
 import { formatPlayer } from "./formatters.js";
 

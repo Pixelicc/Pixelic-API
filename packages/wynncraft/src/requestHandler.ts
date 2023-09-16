@@ -1,8 +1,8 @@
 import Bottleneck from "bottleneck";
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import log from "@packages/logger";
-import { config } from "@packages/utils";
+import log from "@pixelic/logger";
+import { config } from "@pixelic/utils";
 
 const Limiter = new Bottleneck({
   reservoir: 180,

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Application } from "express";
-import redis from "@packages/redis";
+import redis from "@pixelic/redis";
 
 /**
  * Tracks data like requests processed

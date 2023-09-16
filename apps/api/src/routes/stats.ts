@@ -1,9 +1,9 @@
 import express from "express";
 import { exec } from "child_process";
-import redis from "@packages/redis";
-import { client as mongo } from "@packages/mongo";
+import redis from "@pixelic/redis";
+import { client as mongo } from "@pixelic/mongo";
 import axios from "axios";
-import { formatBytes, formatNumber } from "@packages/utils";
+import { formatBytes, formatNumber } from "@pixelic/utils";
 
 const router = express.Router();
 

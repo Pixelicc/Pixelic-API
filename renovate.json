@@ -20,7 +20,6 @@
     },
     {
       "matchPackagePatterns": [
-        "@packages/",
         "@pixelic/",
         "@swc/cli",
         "@swc/core"

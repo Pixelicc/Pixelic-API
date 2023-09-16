@@ -1,5 +1,5 @@
-import { requestUUID } from "@packages/mojang";
-import { formatUUID } from "@packages/utils";
+import { requestUUID } from "@pixelic/mojang";
+import { formatUUID } from "@pixelic/utils";
 
 export const formatPlayer = (player: any) => {
   const characters: any = {};

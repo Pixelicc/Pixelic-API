@@ -1,6 +1,6 @@
 import cluster from "node:cluster";
-import log from "@packages/logger";
-import { config } from "@packages/utils";
+import log from "@pixelic/logger";
+import { config } from "@pixelic/utils";
 
 if (cluster.isPrimary) {
   log("API", `Primary ${process.pid} started...`, "info");

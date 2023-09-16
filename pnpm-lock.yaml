@@ -15,7 +15,7 @@ importers:
         specifier: 1.3.68
         version: 1.3.68
       turbo:
-        specifier: 1.10.14
+        specifier: ^1.10.14
         version: 1.10.14
       typescript:
         specifier: latest
@@ -23,33 +23,33 @@ importers:
 
   apps/api:
     dependencies:
-      '@packages/hypixel':
+      '@pixelic/hypixel':
         specifier: '*'
         version: link:../../packages/hypixel
-      '@packages/logger':
+      '@pixelic/logger':
         specifier: '*'
         version: link:../../packages/logger
-      '@packages/middlewares':
+      '@pixelic/middlewares':
         specifier: '*'
         version: link:../../packages/middlewares
-      '@packages/mojang':
+      '@pixelic/mojang':
         specifier: '*'
         version: link:../../packages/mojang
-      '@packages/mongo':
+      '@pixelic/mongo':
         specifier: '*'
         version: link:../../packages/mongo
-      '@packages/redis':
+      '@pixelic/redis':
         specifier: '*'
         version: link:../../packages/redis
-      '@packages/utils':
-        specifier: '*'
-        version: link:../../packages/utils
-      '@packages/wynncraft':
-        specifier: '*'
-        version: link:../../packages/wynncraft
       '@pixelic/types':
         specifier: '*'
         version: link:../../types
+      '@pixelic/utils':
+        specifier: '*'
+        version: link:../../packages/utils
+      '@pixelic/wynncraft':
+        specifier: '*'
+        version: link:../../packages/wynncraft
       '@sentry/node':
         specifier: ^7.65.0
         version: 7.65.0
@@ -81,19 +81,19 @@ importers:
 
   packages/hypixel:
     dependencies:
-      '@packages/logger':
+      '@pixelic/logger':
         specifier: '*'
         version: link:../logger
-      '@packages/mojang':
+      '@pixelic/mojang':
         specifier: '*'
         version: link:../mojang
-      '@packages/mongo':
+      '@pixelic/mongo':
         specifier: '*'
         version: link:../mongo
-      '@packages/redis':
+      '@pixelic/redis':
         specifier: '*'
         version: link:../redis
-      '@packages/utils':
+      '@pixelic/utils':
         specifier: '*'
         version: link:../utils
       axios-retry:
@@ -120,21 +120,21 @@ importers:
 
   packages/middlewares:
     dependencies:
-      '@packages/logger':
+      '@pixelic/logger':
         specifier: '*'
         version: link:../logger
-      '@packages/mongo':
+      '@pixelic/mongo':
         specifier: '*'
         version: link:../mongo
-      '@packages/redis':
+      '@pixelic/redis':
         specifier: '*'
         version: link:../redis
-      '@packages/utils':
-        specifier: '*'
-        version: link:../utils
       '@pixelic/types':
         specifier: '*'
         version: link:../../types
+      '@pixelic/utils':
+        specifier: '*'
+        version: link:../utils
       '@sentry/node':
         specifier: ^7.65.0
         version: 7.65.0
@@ -151,13 +151,13 @@ importers:
 
   packages/mojang:
     dependencies:
-      '@packages/logger':
+      '@pixelic/logger':
         specifier: '*'
         version: link:../logger
-      '@packages/redis':
+      '@pixelic/redis':
         specifier: '*'
         version: link:../redis
-      '@packages/utils':
+      '@pixelic/utils':
         specifier: '*'
         version: link:../utils
       axios:
@@ -172,19 +172,19 @@ importers:
 
   packages/mongo:
     dependencies:
-      '@packages/utils':
-        specifier: '*'
-        version: link:../utils
       '@pixelic/types':
         specifier: '*'
         version: link:../../types
+      '@pixelic/utils':
+        specifier: '*'
+        version: link:../utils
       mongoose:
         specifier: ^7.4.4
         version: 7.4.4
 
   packages/redis:
     dependencies:
-      '@packages/utils':
+      '@pixelic/utils':
         specifier: '*'
         version: link:../utils
       ioredis:
@@ -206,19 +206,19 @@ importers:
 
   packages/wynncraft:
     dependencies:
-      '@packages/logger':
+      '@pixelic/logger':
         specifier: '*'
         version: link:../logger
-      '@packages/mojang':
+      '@pixelic/mojang':
         specifier: '*'
         version: link:../mojang
-      '@packages/mongo':
+      '@pixelic/mongo':
         specifier: '*'
         version: link:../mongo
-      '@packages/redis':
+      '@pixelic/redis':
         specifier: '*'
         version: link:../redis
-      '@packages/utils':
+      '@pixelic/utils':
         specifier: '*'
         version: link:../utils
       axios-retry:

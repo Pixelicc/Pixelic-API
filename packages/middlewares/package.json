@@ -1,5 +1,5 @@
 {
-  "name": "@packages/middlewares",
+  "name": "@pixelic/middlewares",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "src/index.ts",
@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "ulidx": "^2.1.0",
-    "@packages/utils": "*",
-    "@packages/logger": "*",
-    "@packages/redis": "*",
-    "@packages/mongo": "*",
+    "@pixelic/utils": "*",
+    "@pixelic/logger": "*",
+    "@pixelic/redis": "*",
+    "@pixelic/mongo": "*",
     "@pixelic/types": "*",
     "@sentry/node": "^7.65.0"
   },

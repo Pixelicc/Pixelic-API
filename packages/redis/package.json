@@ -1,5 +1,5 @@
 {
-  "name": "@packages/redis",
+  "name": "@pixelic/redis",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "src/index.ts",
@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "ioredis": "^5.3.2",
-    "@packages/utils": "*"
+    "@pixelic/utils": "*"
   }
 }

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { validateUUID, formatUUID } from "@packages/utils";
+import { validateUUID, formatUUID } from "@pixelic/utils";
 import * as Sentry from "@sentry/node";
-import redis from "@packages/redis";
+import redis from "@pixelic/redis";
 import { APIKeyRedis } from "@pixelic/types";
 
 /**

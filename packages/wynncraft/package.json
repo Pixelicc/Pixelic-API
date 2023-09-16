@@ -1,5 +1,5 @@
 {
-  "name": "@packages/wynncraft",
+  "name": "@pixelic/wynncraft",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "src/index.ts",
@@ -8,11 +8,11 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
-    "@packages/logger": "*",
-    "@packages/mongo": "*",
-    "@packages/redis": "*",
-    "@packages/utils": "*",
-    "@packages/mojang": "*",
+    "@pixelic/logger": "*",
+    "@pixelic/mongo": "*",
+    "@pixelic/redis": "*",
+    "@pixelic/utils": "*",
+    "@pixelic/mojang": "*",
     "axios-retry": "^3.7.0",
     "bottleneck": "^2.19.5"
   }

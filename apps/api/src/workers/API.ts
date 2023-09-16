@@ -2,8 +2,8 @@ import express from "express";
 import * as Sentry from "@sentry/node";
 import mongoSanitize from "express-mongo-sanitize";
 import cors from "cors";
-import { requestID, JSONHandler, requestAnalytics } from "@packages/middlewares";
-import { config } from "@packages/utils";
+import { requestID, JSONHandler, requestAnalytics } from "@pixelic/middlewares";
+import { config } from "@pixelic/utils";
 import router from "../routes/index.js";
 
 const API = express();

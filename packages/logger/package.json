@@ -1,5 +1,5 @@
 {
-  "name": "@packages/logger",
+  "name": "@pixelic/logger",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "src/index.ts",

@@ -1,4 +1,4 @@
 import { Redis } from "ioredis";
-import { config } from "@packages/utils";
+import { config } from "@pixelic/utils";
 
 export default new Redis(config.database.redis);

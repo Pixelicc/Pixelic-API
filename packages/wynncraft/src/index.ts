@@ -1,7 +1,7 @@
-import { parseUUID } from "@packages/mojang";
+import { parseUUID } from "@pixelic/mojang";
 import { requestWynncraft } from "./requestHandler.js";
 import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from "./formatters.js";
-import { dashUUID } from "@packages/utils";
+import { dashUUID } from "@pixelic/utils";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);

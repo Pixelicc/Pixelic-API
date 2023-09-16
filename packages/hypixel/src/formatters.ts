@@ -2,7 +2,7 @@ import nbt from "prismarine-nbt";
 import util from "util";
 // @ts-ignore
 import minecraftItems from "minecraft-items";
-import { getRatio, formatUUID } from "@packages/utils";
+import { getRatio, formatUUID } from "@pixelic/utils";
 
 const parseNbt = util.promisify(nbt.parse);
 
