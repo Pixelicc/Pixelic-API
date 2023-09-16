@@ -14,13 +14,6 @@
       ],
       "matchCurrentVersion": "!/^0/",
       "commitMessagePrefix": "chore(deps):",
-      "matchFileNames": [
-        "apps/*",
-        "packages/*"
-      ],
-      "includePaths": [
-        "package.json"
-      ],
       "automerge": true
     },
     {
