@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "packagePatterns": [
+        "apps/**/package.json",
+        "packages/**/package.json"
+      ],
+      "enabled": true
+    }
+  ]
+}
