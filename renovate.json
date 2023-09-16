@@ -13,8 +13,7 @@
         "patch"
       ],
       "matchCurrentVersion": "!/^0/",
-      "commitMessagePrefix": "chore(deps):",
-      "automerge": true
+      "commitMessagePrefix": "chore(deps):"
     },
     {
       "matchPackagePatterns": [
