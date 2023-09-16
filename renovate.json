@@ -21,7 +21,9 @@
     {
       "matchPackagePatterns": [
         "@packages/",
-        "@pixelic/"
+        "@pixelic/",
+        "@swc/cli",
+        "@swc/core"
       ],
       "enabled": false
     }
