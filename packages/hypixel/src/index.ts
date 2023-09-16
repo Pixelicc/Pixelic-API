@@ -9,8 +9,7 @@ export const getPlayer = async (player: string) => {
     const data = await requestHypixel(`https://api.hypixel.net/player?uuid=${UUID}`);
     if (data.player === null) return "This player never played on Hypixel";
     return formatPlayer(data.player);
-  } catch (e) {
-    console.log(e);
+  } catch {
     return null;
   }
 };

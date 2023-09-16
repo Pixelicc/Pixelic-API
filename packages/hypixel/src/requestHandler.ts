@@ -32,8 +32,7 @@ export const requestHypixel = async (URL: string) => {
       const request = await axios.get(URL, { headers: { "API-Key": config.hypixel.key } });
       return request.data;
     });
-  } catch (e) {
-    console.log(e);
+  } catch {
     throw new Error();
   }
 };
