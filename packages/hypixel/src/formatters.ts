@@ -34,7 +34,7 @@ const parseRank = (rank: string, packageRank: string | null, newPackageRank: str
   return playerRank;
 };
 
-const parsePlusColor = (plusColor: string, rank: string) => {
+const parsePlusColor = (plusColor: string | null, rank: string | null) => {
   if (plusColor === undefined || plusColor === null) {
     if (rank === "MVP_PLUS" || rank === "MVP_PLUS_PLUS") {
       return "RED";
@@ -45,7 +45,7 @@ const parsePlusColor = (plusColor: string, rank: string) => {
   return plusColor;
 };
 
-const parsePlusPlusColor = (plusPlusColor: string, rank: string) => {
+const parsePlusPlusColor = (plusPlusColor: string | null, rank: string | null) => {
   if (rank !== "MVP_PLUS_PLUS") {
     return null;
   }
@@ -1870,90 +1870,88 @@ const formatWoolwars = (woolGames: any) => {
 };
 
 export const formatPlayer = async (Player: any) => {
-  const player: any = {};
-
-  player["UUID"] = Player.uuid;
-  player["username"] = Player.displayname;
-  player["rank"] = parseRank(Player.rank, Player.packageRank, Player.newPackageRank, Player.monthlyPackageRank, Player.prefix);
-  player["plusColor"] = parsePlusColor(Player.rankPlusColor, player["rank"]);
-  player["plusPlusColor"] = parsePlusPlusColor(Player.monthlyRankColor, player["rank"]);
-  player["EXP"] = Player?.networkExp || 0;
-  player["level"] = (Math.sqrt(player["EXP"] + 15312.5) - 125 / Math.sqrt(2)) / (25 * Math.sqrt(2));
-  player["karma"] = Player?.karma || 0;
-  player["achievementPoints"] = Player?.achievementPoints || 0;
-  player["questsCompleted"] = 0;
-  player["challengesCompleted"] = 0;
-  player["online"] = null;
-  if (Player.lastLogout && Player.lastLogin) {
+  const rank = parseRank(Player.rank, Player.packageRank, Player.newPackageRank, Player.monthlyPackageRank, Player.prefix);
+  var online = null;
+  if (Player?.lastLogout && Player?.lastLogin) {
     if (Player.lastLogout < Player.lastLogin) {
-      player["online"] = true;
+      online = true;
     } else {
-      player["online"] = false;
+      online = false;
     }
   }
-  player["firstLogin"] = Player?.firstLogin ? Math.floor(Player.firstLogin / 1000) : null;
-  player["lastLogin"] = Player?.lastLogin ? Math.floor(Player.lastLogin / 1000) : null;
-  player["lastLogout"] = Player?.lastLogout ? Math.floor(Player.lastLogout / 1000) : null;
-  player["language"] = Player?.userLanguage || "ENGLISH";
-  player["chatChannel"] = Player?.channel || "ALL";
-  player["giftsSent"] = Player?.giftingMeta?.realBundlesGiven || 0;
-  player["giftsReceived"] = Player?.giftingMeta?.realBundlesReceived || 0;
-  player["ranksGifted"] = Player?.giftingMeta?.ranksGiven || 0;
-
-  for (const quests in Player?.quests || {}) {
-    player["questsCompleted"] += Player?.quests[quests]?.completions?.length || 0;
+  var questsCompleted = 0;
+  if (Player?.quests) {
+    for (const quest of Player.quests) {
+      questsCompleted += quest?.completions?.length || 0;
+    }
   }
 
-  player["challengesCompleted"] = Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0);
-
-  player["APISettings"] = {
-    onlineStatus: Player?.lastLogin,
-    winstreaks: !(Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined),
+  const player = {
+    UUID: Player.uuid,
+    username: Player.displayname,
+    rank: rank,
+    plusColor: parsePlusColor(Player.rankPlusColor, rank),
+    plusPlusColor: parsePlusPlusColor(Player.monthlyRankColor, rank),
+    EXP: Player?.networkExp || 0,
+    level: (Math.sqrt((Player?.networkExp || 0) + 15312.5) - 125 / Math.sqrt(2)) / (25 * Math.sqrt(2)),
+    karma: Player?.karma || 0,
+    achievementPoints: Player?.achievementPoints || 0,
+    questsCompleted: questsCompleted,
+    challengesCompleted: Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0),
+    online: online,
+    firstLogin: Player?.firstLogin ? Math.floor(Player.firstLogin / 1000) : null,
+    lastLogin: Player?.lastLogin ? Math.floor(Player.lastLogin / 1000) : null,
+    lastLogout: Player?.lastLogout ? Math.floor(Player.lastLogout / 1000) : null,
+    language: Player?.userLanguage || "ENGLISH",
+    chatChannel: Player?.channel || "ALL",
+    giftsSent: Player?.giftingMeta?.realBundlesGiven || 0,
+    giftsReceived: Player?.giftingMeta?.realBundlesReceived || 0,
+    ranksGifted: Player?.giftingMeta?.ranksGiven || 0,
+    APISettings: {
+      onlineStatus: Player?.lastLogin,
+      winstreaks: !(Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined),
+    },
+    rewards: {
+      streak: Player?.rewardScore || 0,
+      highestStreak: Player?.rewardHighScore || 0,
+      claimedTotal: Player?.totalRewards || 0,
+      claimedDaily: Player?.totalDailyRewards || 0,
+      tokens: Player?.adsense_tokens || 0,
+    },
+    socialMedia: {
+      HYPIXEL: Player?.socialMedia?.links?.HYPIXEL?.toLowerCase() || null,
+      DISCORD: Player?.socialMedia?.links?.DISCORD?.toLowerCase() || null,
+      YOUTUBE: Player?.socialMedia?.links?.YOUTUBE?.toLowerCase() || null,
+      TWITCH: Player?.socialMedia?.links?.TWITCH?.toLowerCase() || null,
+      TWITTER: Player?.socialMedia?.links?.TWITTER?.toLowerCase() || null,
+      INSTAGRAM: Player?.socialMedia?.links?.INSTAGRAM?.toLowerCase() || null,
+      TIKTOK: Player?.socialMedia?.links?.TIKTOK?.toLowerCase() || null,
+    },
+    stats: {
+      Bedwars: formatBedwars(Player?.stats?.Bedwars),
+      Skywars: formatSkywars(Player?.stats?.SkyWars),
+      Duels: formatDuels(Player?.stats?.Duels),
+      Skyblock: formatSkyblock(Player?.stats?.SkyBlock),
+      Arcade: formatArcade(Player?.stats?.Arcade),
+      Arena: formatArena(Player?.stats?.Arena),
+      Warlords: formatWarlords(Player?.stats?.Battleground),
+      BuildBattle: formatBuildBattle(Player?.stats?.BuildBattle),
+      TKR: formatTKR(Player?.stats?.GingerBread),
+      MurderMystery: formatMurderMystery(Player?.stats?.MurderMystery),
+      Pit: await formatPit(Player?.stats?.Pit),
+      TNT: formatTNT(Player?.stats?.TNTGAMES),
+      Blitz: formatBlitz(Player?.stats?.HungerGames),
+      CvC: formatCopsAndCrims(Player?.stats?.MCGO),
+      Paintball: formatPaintball(Player?.stats?.Paintball),
+      Quake: formatQuake(Player?.stats?.Quake),
+      SpeedUHC: formatSpeedUHC(Player?.stats?.SpeedUHC),
+      Smash: formatSmash(Player?.stats?.SuperSmash),
+      Walls: formatWalls(Player?.stats?.Walls),
+      MegaWalls: formatMegaWalls(Player?.stats?.["Walls3"]),
+      VampireZ: formatVampireZ(Player?.stats?.VampireZ),
+      Woolwars: formatWoolwars(Player?.stats?.WoolGames),
+    },
   };
-
-  player["rewards"] = {
-    streak: Player?.rewardScore || 0,
-    highestStreak: Player?.rewardHighScore || 0,
-    claimedTotal: Player?.totalRewards || 0,
-    claimedDaily: Player?.totalDailyRewards || 0,
-    tokens: Player?.adsense_tokens || 0,
-  };
-
-  player["socialMedia"] = {
-    HYPIXEL: Player?.socialMedia?.links?.HYPIXEL?.toLowerCase() || null,
-    DISCORD: Player?.socialMedia?.links?.DISCORD?.toLowerCase() || null,
-    YOUTUBE: Player?.socialMedia?.links?.YOUTUBE?.toLowerCase() || null,
-    TWITCH: Player?.socialMedia?.links?.TWITCH?.toLowerCase() || null,
-    TWITTER: Player?.socialMedia?.links?.TWITTER?.toLowerCase() || null,
-    INSTAGRAM: Player?.socialMedia?.links?.INSTAGRAM?.toLowerCase() || null,
-    TIKTOK: Player?.socialMedia?.links?.TIKTOK?.toLowerCase() || null,
-  };
-
-  player["stats"] = {
-    Bedwars: formatBedwars(Player?.stats?.Bedwars),
-    Skywars: formatSkywars(Player?.stats?.SkyWars),
-    Duels: formatDuels(Player?.stats?.Duels),
-    Skyblock: formatSkyblock(Player?.stats?.SkyBlock),
-    Arcade: formatArcade(Player?.stats?.Arcade),
-    Arena: formatArena(Player?.stats?.Arena),
-    Warlords: formatWarlords(Player?.stats?.Battleground),
-    BuildBattle: formatBuildBattle(Player?.stats?.BuildBattle),
-    TKR: formatTKR(Player?.stats?.GingerBread),
-    MurderMystery: formatMurderMystery(Player?.stats?.MurderMystery),
-    Pit: await formatPit(Player?.stats?.Pit),
-    TNT: formatTNT(Player?.stats?.TNTGAMES),
-    Blitz: formatBlitz(Player?.stats?.HungerGames),
-    CvC: formatCopsAndCrims(Player?.stats?.MCGO),
-    Paintball: formatPaintball(Player?.stats?.Paintball),
-    Quake: formatQuake(Player?.stats?.Quake),
-    SpeedUHC: formatSpeedUHC(Player?.stats?.SpeedUHC),
-    Smash: formatSmash(Player?.stats?.SuperSmash),
-    Walls: formatWalls(Player?.stats?.Walls),
-    MegaWalls: formatMegaWalls(Player?.stats?.["Walls3"]),
-    VampireZ: formatVampireZ(Player?.stats?.VampireZ),
-    Woolwars: formatWoolwars(Player?.stats?.WoolGames),
-  };
-
   return player;
 };
 
@@ -2024,9 +2022,7 @@ export const formatGuild = (Guild: any) => {
       guild.memberCount++;
 
       for (const day of Object.keys(currentMember.EXPHistory)) {
-        if (guild.EXPHistory[day] === undefined) {
-          guild.EXPHistory[day] = 0;
-        }
+        if (guild.EXPHistory[day] === undefined) guild.EXPHistory[day] = 0;
         guild.EXPHistory[day] += currentMember.EXPHistory[day];
       }
     }
