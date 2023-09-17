@@ -813,7 +813,7 @@ const formatSkyblock = (skyblock: any) => {
   for (const profile of Object.keys(skyblock?.profiles || {})) {
     profiles.push({ ID: formatUUID(skyblock.profiles[profile]["profile_id"]), cuteName: skyblock.profiles[profile]["cute_name"] });
   }
-  return { profiles: profiles };
+  return { profiles };
 };
 
 const formatArcade = (arcade: any) => {
@@ -1076,9 +1076,7 @@ const formatWarlords = (battleground: any) => {
 };
 
 const formatBuildBattle = (buildBattle: any) => {
-  ///////////////////////////////////////////////////////////////////////////
-  //     fromEntries(), pickKeys() and themeRating is from Slothpixel      //
-  ///////////////////////////////////////////////////////////////////////////
+  // Credits to Slothpixel for fromEntries(), pickKeys() and themeRating
   const fromEntries = (array: any[]) => {
     return array.reduce((object: any, [key, value]: any) => {
       object[key] = value;
@@ -1090,7 +1088,6 @@ const formatBuildBattle = (buildBattle: any) => {
     const filter = options.filter || (() => true);
     const keyMap = options.keyMap || ((key: any) => key);
     const valueMap = options.valueMap || ((value: any) => value);
-
     return fromEntries(
       Object.entries(object)
         .filter(([key, value]) => regexp.test(key) && filter(key, value))
@@ -1101,6 +1098,7 @@ const formatBuildBattle = (buildBattle: any) => {
     regexp: /votes_.*/,
     keyMap: (key: any) => key.replace("votes_", ""),
   });
+
   return {
     coins: buildBattle?.coins || 0,
     score: buildBattle?.score || 0,
@@ -1440,7 +1438,7 @@ const formatBlitz = (hungerGames: any) => {
   };
 };
 
-const formatCopsAndCrims = (MCGO: any) => {
+const formatCvC = (MCGO: any) => {
   return {
     coins: MCGO?.coins || 0,
     wins: MCGO?.game_wins || 0,
@@ -1758,16 +1756,12 @@ const formatWalls = (walls: any) => {
       finalForm: walls?.final_form || 0,
       fortune: walls?.fortune || 0,
       haste: walls?.haste || 0,
-      opportunit: walls?.opportunity || 0,
-      shoutCoun: walls?.shout_count || 0,
+      opportunity: walls?.opportunity || 0,
+      shoutCount: walls?.shout_count || 0,
       swift: walls?.swift || 0,
       tenacity: walls?.tenacity || 0,
       vampirism: walls?.vampirism || 0,
       vitality: walls?.vitality || 0,
-    },
-    votes: {
-      egypt: walls?.votes_Egypt || 0,
-      loveland: walls?.votes_LoveLand || 0,
     },
   };
 };
@@ -1869,11 +1863,11 @@ const formatWoolwars = (woolGames: any) => {
   };
 };
 
-export const formatPlayer = async (Player: any) => {
-  const rank = parseRank(Player.rank, Player.packageRank, Player.newPackageRank, Player.monthlyPackageRank, Player.prefix);
+export const formatPlayer = async (player: any) => {
+  const rank = parseRank(player.rank, player.packageRank, player.newPackageRank, player.monthlyPackageRank, player.prefix);
   var online = null;
-  if (Player?.lastLogout && Player?.lastLogin) {
-    if (Player.lastLogout < Player.lastLogin) {
+  if (player?.lastLogout && player?.lastLogin) {
+    if (player.lastLogout < player.lastLogin) {
       online = true;
     } else {
       online = false;
@@ -1881,82 +1875,79 @@ export const formatPlayer = async (Player: any) => {
   }
 
   var questsCompleted = 0;
-
   type questObject = { completions: { time: number }[]; active: { objectives: { [key: string]: number }; started: number } }[];
-
-  if (Player?.quests) {
-    for (const quest of Object.values(Player.quests) as questObject) {
+  if (player?.quests) {
+    for (const quest of Object.values(player.quests) as questObject) {
       questsCompleted += quest?.completions?.length || 0;
     }
   }
 
-  const player = {
-    UUID: Player.uuid,
-    username: Player.displayname,
+  return {
+    UUID: player.uuid,
+    username: player.displayname,
     rank: rank,
-    plusColor: parsePlusColor(Player.rankPlusColor, rank),
-    plusPlusColor: parsePlusPlusColor(Player.monthlyRankColor, rank),
-    EXP: Player?.networkExp || 0,
-    level: (Math.sqrt((Player?.networkExp || 0) + 15312.5) - 125 / Math.sqrt(2)) / (25 * Math.sqrt(2)),
-    karma: Player?.karma || 0,
-    achievementPoints: Player?.achievementPoints || 0,
+    plusColor: parsePlusColor(player.rankPlusColor, rank),
+    plusPlusColor: parsePlusPlusColor(player.monthlyRankColor, rank),
+    EXP: player?.networkExp || 0,
+    level: (Math.sqrt((player?.networkExp || 0) + 15312.5) - 125 / Math.sqrt(2)) / (25 * Math.sqrt(2)),
+    karma: player?.karma || 0,
+    achievementPoints: player?.achievementPoints || 0,
     questsCompleted: questsCompleted,
-    challengesCompleted: Object.values(Player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0),
+    challengesCompleted: Object.values(player?.challenges?.["all_time"] || {}).reduce((a: any, b: any) => a + b, 0),
     online: online,
-    firstLogin: Player?.firstLogin ? Math.floor(Player.firstLogin / 1000) : null,
-    lastLogin: Player?.lastLogin ? Math.floor(Player.lastLogin / 1000) : null,
-    lastLogout: Player?.lastLogout ? Math.floor(Player.lastLogout / 1000) : null,
-    language: Player?.userLanguage || "ENGLISH",
-    chatChannel: Player?.channel || "ALL",
-    giftsSent: Player?.giftingMeta?.realBundlesGiven || 0,
-    giftsReceived: Player?.giftingMeta?.realBundlesReceived || 0,
-    ranksGifted: Player?.giftingMeta?.ranksGiven || 0,
+    firstLogin: player?.firstLogin ? Math.floor(player.firstLogin / 1000) : null,
+    lastLogin: player?.lastLogin ? Math.floor(player.lastLogin / 1000) : null,
+    lastLogout: player?.lastLogout ? Math.floor(player.lastLogout / 1000) : null,
+    language: player?.userLanguage || "ENGLISH",
+    chatChannel: player?.channel || "ALL",
+    giftsSent: player?.giftingMeta?.realBundlesGiven || 0,
+    giftsReceived: player?.giftingMeta?.realBundlesReceived || 0,
+    ranksGifted: player?.giftingMeta?.ranksGiven || 0,
     APISettings: {
-      onlineStatus: Player?.lastLogin,
-      winstreaks: !(Player?.stats?.Bedwars?.games_played_bedwars !== undefined && Player?.stats?.Bedwars?.winstreak === undefined),
+      onlineStatus: player?.lastLogin,
+      winstreaks: !(player?.stats?.Bedwars?.games_played_bedwars !== undefined && player?.stats?.Bedwars?.winstreak === undefined),
     },
     rewards: {
-      streak: Player?.rewardScore || 0,
-      highestStreak: Player?.rewardHighScore || 0,
-      claimedTotal: Player?.totalRewards || 0,
-      claimedDaily: Player?.totalDailyRewards || 0,
-      tokens: Player?.adsense_tokens || 0,
+      streak: player?.rewardScore || 0,
+      highestStreak: player?.rewardHighScore || 0,
+      claimedTotal: player?.totalRewards || 0,
+      claimedDaily: player?.totalDailyRewards || 0,
+      tokens: player?.adsense_tokens || 0,
     },
     socialMedia: {
-      HYPIXEL: Player?.socialMedia?.links?.HYPIXEL?.toLowerCase() || null,
-      DISCORD: Player?.socialMedia?.links?.DISCORD?.toLowerCase() || null,
-      YOUTUBE: Player?.socialMedia?.links?.YOUTUBE?.toLowerCase() || null,
-      TWITCH: Player?.socialMedia?.links?.TWITCH?.toLowerCase() || null,
-      TWITTER: Player?.socialMedia?.links?.TWITTER?.toLowerCase() || null,
-      INSTAGRAM: Player?.socialMedia?.links?.INSTAGRAM?.toLowerCase() || null,
-      TIKTOK: Player?.socialMedia?.links?.TIKTOK?.toLowerCase() || null,
+      HYPIXEL: player?.socialMedia?.links?.HYPIXEL?.toLowerCase() || null,
+      DISCORD: player?.socialMedia?.links?.DISCORD?.toLowerCase() || null,
+      YOUTUBE: player?.socialMedia?.links?.YOUTUBE?.toLowerCase() || null,
+      TWITCH: player?.socialMedia?.links?.TWITCH?.toLowerCase() || null,
+      TWITTER: player?.socialMedia?.links?.TWITTER?.toLowerCase() || null,
+      INSTAGRAM: player?.socialMedia?.links?.INSTAGRAM?.toLowerCase() || null,
+      TIKTOK: player?.socialMedia?.links?.TIKTOK?.toLowerCase() || null,
     },
     stats: {
-      Bedwars: formatBedwars(Player?.stats?.Bedwars),
-      Skywars: formatSkywars(Player?.stats?.SkyWars),
-      Duels: formatDuels(Player?.stats?.Duels),
-      Skyblock: formatSkyblock(Player?.stats?.SkyBlock),
-      Arcade: formatArcade(Player?.stats?.Arcade),
-      Arena: formatArena(Player?.stats?.Arena),
-      Warlords: formatWarlords(Player?.stats?.Battleground),
-      BuildBattle: formatBuildBattle(Player?.stats?.BuildBattle),
-      TKR: formatTKR(Player?.stats?.GingerBread),
-      MurderMystery: formatMurderMystery(Player?.stats?.MurderMystery),
-      Pit: await formatPit(Player?.stats?.Pit),
-      TNT: formatTNT(Player?.stats?.TNTGAMES),
-      Blitz: formatBlitz(Player?.stats?.HungerGames),
-      CvC: formatCopsAndCrims(Player?.stats?.MCGO),
-      Paintball: formatPaintball(Player?.stats?.Paintball),
-      Quake: formatQuake(Player?.stats?.Quake),
-      SpeedUHC: formatSpeedUHC(Player?.stats?.SpeedUHC),
-      Smash: formatSmash(Player?.stats?.SuperSmash),
-      Walls: formatWalls(Player?.stats?.Walls),
-      MegaWalls: formatMegaWalls(Player?.stats?.["Walls3"]),
-      VampireZ: formatVampireZ(Player?.stats?.VampireZ),
-      Woolwars: formatWoolwars(Player?.stats?.WoolGames),
+      Bedwars: formatBedwars(player?.stats?.Bedwars),
+      Skywars: formatSkywars(player?.stats?.SkyWars),
+      Duels: formatDuels(player?.stats?.Duels),
+      Skyblock: formatSkyblock(player?.stats?.SkyBlock),
+      Arcade: formatArcade(player?.stats?.Arcade),
+      Arena: formatArena(player?.stats?.Arena),
+      Warlords: formatWarlords(player?.stats?.Battleground),
+      BuildBattle: formatBuildBattle(player?.stats?.BuildBattle),
+      TKR: formatTKR(player?.stats?.GingerBread),
+      MurderMystery: formatMurderMystery(player?.stats?.MurderMystery),
+      Pit: await formatPit(player?.stats?.Pit),
+      TNT: formatTNT(player?.stats?.TNTGAMES),
+      Blitz: formatBlitz(player?.stats?.HungerGames),
+      CvC: formatCvC(player?.stats?.MCGO),
+      Paintball: formatPaintball(player?.stats?.Paintball),
+      Quake: formatQuake(player?.stats?.Quake),
+      SpeedUHC: formatSpeedUHC(player?.stats?.SpeedUHC),
+      Smash: formatSmash(player?.stats?.SuperSmash),
+      Walls: formatWalls(player?.stats?.Walls),
+      MegaWalls: formatMegaWalls(player?.stats?.["Walls3"]),
+      VampireZ: formatVampireZ(player?.stats?.VampireZ),
+      Woolwars: formatWoolwars(player?.stats?.WoolGames),
     },
   };
-  return player;
 };
 
 export const formatGuild = (Guild: any) => {
@@ -1977,32 +1968,10 @@ export const formatGuild = (Guild: any) => {
     return 1000;
   };
 
-  const guild: any = {
-    ID: Guild._id,
-    created: Guild?.created ? Math.floor(Guild.created / 1000) : null,
-    name: Guild.name,
-    description: Guild?.description || null,
-    publiclyListed: Guild?.publiclyListed || false,
-    tag: Guild?.tag || null,
-    tagColor: Guild?.tagColor || null,
-    EXP: Guild?.exp || 0,
-    EXPHistory: {},
-    level: getLevel(Guild?.exp || 0),
-    ranks: [],
-    memberCount: 0,
-    members: [],
-    preferredGames: Guild?.preferredGames || [],
-    EXPPerGame: Guild?.guildExpByGameType || {},
-    achievements: {
-      experienceKings: Guild?.achievements?.EXPERIENCE_KINGS || 0,
-      winners: Guild?.achievements?.WINNERS || 0,
-      onlinePlayers: Guild?.achievements?.ONLINE_PLAYERS || 0,
-    },
-  };
-
+  const ranks = [];
   if (Guild?.ranks) {
     for (const rank of Guild.ranks.sort((a: any, b: any) => parseFloat(b.priority) - parseFloat(a.priority))) {
-      guild.ranks.push({
+      ranks.push({
         name: rank.name,
         tag: rank.tag,
         default: rank.default,
@@ -2012,6 +1981,9 @@ export const formatGuild = (Guild: any) => {
     }
   }
 
+  const members = [];
+  var memberCount = 0;
+  const EXPHistory: { [key: string]: number } = {};
   if (Guild?.members) {
     for (const member of Guild.members) {
       const currentMember = {
@@ -2022,14 +1994,36 @@ export const formatGuild = (Guild: any) => {
         EXPHistory: member?.expHistory || {},
         mutedTill: member?.mutedTill || null,
       };
-      guild.members.push(currentMember);
-      guild.memberCount++;
+      members.push(currentMember);
+      memberCount++;
 
       for (const day of Object.keys(currentMember.EXPHistory)) {
-        if (guild.EXPHistory[day] === undefined) guild.EXPHistory[day] = 0;
-        guild.EXPHistory[day] += currentMember.EXPHistory[day];
+        if (EXPHistory[day] === undefined) EXPHistory[day] = 0;
+        EXPHistory[day] += currentMember.EXPHistory[day];
       }
     }
   }
-  return guild;
+
+  return {
+    ID: Guild._id,
+    created: Guild?.created ? Math.floor(Guild.created / 1000) : null,
+    name: Guild.name,
+    description: Guild?.description || null,
+    publiclyListed: Guild?.publiclyListed || false,
+    tag: Guild?.tag || null,
+    tagColor: Guild?.tagColor || null,
+    EXP: Guild?.exp || 0,
+    EXPHistory: {},
+    level: getLevel(Guild?.exp || 0),
+    ranks: ranks,
+    memberCount: memberCount,
+    members: members,
+    preferredGames: Guild?.preferredGames || [],
+    EXPPerGame: Guild?.guildExpByGameType || {},
+    achievements: {
+      experienceKings: Guild?.achievements?.EXPERIENCE_KINGS || 0,
+      winners: Guild?.achievements?.WINNERS || 0,
+      onlinePlayers: Guild?.achievements?.ONLINE_PLAYERS || 0,
+    },
+  };
 };
