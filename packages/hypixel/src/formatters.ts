@@ -2014,7 +2014,7 @@ export const formatGuild = (guild: any) => {
     tag: guild?.tag || null,
     tagColor: guild?.tagColor || null,
     EXP: guild?.exp || 0,
-    EXPHistory: {},
+    EXPHistory: EXPHistory,
     level: getLevel(guild?.exp || 0),
     ranks: ranks,
     memberCount: memberCount,
