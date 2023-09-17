@@ -1879,9 +1879,13 @@ export const formatPlayer = async (Player: any) => {
       online = false;
     }
   }
+
   var questsCompleted = 0;
+
+  type questObject = { completions: { time: number }[]; active: { objectives: { [key: string]: number }; started: number } }[];
+
   if (Player?.quests) {
-    for (const quest of Player.quests) {
+    for (const quest of Object.values(Player.quests) as questObject) {
       questsCompleted += quest?.completions?.length || 0;
     }
   }
