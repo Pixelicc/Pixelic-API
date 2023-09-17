@@ -1898,6 +1898,7 @@ export const formatPlayer = async (player: any) => {
     firstLogin: player?.firstLogin ? Math.floor(player.firstLogin / 1000) : null,
     lastLogin: player?.lastLogin ? Math.floor(player.lastLogin / 1000) : null,
     lastLogout: player?.lastLogout ? Math.floor(player.lastLogout / 1000) : null,
+    lastModePlayed: player?.mostRecentGameType || null,
     language: player?.userLanguage || "ENGLISH",
     chatChannel: player?.channel || "ALL",
     giftsSent: player?.giftingMeta?.realBundlesGiven || 0,
