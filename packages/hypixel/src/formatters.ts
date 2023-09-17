@@ -1950,7 +1950,7 @@ export const formatPlayer = async (player: any) => {
   };
 };
 
-export const formatGuild = (Guild: any) => {
+export const formatGuild = (guild: any) => {
   const getLevel = (EXP: number) => {
     const reqs = [100000, 150000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 2000000, 2500000, 2500000, 2500000, 2500000, 2500000, 3000000];
     var level = 0;
@@ -1969,8 +1969,8 @@ export const formatGuild = (Guild: any) => {
   };
 
   const ranks = [];
-  if (Guild?.ranks) {
-    for (const rank of Guild.ranks.sort((a: any, b: any) => parseFloat(b.priority) - parseFloat(a.priority))) {
+  if (guild?.ranks) {
+    for (const rank of guild.ranks.sort((a: any, b: any) => parseFloat(b.priority) - parseFloat(a.priority))) {
       ranks.push({
         name: rank.name,
         tag: rank.tag,
@@ -1984,8 +1984,8 @@ export const formatGuild = (Guild: any) => {
   const members = [];
   var memberCount = 0;
   const EXPHistory: { [key: string]: number } = {};
-  if (Guild?.members) {
-    for (const member of Guild.members) {
+  if (guild?.members) {
+    for (const member of guild.members) {
       const currentMember = {
         UUID: formatUUID(member.uuid),
         rank: member.rank,
@@ -2005,25 +2005,25 @@ export const formatGuild = (Guild: any) => {
   }
 
   return {
-    ID: Guild._id,
-    created: Guild?.created ? Math.floor(Guild.created / 1000) : null,
-    name: Guild.name,
-    description: Guild?.description || null,
-    publiclyListed: Guild?.publiclyListed || false,
-    tag: Guild?.tag || null,
-    tagColor: Guild?.tagColor || null,
-    EXP: Guild?.exp || 0,
+    ID: guild._id,
+    created: guild?.created ? Math.floor(guild.created / 1000) : null,
+    name: guild.name,
+    description: guild?.description || null,
+    publiclyListed: guild?.publiclyListed || false,
+    tag: guild?.tag || null,
+    tagColor: guild?.tagColor || null,
+    EXP: guild?.exp || 0,
     EXPHistory: {},
-    level: getLevel(Guild?.exp || 0),
+    level: getLevel(guild?.exp || 0),
     ranks: ranks,
     memberCount: memberCount,
     members: members,
-    preferredGames: Guild?.preferredGames || [],
-    EXPPerGame: Guild?.guildExpByGameType || {},
+    preferredGames: guild?.preferredGames || [],
+    EXPPerGame: guild?.guildExpByGameType || {},
     achievements: {
-      experienceKings: Guild?.achievements?.EXPERIENCE_KINGS || 0,
-      winners: Guild?.achievements?.WINNERS || 0,
-      onlinePlayers: Guild?.achievements?.ONLINE_PLAYERS || 0,
+      experienceKings: guild?.achievements?.EXPERIENCE_KINGS || 0,
+      winners: guild?.achievements?.WINNERS || 0,
+      onlinePlayers: guild?.achievements?.ONLINE_PLAYERS || 0,
     },
   };
 };
