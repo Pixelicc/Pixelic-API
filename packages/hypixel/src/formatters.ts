@@ -1905,7 +1905,7 @@ export const formatPlayer = async (player: any) => {
     giftsReceived: player?.giftingMeta?.realBundlesReceived || 0,
     ranksGifted: player?.giftingMeta?.ranksGiven || 0,
     APISettings: {
-      onlineStatus: player?.lastLogin,
+      onlineStatus: player?.lastLogin !== undefined,
       winstreaks: !(player?.stats?.Bedwars?.games_played_bedwars !== undefined && player?.stats?.Bedwars?.winstreak === undefined),
     },
     rewards: {
