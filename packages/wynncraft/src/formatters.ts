@@ -40,7 +40,7 @@ export const formatGuild = (guild: any) => {
     name: guild.name,
     prefix: guild?.prefix || null,
     members: members,
-    GEXP: guild?.xp || 0,
+    XP: guild?.xp || 0,
     level: guild?.level || 0,
     created: guild?.created ? Math.floor(new Date(guild?.created).valueOf() / 1000) : null,
     territories: guild?.territories || 0,

@@ -23,7 +23,7 @@ const guildSchema = new Schema({
       joined: { type: Number },
     },
   ],
-  GEXP: {
+  XP: {
     type: Number,
     required: true,
   },
