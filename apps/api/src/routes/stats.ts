@@ -45,7 +45,7 @@ router.get("/v1/stats/repo", async (req, res) => {
   res.set("Cache-Control", "public, max-age=3600");
   if (await redis.exists("API:Cache:Repo-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Repo-Stats")) as string) });
   axios
-    .get("https://api.github.com/repos/pixelicc/pixelic-overlay")
+    .get("https://api.github.com/repos/pixelicc/pixelic-api")
     .then(async (github) => {
       const parsed = {
         ID: github.data.id,
