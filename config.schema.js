@@ -52,6 +52,32 @@ export default {
      * @default Production Keys: 600
      */
     limit: 300,
+    /**
+     * Wether to persist general data in MongoDB
+     */
+    persistData: true,
+    /**
+     * Wether to persist historical data in MongoDB
+     */
+    persistHistoricalData: true,
+    /**
+     * Wether to cache API responses in Redis
+     */
+    cache: true,
+  },
+  wynncraft: {
+    /**
+     * Wether to persist general data in MongoDB
+     */
+    persistData: true,
+    /**
+     * Wether to persist historical data in MongoDB
+     */
+    persistHistoricalData: true,
+    /**
+     * Wether to cache API responses in Redis
+     */
+    cache: true,
   },
   /**
    * The current environment the code is running in
