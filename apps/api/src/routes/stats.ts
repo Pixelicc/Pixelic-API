@@ -8,7 +8,7 @@ import { formatBytes, formatNumber } from "@pixelic/utils";
 const router = express.Router();
 
 router.get("/v1/stats/code", async (req, res) => {
-  res.set("Cache-Control", "public, max-age=3600");
+  res.set("Cache-Control", "public, max-age=300");
   if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
   exec("pnpm exec cloc --json --docstring-as-code --include-lang=TypeScript,JavaScript --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
     if (error || stderr) return res.status(501).json({ success: false });
@@ -33,7 +33,7 @@ router.get("/v1/stats/code", async (req, res) => {
     }
 
     const parsed = { languages, ...total };
-    await redis.setex("API:Cache:Code-Stats", 3600, JSON.stringify(parsed));
+    await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
     return res.json({
       success: true,
       ...parsed,
@@ -42,7 +42,7 @@ router.get("/v1/stats/code", async (req, res) => {
 });
 
 router.get("/v1/stats/repo", async (req, res) => {
-  res.set("Cache-Control", "public, max-age=3600");
+  res.set("Cache-Control", "public, max-age=300");
   if (await redis.exists("API:Cache:Repo-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Repo-Stats")) as string) });
   axios
     .get("https://api.github.com/repos/pixelicc/pixelic-api")
