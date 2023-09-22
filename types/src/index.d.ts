@@ -1,6 +1,6 @@
 export interface APIKeyRedis {
   owner: string;
-  type: undefined | string;
+  type: undefined | "CUSTOM" | "STAFF" | "ADMIN";
   limit: string;
   lastRequest: number | string;
   requestsLastPeriod: number;
