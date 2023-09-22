@@ -1,6 +1,9 @@
+// If you want to add futher custom scopes just do it by adding `| "YOUR-SCOPE"` to the type below
+export type APIKeyScope = "";
 export interface APIKeyRedis {
   owner: string;
-  type: undefined | "CUSTOM" | "STAFF" | "ADMIN";
+  type?: "CUSTOM" | "STAFF" | "ADMIN";
+  scopes?: APIKeyScope[];
   limit: string;
   lastRequest: number | string;
   requestsLastPeriod: number;
@@ -32,3 +35,5 @@ export interface APIKeyMongo {
 }
 
 export type APIKey = APIKeyMongo & APIKeyRedis;
+
+export type RequireOneObjParam<T> = { [K in keyof T]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<keyof T, K>>> }[keyof T];

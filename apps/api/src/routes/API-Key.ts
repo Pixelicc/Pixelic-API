@@ -25,6 +25,7 @@ router.get("/v1/key", ratelimit(), async (req, res) => {
     success: true,
     owner: redisData.owner,
     type: redisData?.type || "DEFAULT",
+    scopes: redisData?.scopes || [],
     totalRequests: redisData.requests,
     usageHistory: mongoData.usageHistory,
     IPHistory: redisData.IPHistory,
@@ -46,7 +47,7 @@ router.get("/v1/key/usage", ratelimit(), async (req, res) => {
   });
 });
 
-router.post("/v1/key", authorization("ADMIN"), async (req, res) => {
+router.post("/v1/key", authorization({ type: "ADMIN" }), async (req, res) => {
   if (await redis.exists(`API:Users:${String(req.query.owner)}`)) return res.status(422).json({ success: false, cause: "This user already has an API-Key" });
   if (!req.query.owner) return res.status(422).json({ success: false, cause: "Invalid Owner" });
 
