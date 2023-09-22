@@ -2,4 +2,8 @@ import mongoose from "mongoose";
 import { config } from "@pixelic/utils";
 
 mongoose.pluralize(null);
-export const client = mongoose.createConnection(config.database.mongoDB);
+
+const connection = mongoose.createConnection(config.database.mongoDB);
+connection.setMaxListeners(0);
+
+export const client = connection;
