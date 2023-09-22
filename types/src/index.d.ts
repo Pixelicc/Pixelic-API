@@ -1,5 +1,6 @@
 // If you want to add futher custom scopes just do it by adding `| "YOUR-SCOPE"` to the type below
 export type APIKeyScope = "";
+
 export interface APIKeyRedis {
   owner: string;
   type?: "CUSTOM" | "STAFF" | "ADMIN";

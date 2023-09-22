@@ -1,10 +1,9 @@
 import express from "express";
 import { authorization, ratelimit } from "@pixelic/middlewares";
 import redis from "@pixelic/redis";
-import { formatUUID, generateUUID } from "@pixelic/utils";
+import { decodeULIDTime, formatUUID, generateUUID } from "@pixelic/utils";
 import { APIKeyModel } from "@pixelic/mongo";
 import { APIKeyMongo, APIKeyRedis } from "@pixelic/types";
-import { decodeTime } from "ulidx";
 
 const router = express.Router();
 
@@ -14,7 +13,7 @@ router.get("/v1/key", ratelimit(), async (req, res) => {
 
   const parsedRequestHistory: {}[] = [];
   for (const request of mongoData.requestHistory.reverse()) {
-    parsedRequestHistory.push({ ...request, timestamp: Math.floor(decodeTime(request.ID || String(res.get("X-Request-ID"))) / 1000) });
+    parsedRequestHistory.push({ ...request, timestamp: Math.floor(decodeULIDTime(request.ID || String(res.get("X-Request-ID"))) / 1000) });
   }
 
   redisData.keyHistory[redisData.keyHistory.length - 1].requests = redisData.requests - redisData.keyHistory.reduce((n, { requests }) => n + requests, 0);

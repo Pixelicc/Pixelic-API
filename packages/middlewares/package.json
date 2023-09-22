@@ -8,7 +8,6 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
-    "ulidx": "^2.1.0",
     "@pixelic/utils": "*",
     "@pixelic/logger": "*",
     "@pixelic/redis": "*",
@@ -17,7 +16,6 @@
     "@sentry/node": "^7.65.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/uuid": "^9.0.2"
+    "@types/express": "^4.17.17"
   }
 }
