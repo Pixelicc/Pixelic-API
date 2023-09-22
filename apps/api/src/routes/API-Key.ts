@@ -33,6 +33,19 @@ router.get("/v1/key", ratelimit(), async (req, res) => {
   });
 });
 
+router.get("/v1/key/usage", ratelimit(), async (req, res) => {
+  const redisData: APIKeyRedis = JSON.parse((await redis.call("JSON.GET", `API:Keys:${formatUUID(String(req.headers["x-api-key"]))}`, "$")) as string)[0];
+  const mongoData: APIKeyMongo = (await APIKeyModel.findOne({ owner: redisData.owner }, ["usageHistory"]).lean()) || { owner: redisData.owner, usageHistory: {}, requestHistory: [] };
+
+  res.set("Cache-Control", "public, max-age=0");
+
+  return res.json({
+    success: true,
+    totalRequests: redisData.requests,
+    usageHistory: mongoData.usageHistory,
+  });
+});
+
 router.post("/v1/key", authorization("ADMIN"), async (req, res) => {
   if (await redis.exists(`API:Users:${String(req.query.owner)}`)) return res.status(422).json({ success: false, cause: "This user already has an API-Key" });
   if (!req.query.owner) return res.status(422).json({ success: false, cause: "Invalid Owner" });
