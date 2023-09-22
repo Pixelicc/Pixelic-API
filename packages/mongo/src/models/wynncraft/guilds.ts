@@ -36,7 +36,7 @@ const guildSchema = new Schema({
     required: true,
   },
   territories: {
-    type: String,
+    type: Number,
     required: true,
   },
   banner: {
