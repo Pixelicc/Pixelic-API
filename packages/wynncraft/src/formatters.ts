@@ -9,14 +9,14 @@ export const formatPlayer = (player: any) => {
   return {
     UUID: formatUUID(player.uuid),
     username: player.username,
-    playtime: player?.meta?.playtime || 0,
+    playtime: Math.floor((player?.meta?.playtime || 0) * 4.7),
     firstLogin: player?.meta?.firstJoin ? Math.floor(new Date(player?.meta?.firstJoin).valueOf() / 1000) : null,
     lastLogin: player?.meta?.lastJoin ? Math.floor(new Date(player?.meta?.lastJoin).valueOf() / 1000) : null,
     status: {
       online: player?.meta?.location?.online || false,
       server: player?.meta?.location?.server || null,
     },
-    rank: player?.rank?.toUpperCase() || "player",
+    rank: player?.rank?.toUpperCase() || "PLAYER",
     purchasedRank: player?.meta?.tag?.value?.toUpperCase() || null,
     veteran: player?.meta?.veteran || false,
     global: player?.global || {},
@@ -64,7 +64,7 @@ export const formatServerList = async (data: any) => {
     parsedData.push({
       name: server,
       playercount: data[server].length,
-      players: players.sort((a, b) => a.username.localeCompare(b.username)),
+      players: players.sort(),
     });
   }
   return parsedData;
@@ -78,7 +78,7 @@ export const formatTerritoryList = async (territories: any) => {
       guild: territories[territory].guild !== "Nobody" ? territories[territory].guild : null,
       guildPrefix: territories[territory].guildPrefix,
       attacker: territories[territory].attacker || null,
-      acquired: Math.floor(new Date(territories[territory].acquired).valueOf() / 1000),
+      acquired: territories[territory]?.acquired ? Math.floor(new Date(territories[territory].acquired).valueOf() / 1000) : null,
       location: territories[territory].location,
     });
   }
