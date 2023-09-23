@@ -18,7 +18,7 @@ An API focused on Minecraft related data
 - [`Node.js`](https://nodejs.org/en/download/current/) » For running code (`v20`)
 - [`pnpm`](https://pnpm.io/) » Installing packages and running scripts (`npm install -g pnpm`)
 - [`MongoDB`](https://www.mongodb.com/) » For persisting data
-- [`Redis`](https://redis.io/) » For caching data and frequently accessed data
+- [`Redis Stack`](https://redis.io/docs/about/about-stack/) » For caching data and frequently accessed data
 
 - [`Hypixel API-Key`](https://developer.hypixel.net/) » For requesting Hypixel data, visit the [Hypixel Developer Portal](https://developer.hypixel.net/)
 
