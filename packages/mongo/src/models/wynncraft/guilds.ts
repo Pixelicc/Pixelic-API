@@ -22,6 +22,7 @@ const guildSchema = new Schema({
       contributed: { type: Number },
       joined: { type: Number },
     },
+    { _id: false },
   ],
   XP: {
     type: Number,

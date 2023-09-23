@@ -20,6 +20,7 @@ const keySchema = new Schema<APIKeyMongo>({
       IP: { type: String },
       key: { type: String },
     },
+    { _id: false },
   ],
 });
 
