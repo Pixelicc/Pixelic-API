@@ -23,7 +23,7 @@ axiosRetry(axios, {
     log("Mojang", `Retrying to fetch Mojang Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2) * 5}s)`, "warn");
     return Math.pow(retryCount, 2) * 5000;
   },
-  retryCondition: async (error) => {
+  retryCondition: (error) => {
     return error?.response?.status === 429 || error?.response?.status === 502 || error?.response?.status === 503 || error?.response?.status === 504;
   },
 });
