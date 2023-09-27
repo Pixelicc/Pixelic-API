@@ -25,7 +25,7 @@ const errorTransport = new winston.transports.DailyRotateFile({
 
 const logger = winston.createLogger({ format: winston.format.json(), transports: [infoTransport, warningTransport, errorTransport] });
 
-export default (service: string, message: string, level: "info" | "warn" | "error", requestID?: string) => {
+export default (service: string, message: string, level: "info" | "warn" | "error", extra?: object) => {
   const date = `[${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}:${String(new Date().getSeconds()).padStart(2, "0")}]`;
 
   if (level === "info") console.log(`${chalk.white(date)} [${chalk.green(service)}] » ${chalk.blue(message)}`);
@@ -33,10 +33,10 @@ export default (service: string, message: string, level: "info" | "warn" | "erro
   if (level === "error") console.log(`${chalk.white(date)} [${chalk.green(service)}] » ${chalk.red(message)}`);
 
   logger.log({
-    level: level,
-    time: new Date().toLocaleString(),
-    service: service,
-    message: message,
-    requestID: requestID,
+    time: new Date().toJSON(),
+    level,
+    service,
+    message,
+    extra,
   });
 };
