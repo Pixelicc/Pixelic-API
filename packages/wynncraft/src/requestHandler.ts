@@ -28,8 +28,8 @@ axiosRetry(axios, {
 
 export const requestWynncraft = async (URL: string) => {
   try {
-    return await Limiter.schedule({ expiration: 10000 }, async () => {
-      const request = await axios.get(URL);
+    return await Limiter.schedule(async () => {
+      const request = await axios.get(URL, { timeout: 10000 });
       return request.data;
     });
   } catch {
