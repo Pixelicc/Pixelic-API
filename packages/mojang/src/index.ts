@@ -38,7 +38,7 @@ export const requestUUID = async (username: string) => {
         return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string);
       }
       log("Mojang", `Requested UUID of ${username}`, "info");
-      const request = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+      const request = await axios.get(`https://api.mojang.com/users/profiles/minecraft/${username}`, { timeout: 10000 });
       const data = { UUID: formatUUID(request.data.id), username: request.data.name };
       if ((await redis.zscore("Mojang:UUIDList", data.UUID)) === null) await redis.zadd("Mojang:UUIDList", Math.floor(Date.now() / 1000), data.UUID);
       await redis.setex(`Mojang:Cache:${request.data.name.toLowerCase()}`, 86400 * 30, JSON.stringify(data));
@@ -61,7 +61,7 @@ export const requestUsername = async (UUID: string) => {
         return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string);
       }
       log("Mojang", `Requested Username of ${UUID}`, "info");
-      const request = await axios.get(`https://api.mojang.com/user/profile/${UUID}`);
+      const request = await axios.get(`https://api.mojang.com/user/profile/${UUID}`, { timeout: 10000 });
       const data = { UUID: formatUUID(request.data.id), username: request.data.name };
       if ((await redis.zscore("Mojang:UUIDList", data.UUID)) === null) await redis.zadd("Mojang:UUIDList", Math.floor(Date.now() / 1000), data.UUID);
       await redis.setex(`Mojang:Cache:${request.data.name.toLowerCase()}`, 86400 * 30, JSON.stringify(data));
