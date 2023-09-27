@@ -32,7 +32,7 @@ export const requestUUID = async (username: string) => {
   username = username.toLowerCase();
   if (await redis.exists(`Mojang:Cache:${username}`)) return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string);
   try {
-    return await limiter.schedule({ expiration: 10000 }, async () => {
+    return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${username}`)) {
         limiter.incrementReservoir(1);
         return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string);
@@ -55,7 +55,7 @@ export const requestUsername = async (UUID: string) => {
   UUID = formatUUID(UUID);
   if (await redis.exists(`Mojang:Cache:${UUID}`)) return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string);
   try {
-    return await limiter.schedule({ expiration: 10000 }, async () => {
+    return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${UUID}`)) {
         limiter.incrementReservoir(1);
         return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string);
