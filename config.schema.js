@@ -78,6 +78,18 @@ export default {
      * Wether to cache API responses in Redis
      */
     cache: true,
+    /**
+     * List of supported **Discord** Webhooks
+     */
+    webhooks: {
+      /**
+       * Triggered once a new player gets added to the MongoDB Database (required persistData to be enabled)
+       */
+      newPlayerEvent: {
+        enabled: true,
+        URL: "",
+      },
+    },
   },
   /**
    * The current environment the code is running in

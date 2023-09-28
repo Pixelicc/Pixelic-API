@@ -3,21 +3,52 @@ import { requestWynncraft } from "./requestHandler.js";
 import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from "./formatters.js";
 import { config, dashUUID, deepCompare } from "@pixelic/utils";
 import redis from "@pixelic/redis";
+import axios from "axios";
 import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel } from "@pixelic/mongo";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);
   if (UUID === null) return "Invalid UUID or Username";
   try {
-    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:${UUID}`)) as string);
+    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
     const data = await requestWynncraft(`https://api.wynncraft.com/v2/player/${dashUUID(UUID)}/stats`);
     if (data.data.length === 0) return "This player never played on Wynncraft";
     const formattedData = formatPlayer(data.data[0]);
-    if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:${UUID}`, 300, JSON.stringify(formattedData));
-    if (config.wynncraft.persistData) await WynncraftPlayerModel.updateOne({ _id: UUID }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+    if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(formattedData));
+    if (config.wynncraft.persistData) {
+      const operation = await WynncraftPlayerModel.updateOne({ _id: UUID }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+      if (config.wynncraft.webhooks.newPlayerEvent.enabled && operation.upsertedId !== null) {
+        axios
+          .post(config.wynncraft.webhooks.newPlayerEvent.URL, {
+            username: "[Wynncraft]",
+            embeds: [
+              {
+                description: `
+                \`•\` **Trigger**: \`Event.newPlayer\`
+
+                \`•\` **Username**: \`${formattedData.username}\`
+                \`•\` **UUID**: \`${UUID}\`
+                \`•\` **Rank**: \`${formattedData.rank}\`
+                \`•\` **Purchased Rank**: \`${formattedData.purchasedRank}\`
+                \`•\` **Playtime**: \`${Math.floor(formattedData.playtime / 60)}h\`
+                `,
+                footer: {
+                  text: `Now storing ${(await WynncraftPlayerModel.estimatedDocumentCount()).toLocaleString("en-US")} Players`,
+                },
+                thumbnail: {
+                  url: `https://visage.surgeplay.com/bust/256/${UUID}`,
+                },
+                color: 12706241,
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          })
+          .catch(() => {});
+      }
+    }
     if (config.wynncraft.persistHistoricalData) {
       if ((await WynncraftHistoricalPlayerModel.exists({ UUID: UUID })) === null) {
-        await WynncraftHistoricalPlayerModel.create({ ...formattedData, timestamp: Math.floor(Date.now() / 1000) });
+        await WynncraftHistoricalPlayerModel.create(formattedData);
       } else {
         const lastDataPoint = await WynncraftHistoricalPlayerModel.findOne({
           UUID: UUID,
@@ -39,11 +70,11 @@ export const getPlayer = async (player: string) => {
 
 export const getGuild = async (guild: string) => {
   try {
-    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:${guild.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:${guild.toLowerCase()}`)) as string);
+    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`)) as string);
     const data = await requestWynncraft(`https://api.wynncraft.com/public_api.php?action=guildStats&command=${guild}`);
     if (data.error) return "This Guild does not exist";
     const formattedData = formatGuild(data);
-    if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:${guild.toLowerCase()}`, 300, JSON.stringify(formattedData));
+    if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`, 300, JSON.stringify(formattedData));
     if (config.wynncraft.persistData) await WynncraftGuildModel.updateOne({ _id: formattedData.name.toLowerCase() }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
     return formattedData;
   } catch {
