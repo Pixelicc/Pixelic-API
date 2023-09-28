@@ -17,8 +17,8 @@ export const deepCompare = (obj1: any, obj2: any) => {
   return Object.keys(obj2).reduce((result, key: any) => {
     if (obj1[key] !== obj2[key]) {
       if (typeof obj1[key] === "object" && typeof obj2[key] === "object") {
-        if (Array.isArray(obj1) && Array.isArray(obj2)) {
-          if (JSON.stringify(obj1.sort()) !== JSON.stringify(obj2.sort())) {
+        if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+          if (JSON.stringify(obj1[key].sort()) !== JSON.stringify(obj2[key].sort())) {
             result[key] = obj2[key];
           }
         } else {
