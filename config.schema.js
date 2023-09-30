@@ -64,6 +64,22 @@ export default {
      * Wether to cache API responses in Redis
      */
     cache: true,
+    webhooks: {
+      /**
+       * Triggered once a new player gets added to the MongoDB Database (required persistData to be enabled)
+       */
+      newPlayerEvent: {
+        enabled: false,
+        URL: "",
+      },
+      /**
+       * Triggered once a new guild gets added to the MongoDB Database (required persistData to be enabled)
+       */
+      newGuildEvent: {
+        enabled: false,
+        URL: "",
+      },
+    },
   },
   wynncraft: {
     /**
@@ -86,7 +102,14 @@ export default {
        * Triggered once a new player gets added to the MongoDB Database (required persistData to be enabled)
        */
       newPlayerEvent: {
-        enabled: true,
+        enabled: false,
+        URL: "",
+      },
+      /**
+       * Triggered once a new guild gets added to the MongoDB Database (required persistData to be enabled)
+       */
+      newGuildEvent: {
+        enabled: false,
         URL: "",
       },
     },
