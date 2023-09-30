@@ -16,5 +16,5 @@ if (cluster.isPrimary) {
   });
 } else {
   log("API", `Worker ${process.pid} started...`, "info");
-  import("./workers/API.js");
+  import("./API.js");
 }
