@@ -31,7 +31,10 @@ export const getPlayer = async (player: string) => {
                 \`•\` **Rank**: \`${formattedData.rank}\`
                 \`•\` **Purchased Rank**: \`${formattedData.purchasedRank}\`
                 \`•\` **Playtime**: \`${Math.floor(formattedData.playtime / 60)}h\`
-                `,
+                `
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .join("\n"),
                 footer: {
                   text: `Now storing ${(await WynncraftPlayerModel.estimatedDocumentCount()).toLocaleString("en-US")} Players`,
                 },
