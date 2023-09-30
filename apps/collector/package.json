@@ -1,0 +1,22 @@
+{
+  "name": "@pixelic/collector",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --enable-source-maps .",
+    "build": "swc src --config-file ../../.swcrc --out-dir dist"
+  },
+  "dependencies": {
+    "@pixelic/logger": "*",
+    "@pixelic/mojang": "*",
+    "@pixelic/mongo": "*",
+    "@pixelic/redis": "*",
+    "@pixelic/utils": "*",
+    "@pixelic/wynncraft": "*",
+    "@pixelic/hypixel": "*",
+    "@pixelic/types": "*",
+    "axios": "^1.4.0"
+  }
+}

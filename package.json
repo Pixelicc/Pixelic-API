@@ -10,7 +10,7 @@
   "scripts": {
     "build": "turbo run build --parallel --cache-dir=.turbo --no-daemon",
     "api": "pnpm --filter api",
-    "bot": "pnpm --filter bot"
+    "collector": "pnpm --filter collector"
   },
   "devDependencies": {
     "@swc/cli": "0.1.62",

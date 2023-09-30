@@ -76,6 +76,36 @@ importers:
         specifier: ^4.17.17
         version: 4.17.17
 
+  apps/collector:
+    dependencies:
+      '@pixelic/hypixel':
+        specifier: '*'
+        version: link:../../packages/hypixel
+      '@pixelic/logger':
+        specifier: '*'
+        version: link:../../packages/logger
+      '@pixelic/mojang':
+        specifier: '*'
+        version: link:../../packages/mojang
+      '@pixelic/mongo':
+        specifier: '*'
+        version: link:../../packages/mongo
+      '@pixelic/redis':
+        specifier: '*'
+        version: link:../../packages/redis
+      '@pixelic/types':
+        specifier: '*'
+        version: link:../../types
+      '@pixelic/utils':
+        specifier: '*'
+        version: link:../../packages/utils
+      '@pixelic/wynncraft':
+        specifier: '*'
+        version: link:../../packages/wynncraft
+      axios:
+        specifier: ^1.4.0
+        version: 1.4.0
+
   packages/hypixel:
     dependencies:
       '@pixelic/logger':
