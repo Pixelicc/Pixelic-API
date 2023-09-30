@@ -36,7 +36,6 @@ const itemSchema = new Schema(
     },
     reforge: {
       type: String,
-      required: true,
     },
     tier: {
       type: String,
@@ -48,6 +47,10 @@ const itemSchema = new Schema(
 );
 
 const auctionSchema = new Schema({
+  _id: {
+    type: String,
+    required: true,
+  },
   seller: {
     type: String,
     required: true,

@@ -6,7 +6,7 @@ import { requestHypixel } from "./requestHandler.js";
 import redis from "@pixelic/redis";
 import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockitems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
 import { HypixelActiveAuction, HypixelEndedAuction, RequireOneObjParam } from "@pixelic/types";
-import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
+import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);
@@ -168,7 +168,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
     const firstPage = (await axios.get("https://api.hypixel.net/skyblock/auctions")).data;
     log("Hypixel", `Fetching Hypixel Auctions (1/${firstPage.totalPages})`, "info");
     const pipeline = redis.pipeline();
-    firstPage.auctions.forEach(async (auction: HypixelActiveAuction) => {
+    await firstPage.auctions.forEach(async (auction: HypixelActiveAuction) => {
       const formattedData = await formatSkyblockActiveAuction(auction);
       pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
       pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
@@ -180,7 +180,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
       const page = (await axios.get(`https://api.hypixel.net/skyblock/auctions?page=${i}`)).data;
       log("Hypixel", `Fetching Hypixel Auctions (${i + 1}/${firstPage.totalPages})`, "info");
       const pipeline = redis.pipeline();
-      page.auctions.forEach(async (auction: HypixelActiveAuction) => {
+      await page.auctions.forEach(async (auction: HypixelActiveAuction) => {
         const formattedData = await formatSkyblockActiveAuction(auction);
         pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
         pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
@@ -222,14 +222,21 @@ export const querySkyblockActiveAuctions = async (query: string, limit?: number)
 
 export const getSkyblockEndedAuctions = async () => {
   try {
+    if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockEndedAuctions"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockEndedAuctions")) as string);
     const auctions: any[] = [];
     const data: HypixelEndedAuction[] = (await axios.get("https://api.hypixel.net/skyblock/auctions_ended")).data.auctions;
     log("Hypixel", "Fetched Ended Hypixel Auctions", "info");
     for (const auction of data) {
-      auctions.push(await formatSkyblockEndedAuction(auction));
+      const formattedData = await formatSkyblockEndedAuction(auction);
+      auctions.push(formattedData);
+      if (config.hypixel.persistData) {
+        await HypixelSkyblockAuctionModel.create({ _id: formattedData.UUID, ...formattedData }).catch(() => {});
+      }
     }
+    if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return auctions;
   } catch {
+    log("Hypixel", "Failed to fetch Hypixel Ended Auctions", "warn");
     return null;
   }
 };
