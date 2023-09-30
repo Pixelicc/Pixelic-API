@@ -2,7 +2,9 @@ import nbt from "prismarine-nbt";
 import util from "util";
 // @ts-ignore
 import minecraftItems from "minecraft-items";
-import { getRatio, formatUUID } from "@pixelic/utils";
+import { getRatio, formatUUID, decodeNBT } from "@pixelic/utils";
+import { HypixelActiveAuction, HypixelEndedAuction } from "@pixelic/types";
+import { getSkyblockItems } from "./index.js";
 
 const parseNbt = util.promisify(nbt.parse);
 
@@ -1118,7 +1120,7 @@ const formatBuildBattle = (buildBattle: any) => {
     selectedSuit: buildBattle?.new_suit || null,
     selectedMovementTrail: buildBattle?.active_movement_trail || null,
     selectedBackdrop: buildBattle?.selected_backdrop || null,
-    themeRatings: themeRatings,
+    themeRatings: themeRatings || {},
   };
 };
 
@@ -2026,5 +2028,186 @@ export const formatGuild = (guild: any) => {
       winners: guild?.achievements?.WINNERS || 0,
       onlinePlayers: guild?.achievements?.ONLINE_PLAYERS || 0,
     },
+  };
+};
+
+const formatSkyblockAuctionNBT = (NBT: any) => {
+  const rawTier = NBT.tag.display.Lore[NBT.tag.display.Lore.length - 1].toUpperCase();
+  var tier;
+
+  if (rawTier.includes("COMMON")) tier = "COMMON";
+  if (rawTier.includes("UNCOMMON")) tier = "UNCOMMON";
+  if (rawTier.includes("RARE")) tier = "RARE";
+  if (rawTier.includes("EPIC")) tier = "EPIC";
+  if (rawTier.includes("LEGENDARY")) tier = "LEGENDARY";
+  if (rawTier.includes("MYTHIC")) tier = "MYTHIC";
+  if (rawTier.includes("DIVINE")) tier = "DIVINE";
+  if (rawTier.includes("SPECIAL")) tier = "SPECIAL";
+  if (rawTier.includes("VERY SPECIAL")) tier = "VERY SPECIAL";
+  if (rawTier.includes("SUPREME")) tier = "DIVINE"; // This should never occure as SUPREME got replaced by DIVINE
+  if (rawTier.includes("ADMIN")) tier = "ADMIN"; // This should never occure
+
+  const item: any = {
+    count: NBT?.Count,
+    name: NBT?.tag.display.Name,
+    lore: NBT?.tag?.display.Lore,
+    color: NBT?.tag?.display.color,
+    tier: tier ? tier : null,
+    attributes: NBT?.tag?.ExtraAttributes,
+  };
+
+  if (item?.attributes?.modifier) {
+    item.reforge = item.attributes.modifier.toUpperCase();
+  }
+
+  if (NBT?.tag?.ExtraAttributes?.id === "PET") {
+    const petData = JSON.parse(NBT.tag.ExtraAttributes.petInfo);
+    item.attributes.ID = `PET_${petData.type}`;
+    item.attributes.EXP = petData.exp;
+    if (petData?.candyUsed) item.attributes.candyUsed = petData.candyUsed;
+    if (petData?.heldItem) item.attributes.heldItem = petData.heldItem;
+    if (petData?.skin) item.attributes.skin = petData.skin;
+    if (NBT?.tag?.ExtraAttributes?.timestamp) item.attributes.timestamp = (new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() - (new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() % 1000)) / 1000;
+
+    delete item.attributes.petInfo;
+  } else if (NBT?.tag?.ExtraAttributes?.id === "POTION") {
+    item.attributes.ID = `POTION_${String(NBT.tag.ExtraAttributes.potion).toUpperCase()}`;
+    item.attributes.duration = NBT?.tag?.ExtraAttributes?.effects?.[0]?.duration_ticks || 0;
+    item.attributes.splash = Boolean(item.attributes.splash);
+
+    delete item.attributes.potion_level;
+    delete item.attributes.potion;
+    delete item.attributes.effects;
+    delete item.attributes.potion_type;
+  } else if (NBT?.tag?.ExtraAttributes?.id === "RUNE") {
+    item.attributes.ID = `RUNE_${String(Object.keys(NBT.tag.ExtraAttributes.runes)[0]).toUpperCase()}`;
+    item.attributes.runeTier = NBT.tag.ExtraAttributes.runes[Object.keys(NBT.tag.ExtraAttributes.runes)[0]];
+    delete item.attributes.runes;
+  } else {
+    item.attributes = {
+      ...NBT.tag.ExtraAttributes,
+      ID: NBT.tag.ExtraAttributes.id,
+      UUID: NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : null,
+      texture: NBT?.SkullOwner?.Properties?.textures?.[0]?.Value,
+      timestamp: Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000) || null,
+    };
+  }
+
+  delete item.attributes.id;
+  delete item.attributes.uuid;
+  delete item.attributes.color;
+  delete item.attributes.originTag;
+  delete item.attributes.modifier;
+
+  return item;
+};
+
+export const formatSkyblockActiveAuction = async (auction: HypixelActiveAuction) => {
+  const NBT: any = await decodeNBT(Buffer.from(auction.item_bytes, "base64"));
+
+  const auctionBids = [];
+  for (const bid of auction.bids.sort((a, b) => a.amount - b.amount)) {
+    auctionBids.push({
+      bidder: bid.bidder,
+      profileID: bid.profile_id,
+      amount: bid.amount,
+      timestamp: Math.floor(bid.timestamp / 1000),
+    });
+  }
+
+  return {
+    UUID: auction.uuid,
+    seller: auction.auctioneer,
+    sellerProfile: auction.profile_id,
+    coop: auction.coop.length !== 1,
+    coopMembers: auction.coop.length !== 1 ? auction.coop : undefined,
+    started: Math.floor(auction.start / 1000),
+    ending: Math.floor(auction.end / 1000),
+    category: auction.category.toUpperCase(),
+    bin: auction.bin,
+    startingBid: auction.starting_bid,
+    highestBid: auction.bin ? auction.starting_bid : auction.highest_bid_amount,
+    bids: auctionBids,
+    item: formatSkyblockAuctionNBT(NBT),
+  };
+};
+
+export const formatSkyblockEndedAuction = async (auction: HypixelEndedAuction) => {
+  const NBT: any = await decodeNBT(Buffer.from(auction.item_bytes, "base64"));
+
+  return {
+    UUID: auction.auction_id,
+    seller: auction.seller,
+    sellerProfile: auction.seller_profile,
+    buyer: auction.buyer,
+    bin: auction.bin,
+    price: auction.price,
+    item: formatSkyblockAuctionNBT(NBT),
+    timestamp: Math.floor(auction.timestamp / 1000),
+  };
+};
+
+export const formatSkyblockBazaar = async (bazaar: any, { itemInfo }: { itemInfo?: boolean }) => {
+  const skyblockItems = itemInfo ? await getSkyblockItems() : {};
+  const formattedData: any = {};
+  for (const product of Object.keys(bazaar)) {
+    formattedData[product] = {
+      sellSummary: bazaar[product].sell_summary,
+      buySummary: bazaar[product].buy_summary,
+      quickStatus: {
+        sellPrice: Number(bazaar[product].quick_status.sellPrice.toFixed(1)),
+        sellVolume: bazaar[product].quick_status.sellVolume,
+        sellMovingWeek: bazaar[product].quick_status.sellMovingWeek,
+        sellOrders: bazaar[product].quick_status.sellOrders,
+        buyPrice: Number(bazaar[product].quick_status.buyPrice.toFixed(1)),
+        buyVolume: bazaar[product].quick_status.buyVolume,
+        buyMovingWeek: bazaar[product].quick_status.buyMovingWeek,
+        buyOrders: bazaar[product].quick_status.buyOrders,
+      },
+      item: itemInfo ? skyblockItems[product] : undefined,
+    };
+  }
+  return formattedData;
+};
+
+export const formatSkyblockitems = (items: any) => {
+  const formattedItems: any = {};
+  for (const item of items) {
+    const ID = item.id;
+    var texture;
+    if (item?.skin) texture = JSON.parse(Buffer.from(item.skin, "base64").toString())?.textures?.SKIN?.url?.split("/")?.slice(-1)?.[0];
+    delete item.skin;
+    delete item.id;
+    formattedItems[ID] = { ...item, texture };
+  }
+  return formattedItems;
+};
+
+export const formatSkyblockElection = (election: any) => {
+  const nextMayor = election.current.candidates.sort((a: any, b: any) => b.votes - a.votes)[0];
+  nextMayor.key = nextMayor.key.toUpperCase();
+
+  const currentElection: any = election.current;
+  currentElection.candidates = currentElection.candidates.sort((a: any, b: any) => b.votes - a.votes);
+  for (const candidate in currentElection.candidates) {
+    currentElection.candidates[candidate].key = currentElection.candidates[candidate].key.toUpperCase();
+  }
+
+  const lastElection: any = election.mayor.election;
+  lastElection.candidates = lastElection.candidates.sort((a: any, b: any) => b.votes - a.votes);
+  for (const candidate in currentElection.candidates) {
+    lastElection.candidates[candidate].key = lastElection.candidates[candidate].key.toUpperCase();
+  }
+
+  return {
+    currentMayor: {
+      key: election.mayor.key.toUpperCase(),
+      name: election.mayor.name,
+      perks: election.mayor.perks,
+      votes: currentElection.candidates[0].votes,
+    },
+    nextMayor,
+    currentElection,
+    lastElection,
   };
 };

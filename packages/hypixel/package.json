@@ -8,6 +8,7 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/types": "*",
     "@pixelic/logger": "*",
     "@pixelic/mojang": "*",
     "@pixelic/mongo": "*",

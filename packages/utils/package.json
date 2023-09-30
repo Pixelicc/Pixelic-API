@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "ioredis": "^5.3.2",
+    "prismarine-nbt": "^2.2.1",
     "ulidx": "^2.1.0",
     "uuid": "^9.0.0"
   },
