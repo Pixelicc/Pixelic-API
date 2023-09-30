@@ -6,7 +6,7 @@ export interface APIKeyRedis {
   type?: "CUSTOM" | "STAFF" | "ADMIN";
   scopes?: APIKeyScope[];
   limit: string;
-  lastRequest: number | string;
+  lastRequest: number;
   requestsLastPeriod: number;
   requests: number;
   keyHistory: {
