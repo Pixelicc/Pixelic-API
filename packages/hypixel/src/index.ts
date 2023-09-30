@@ -249,7 +249,7 @@ export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) =>
     const data = (await axios.get("https://api.hypixel.net/skyblock/bazaar")).data.products;
     log("Hypixel", "Fetched Hypixel Bazaar", "info");
     const formattedData = itemInfo ? await formatSkyblockBazaar(data, { itemInfo: true }) : formatSkyblockBazaar(data, { itemInfo: false });
-    if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockBazaar", 1800, JSON.stringify(data));
+    if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockBazaar", 55, JSON.stringify(data));
     return formattedData;
   } catch {
     return null;
