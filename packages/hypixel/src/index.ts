@@ -156,7 +156,9 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
 };
 
 /**
- * To get active auctions use the `queryActiveAuctions` function in combination with this function
+ * To get and query active auctions use the `queryActiveAuctions` function in combination with this function
+ *
+ * This is a very resource heavy function and should be used appropriately
  */
 export const getSkyblockActiveAuctions = async (): Promise<void> => {
   try {
