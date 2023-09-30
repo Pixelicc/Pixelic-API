@@ -78,7 +78,36 @@ export const getGuild = async (guild: string) => {
     if (data.error) return "This Guild does not exist";
     const formattedData = formatGuild(data);
     if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`, 300, JSON.stringify(formattedData));
-    if (config.wynncraft.persistData) await WynncraftGuildModel.updateOne({ _id: formattedData.name.toLowerCase() }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+    if (config.wynncraft.persistData) {
+      const operation = await WynncraftGuildModel.updateOne({ _id: formattedData.name.toLowerCase() }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+      if (config.wynncraft.webhooks.newGuildEvent.enabled && operation.upsertedId !== null) {
+        axios
+          .post(config.wynncraft.webhooks.newGuildEvent.URL, {
+            username: "[Wynncraft]",
+            embeds: [
+              {
+                description: `
+                \`•\` **Trigger**: \`Event.newGuild\`
+                
+                \`•\` **Name [Prefix]**: \`${formattedData.name}${formattedData.prefix !== null ? ` [${formattedData.prefix}]` : ""}\`
+                \`•\` **Level**: \`${Number(formattedData.level.toFixed(2))}\`
+                \`•\` **Members**: \`${formattedData.members.length}\`
+                \`•\` **Created**: \`${new Date((formattedData?.created || Math.floor(Date.now() / 1000)) * 1000).toUTCString()}\`
+                `
+                  .split("\n")
+                  .map((line) => line.trim())
+                  .join("\n"),
+                footer: {
+                  text: `Now storing ${(await WynncraftGuildModel.estimatedDocumentCount()).toLocaleString("en-US")} Guilds`,
+                },
+                color: 12706241,
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          })
+          .catch(() => {});
+      }
+    }
     return formattedData;
   } catch {
     return null;
