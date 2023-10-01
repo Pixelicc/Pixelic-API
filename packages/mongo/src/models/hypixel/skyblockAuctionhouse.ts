@@ -42,7 +42,7 @@ const longTermRetentionSchema = new Schema(
   }
 );
 
-export const HypixelSkyblockBazaarModel = {
+export const HypixelSkyblockAuctiohouseModel = {
   shortTerm: client.useDb("Hypixel").model("skyblockAuctionhouseShortTerm", shortTermRetentionSchema),
   longTerm: client.useDb("Hypixel").model("skyblockAuctionhouseLongTerm", longTermRetentionSchema),
 };
