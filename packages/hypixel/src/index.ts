@@ -6,7 +6,7 @@ import { requestHypixel } from "./requestHandler.js";
 import redis from "@pixelic/redis";
 import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockitems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
 import { HypixelActiveAuction, HypixelEndedAuction, RequireOneObjParam } from "@pixelic/types";
-import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
+import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);
@@ -244,12 +244,25 @@ export const getSkyblockEndedAuctions = async () => {
 export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockBazaar"))) {
-      return itemInfo ? await formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: true }) : formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: false });
+      return itemInfo ? await formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: true }) : await formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: false });
     }
     const data = (await axios.get("https://api.hypixel.net/skyblock/bazaar")).data.products;
     log("Hypixel", "Fetched Hypixel Bazaar", "info");
-    const formattedData = itemInfo ? await formatSkyblockBazaar(data, { itemInfo: true }) : formatSkyblockBazaar(data, { itemInfo: false });
+    const formattedData = itemInfo ? await formatSkyblockBazaar(data, { itemInfo: true }) : await formatSkyblockBazaar(data, { itemInfo: false });
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockBazaar", 55, JSON.stringify(data));
+    if (config.hypixel.persistData) {
+      const persistableData = [];
+      for (const product of Object.keys(formattedData)) {
+        persistableData.push({ timestamp: new Date(), meta: product, data: formattedData[product].quickStatus });
+      }
+      await HypixelSkyblockBazaarModel.shortTerm.insertMany(persistableData);
+
+      // Checks wether the last ingestion on the long term collection was over an hour ago
+      if (!(await redis.exists("Hypixel:lastSkyblockBazaarLongTermIngestion"))) {
+        await HypixelSkyblockBazaarModel.longTerm.insertMany(persistableData);
+        await redis.setex("Hypixel:lastSkyblockBazaarLongTermIngestion", 3595, "");
+      }
+    }
     return formattedData;
   } catch {
     return null;
