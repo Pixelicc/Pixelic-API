@@ -2184,18 +2184,22 @@ export const formatSkyblockitems = (items: any) => {
 };
 
 export const formatSkyblockElection = (election: any) => {
-  const nextMayor = election.current.candidates.sort((a: any, b: any) => b.votes - a.votes)[0];
-  nextMayor.key = nextMayor.key.toUpperCase();
+  var nextMayor = null;
+  var currentElection = null;
+  if (election?.current) {
+    nextMayor = election.current.candidates.sort((a: any, b: any) => b.votes - a.votes)[0];
+    nextMayor.key = nextMayor.key.toUpperCase();
 
-  const currentElection: any = election.current;
-  currentElection.candidates = currentElection.candidates.sort((a: any, b: any) => b.votes - a.votes);
-  for (const candidate in currentElection.candidates) {
-    currentElection.candidates[candidate].key = currentElection.candidates[candidate].key.toUpperCase();
+    currentElection = election.current;
+    currentElection.candidates = currentElection.candidates.sort((a: any, b: any) => b.votes - a.votes);
+    for (const candidate in currentElection.candidates) {
+      currentElection.candidates[candidate].key = currentElection.candidates[candidate].key.toUpperCase();
+    }
   }
 
   const lastElection: any = election.mayor.election;
   lastElection.candidates = lastElection.candidates.sort((a: any, b: any) => b.votes - a.votes);
-  for (const candidate in currentElection.candidates) {
+  for (const candidate in lastElection.candidates) {
     lastElection.candidates[candidate].key = lastElection.candidates[candidate].key.toUpperCase();
   }
 
@@ -2204,7 +2208,7 @@ export const formatSkyblockElection = (election: any) => {
       key: election.mayor.key.toUpperCase(),
       name: election.mayor.name,
       perks: election.mayor.perks,
-      votes: currentElection.candidates[0].votes,
+      votes: lastElection.candidates[0].votes,
     },
     nextMayor,
     currentElection,
