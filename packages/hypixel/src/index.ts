@@ -168,33 +168,33 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
     const firstPage = (await axios.get("https://api.hypixel.net/skyblock/auctions")).data;
     log("Hypixel", `Fetching Hypixel Auctions (1/${firstPage.totalPages})`, "info");
     const pipeline = redis.pipeline();
-    await firstPage.auctions.forEach(async (auction: HypixelActiveAuction) => {
+    for (const auction of firstPage.auctions) {
       const formattedData = await formatSkyblockActiveAuction(auction);
       pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
       pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
       UUIDs.push(formattedData.UUID);
-    });
+    }
     pipeline.exec();
 
     for (var i = 1; i < firstPage.totalPages; i++) {
       const page = (await axios.get(`https://api.hypixel.net/skyblock/auctions?page=${i}`)).data;
       log("Hypixel", `Fetching Hypixel Auctions (${i + 1}/${firstPage.totalPages})`, "info");
       const pipeline = redis.pipeline();
-      await page.auctions.forEach(async (auction: HypixelActiveAuction) => {
+      for (const auction of page.auctions) {
         const formattedData = await formatSkyblockActiveAuction(auction);
         pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
         pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
         UUIDs.push(formattedData.UUID);
-      });
+      }
       pipeline.exec();
     }
     log("Hypixel", "Fetched all Hypixel Auctions", "info");
 
     const removeInvalid = redis.pipeline();
-    UUIDsBefore.filter((UUID) => !UUIDs.includes(UUID)).forEach((UUID) => {
+    for (const UUID of UUIDsBefore.filter((UUID) => !UUIDs.includes(UUID))) {
       removeInvalid.srem("Hypixel:Auctions:UUIDs", UUID);
       removeInvalid.del(`Hypixel:Auctions:${UUID}`);
-    });
+    }
 
     removeInvalid.exec();
   } catch {
