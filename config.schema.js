@@ -41,6 +41,16 @@ export default {
       tracesSampleRate: 0.5,
     },
   },
+  mojang: {
+    /**
+     * Wether to create & maintain a UUIDList in Redis
+     */
+    UUIDList: true,
+    /**
+     * Wether to cache API responses in Redis
+     */
+    cache: true,
+  },
   hypixel: {
     /**
      * Your Hypixel App's API-Key for accessing the Hypixel API: https://developer.hypixel.net/
