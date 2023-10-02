@@ -8,6 +8,15 @@ export const getRatio = (x: number, y: number) => {
   return Number(x / y);
 };
 
+export const average = (array: number[]) => array.reduce((a, b) => a + b) / array.length;
+
+export const median = (array: number[]) => {
+  const sorted = Array.from(array).sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) return (sorted[middle - 1] + sorted[middle]) / 2;
+  return sorted[middle];
+};
+
 /**
  * Compares two objects at full depth and only returns keys that have changed with its current value
  * @param obj1 Old Object
