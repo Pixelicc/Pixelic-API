@@ -6,7 +6,8 @@ import { requestHypixel } from "./requestHandler.js";
 import redis from "@pixelic/redis";
 import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockitems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
 import { HypixelActiveAuction, HypixelEndedAuction, RequireOneObjParam } from "@pixelic/types";
-import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
+import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockAuctionTrackingModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
+import { calculateSkyblockAuctionPrices } from "./calcs.js";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);
@@ -231,6 +232,11 @@ export const getSkyblockEndedAuctions = async () => {
       auctions.push(formattedData);
       if (config.hypixel.persistData) {
         await HypixelSkyblockAuctionModel.create({ _id: formattedData.UUID, ...formattedData }).catch(() => {});
+        await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID }).catch(() => {});
+      }
+      // Checks wether the last ingestion was over an hour ago
+      if (!(await redis.exists("Hypixel:lastSkyblockAuctionhouseIngestion"))) {
+        await calculateSkyblockAuctionPrices();
       }
     }
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
