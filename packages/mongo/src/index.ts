@@ -3,6 +3,7 @@ export * from "./models/APIKey.js";
 export * from "./models/wynncraft/players.js";
 export * from "./models/wynncraft/historicalPlayers.js";
 export * from "./models/wynncraft/guilds.js";
+export * from "./models/wynncraft/servers.js";
 export * from "./models/hypixel/players.js";
 export * from "./models/hypixel/historicalPlayers.js";
 export * from "./models/hypixel/guilds.js";

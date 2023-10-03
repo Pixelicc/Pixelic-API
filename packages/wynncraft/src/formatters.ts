@@ -48,24 +48,28 @@ export const formatGuild = (guild: any) => {
   };
 };
 
-export const formatServerList = async (data: any) => {
-  const parsedData = [];
+export const formatServerList = async (data: any, { UUIDs }: { UUIDs?: boolean }) => {
+  const parsedData: any = [];
   for (const server of Object.keys(data)) {
     if (server === "request") continue;
-    const players = [];
+    var players = [];
     for (const player of data[server]) {
-      players.push({
-        UUID: await requestUUID(player).catch(() => {
-          return null;
-        }),
-        username: player,
-      });
+      if (UUIDs) {
+        players.push({
+          UUID: await requestUUID(player).catch(() => {
+            return null;
+          }),
+          username: player,
+        });
+      } else {
+        players = data[server];
+        break;
+      }
     }
-    parsedData.push({
-      name: server,
+    parsedData[server] = {
       playercount: data[server].length,
       players: players.sort(),
-    });
+    };
   }
   return parsedData;
 };

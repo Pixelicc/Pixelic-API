@@ -4,7 +4,7 @@ import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from
 import { config, dashUUID, deepCompare } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import axios from "axios";
-import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel } from "@pixelic/mongo";
+import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel, WynncraftServerPlayercountModel } from "@pixelic/mongo";
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);
@@ -131,8 +131,21 @@ export const getServerList = async () => {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:serverList"))) return JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string);
     const data = await requestWynncraft("https://api.wynncraft.com/public_api.php?action=onlinePlayers");
     if (data.error) return null;
-    const formattedData = formatServerList(data);
+    const formattedData = await formatServerList(data, { UUIDs: false });
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(formattedData));
+    if (config.wynncraft.persistData) {
+      const persistableData = [];
+      for (const server of Object.keys(formattedData)) {
+        persistableData.push({ timestamp: new Date(), meta: server, data: formattedData[server].playercount });
+      }
+      await WynncraftServerPlayercountModel.shortTerm.insertMany(persistableData);
+
+      // Checks wether the last ingestion on the long term collection was over an hour ago
+      if (!(await redis.exists("Wynncraft:lastServerListLongTermIngestion"))) {
+        await WynncraftServerPlayercountModel.longTerm.insertMany(persistableData);
+        await redis.setex("Wynncraft:lastServerListLongTermIngestion", 3595, "");
+      }
+    }
     return formattedData;
   } catch {
     return null;
