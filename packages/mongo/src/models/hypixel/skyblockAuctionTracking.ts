@@ -20,8 +20,8 @@ const auctionTrackingSchema = new Schema({
   },
   timestamp: {
     type: Date,
-    default: new Date(),
-    expires: "1h",
+    required: true,
+    index: { expireAfterSeconds: 3600 },
   },
 });
 
