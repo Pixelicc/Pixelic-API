@@ -4,3 +4,4 @@ export * from "./validators.js";
 export * from "./calcs.js";
 export * from "./generators.js";
 export * from "./decoders.js";
+export * from "./SLPPing.js";
