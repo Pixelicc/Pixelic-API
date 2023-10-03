@@ -126,12 +126,12 @@ export const getGuildList = async () => {
   }
 };
 
-export const getServerList = async () => {
+export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
   try {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:serverList"))) return JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string);
     const data = await requestWynncraft("https://api.wynncraft.com/public_api.php?action=onlinePlayers");
     if (data.error) return null;
-    const formattedData = await formatServerList(data, { UUIDs: false });
+    const formattedData = await formatServerList(data, { UUIDs: UUIDs });
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(formattedData));
     if (config.wynncraft.persistData) {
       const persistableData = [];
