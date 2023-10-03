@@ -8,6 +8,9 @@ import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockE
 import { HypixelActiveAuction, HypixelEndedAuction, RequireOneObjParam } from "@pixelic/types";
 import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockAuctionTrackingModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 import { calculateSkyblockAuctionPrices } from "./calcs.js";
+import { requestTracker } from "@pixelic/interceptors";
+
+axios.interceptors.response.use(requestTracker);
 
 export const getPlayer = async (player: string) => {
   const UUID = await parseUUID(player);

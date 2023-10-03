@@ -8,6 +8,7 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/interceptors": "*",
     "@pixelic/logger": "*",
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",

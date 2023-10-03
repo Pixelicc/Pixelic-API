@@ -5,6 +5,9 @@ import log from "@pixelic/logger";
 import { config, validateUUID, validateUsername } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import { formatUUID } from "@pixelic/utils";
+import { requestTracker } from "@pixelic/interceptors";
+
+axios.interceptors.response.use(requestTracker);
 
 const limiter = new Bottleneck({
   reservoir: 600,

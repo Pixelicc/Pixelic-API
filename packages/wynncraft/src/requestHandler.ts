@@ -3,6 +3,9 @@ import axios from "axios";
 import axiosRetry from "axios-retry";
 import log from "@pixelic/logger";
 import { config } from "@pixelic/utils";
+import { requestTracker } from "@pixelic/interceptors";
+
+axios.interceptors.response.use(requestTracker);
 
 const Limiter = new Bottleneck({
   reservoir: 180,

@@ -15,9 +15,9 @@
     "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
     "@pixelic/types": "*",
+    "@pixelic/interceptors": "*",
     "@pixelic/utils": "*",
     "@pixelic/wynncraft": "*",
-    "axios": "^1.4.0",
     "cron": "^3.0.0"
   }
 }
