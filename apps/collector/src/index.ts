@@ -5,7 +5,7 @@ import { getServerList } from "@pixelic/wynncraft";
 new CronJob("* * * * *", () => {
   getSkyblockEndedAuctions();
   getSkyblockBazaar({ itemInfo: false });
-  getServerList();
+  getServerList({ UUIDs: false });
 }).start();
 
 new CronJob("*/5 * * * *", () => {
