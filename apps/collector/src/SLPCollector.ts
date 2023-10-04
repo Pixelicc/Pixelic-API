@@ -10,6 +10,7 @@ export const pingServers = async () => {
     for (const server of serverList) {
       const SLPData = await sendSLP(server.host, server.port);
       if (SLPData !== null) {
+        await redis.set(`Minecraft:Servers:${server.UUID}`, JSON.stringify(SLPData)).catch(() => {});
         persistableData.push({ timestamp: new Date(), meta: server.UUID, data: { playercount: SLPData.players.online, latency: SLPData.latency } });
       }
     }
