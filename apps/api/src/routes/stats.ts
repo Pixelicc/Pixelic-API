@@ -11,7 +11,7 @@ router.get("/v1/stats/code", async (req, res) => {
   res.set("Cache-Control", "public, max-age=300");
   if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
   exec("pnpm exec cloc --json --docstring-as-code --include-lang=TypeScript,JavaScript --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
-    if (error || stderr) return res.status(501).json({ success: false });
+    if (error || stderr) return res.status(500).json({ success: false });
     const raw = JSON.parse(stdout);
     delete raw.header;
     const languages: any = {};
@@ -73,7 +73,7 @@ router.get("/v1/stats/repo", async (req, res) => {
       });
     })
     .catch(() => {
-      return res.status(501).json({ success: false });
+      return res.status(500).json({ success: false });
     });
 });
 
@@ -92,13 +92,9 @@ router.get("/v1/stats/redis", async (req, res) => {
       bytesStoredFormatted: formatBytes(Number(info.used_memory), 3),
       keys: Number(info.db0.split("=")[1].split(",")[0]),
       keysFormatted: formatNumber(Number(info.db0.split("=")[1].split(",")[0]), 3),
-      sinceRestart: {
-        commandsProcessed: Number(info.total_commands_processed),
-        commandsProcessedFormatted: formatNumber(Number(info.total_commands_processed), 3),
-      },
     });
   } catch {
-    return res.status(501).json({ success: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -138,7 +134,7 @@ router.get("/v1/stats/mongo", async (req, res) => {
     total["bytesStoredFormatted"] = formatBytes(total.bytesStored, 3);
     return res.json({ success: true, ...total, databases: parsedDBs });
   } catch {
-    return res.status(501).json({ success: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -153,7 +149,7 @@ router.get("/v1/stats", async (req, res) => {
       requestsFormatted: formatNumber(requests, 3),
     });
   } catch {
-    return res.status(501).json({ success: false });
+    return res.status(500).json({ success: false });
   }
 });
 
