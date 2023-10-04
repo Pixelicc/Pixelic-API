@@ -13,3 +13,4 @@ export * from "./models/hypixel/skyblockAuctionTracking.js";
 export * from "./models/hypixel/skyblockAuctionhouse.js";
 export * from "./models/hypixel/skyblockBazaar.js";
 export * from "./models/hypixel/skyblockElections.js";
+export * from "./models/minecraft/servers.js";
