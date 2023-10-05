@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.get("/v1/minecraft/server/list", async (req, res) => {
   if (!(await redis.exists("Minecraft:serverList"))) return res.status(500).json({ success: false });
-
   const serverList: { UUID: string; name: string; host: string; port: string }[] = JSON.parse((await redis.call("JSON.GET", "Minecraft:serverList", "$")) as string)[0];
 
   return res.json({
@@ -18,7 +17,6 @@ router.get("/v1/minecraft/server/list", async (req, res) => {
 
 router.get("/v1/minecraft/server/:server", async (req, res) => {
   const serverList: { UUID: string; name: string; host: string; port: string }[] = JSON.parse((await redis.call("JSON.GET", "Minecraft:serverList", "$")) as string)[0];
-
   if (!validateUUID(formatUUID(req.params.server)) || !serverList.some((s) => formatUUID(req.params.server) === s.UUID)) return res.status(422).json({ success: false, cause: "Invalid Server UUID" });
 
   const SLPData = JSON.parse((await redis.get(`Minecraft:Servers:${formatUUID(req.params.server)}`)) as string);
