@@ -16,14 +16,12 @@ router.get("/v1/minecraft/uuids/:page", async (req, res) => {
   if (page > totalPages) return res.status(422).json({ success: false, cause: "Invalid Page" });
   if (page === totalPages) res.set("Cache-Control", `public, max-age=900, stale-while-revalidate=60`);
 
-  const UUIDs = await redis.zrange("Mojang:UUIDList", page * 100000, page * 100000 + 100000);
-
   return res.json({
     success: true,
     totalPages: totalPages,
     currentPage: page,
     totalUUIDs: totalUUIDs,
-    UUIDs: UUIDs,
+    UUIDs: await redis.zrange("Mojang:UUIDList", page * 100000, page * 100000 + 100000),
   });
 });
 
