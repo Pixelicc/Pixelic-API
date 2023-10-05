@@ -234,7 +234,7 @@ export const getSkyblockEndedAuctions = async () => {
       const formattedData = await formatSkyblockEndedAuction(auction);
       auctions.push(formattedData);
       if (config.hypixel.persistData) {
-        await HypixelSkyblockAuctionModel.create({ _id: formattedData.UUID, ...formattedData }).catch(() => {});
+        await HypixelSkyblockAuctionModel.create({ timestamp: new Date(), meta: formattedData.seller, data: formattedData });
         await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID, timestamp: new Date(formattedData.timestamp * 1000) }).catch(() => {});
       }
       // Checks wether the last ingestion was over an hour ago
@@ -244,7 +244,8 @@ export const getSkyblockEndedAuctions = async () => {
     }
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return auctions;
-  } catch {
+  } catch (e) {
+    console.log(e);
     log("Hypixel", "Failed to fetch Hypixel Ended Auctions", "warn");
     return null;
   }

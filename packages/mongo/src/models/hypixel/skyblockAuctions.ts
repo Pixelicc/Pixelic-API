@@ -46,39 +46,26 @@ const itemSchema = new Schema(
   { strict: false, _id: false }
 );
 
-const auctionSchema = new Schema({
-  _id: {
-    type: String,
-    required: true,
+const retentionSchema = new Schema(
+  {
+    timestamp: { type: Date, required: true },
+    meta: { type: String, required: true },
+    data: {
+      UUID: { type: String, required: true, index: true },
+      sellerProfile: { type: String, required: true, index: true },
+      buyer: { type: String, required: true, index: true },
+      price: { type: Number, required: true },
+      bin: { type: Boolean, required: true },
+      item: { type: itemSchema, required: true },
+    },
   },
-  seller: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  sellerProfile: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  buyer: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  bin: {
-    type: Boolean,
-    required: true,
-  },
-  item: itemSchema,
-  timestamp: {
-    type: Number,
-    required: true,
-  },
-});
+  {
+    timeseries: {
+      timeField: "timestamp",
+      metaField: "meta",
+      granularity: "hours",
+    },
+  }
+);
 
-export const HypixelSkyblockAuctionModel = client.useDb("Hypixel").model("skyblockAuctions", auctionSchema);
+export const HypixelSkyblockAuctionModel = client.useDb("Hypixel").model("skyblockAuctions", retentionSchema);
