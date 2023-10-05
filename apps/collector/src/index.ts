@@ -10,8 +10,10 @@ new CronJob("* * * * *", () => {
 
   // Wynncraft
   getServerList({ UUIDs: false });
+}).start();
 
-  // Minecraft
+new CronJob("30 * * * * *", () => {
+  // Offset by 30s so Minecraft Server Latency can be measured more precisely
   pingServers();
 }).start();
 
