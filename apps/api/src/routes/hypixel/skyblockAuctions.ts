@@ -2,8 +2,11 @@ import express from "express";
 import { parseUUID } from "@pixelic/mojang";
 import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID } from "@pixelic/utils";
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
+import { ratelimit } from "@pixelic/middlewares";
 
 const router = express.Router();
+
+router.use(ratelimit());
 
 router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", async (req, res) => {
   try {
