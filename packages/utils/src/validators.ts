@@ -8,3 +8,5 @@ export const validateUUID = (UUID: string) => {
 };
 
 export const validateUsername = (username: string) => /^[a-zA-Z0-9_]{2,16}$/.test(username);
+
+export const validateSkyblockItemID = (ID: string) => /^[A-Z\d\_:]+$/.test(ID);

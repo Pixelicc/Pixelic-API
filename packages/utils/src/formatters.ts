@@ -38,13 +38,15 @@ export const formatBytes = (bytes: number, digits: number) => {
   return item ? (bytes / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
 };
 
-export const formatTimeseries = (array: any[]) => {
+export const formatTimeseries = (array: any[], options?: { meta: string }) => {
   const formattedArray: {}[] = [];
   for (const datapoint of array) {
-    formattedArray.push({
+    const formattedData = {
       timestamp: Math.floor(new Date(datapoint.timestamp).valueOf() / 1000),
       ...datapoint.data,
-    });
+    };
+    if (options?.meta) formattedData[options.meta] = datapoint.meta;
+    formattedArray.push(formattedData);
   }
   return formattedArray;
 };
