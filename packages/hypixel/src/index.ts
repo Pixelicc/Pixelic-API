@@ -233,6 +233,7 @@ export const getSkyblockEndedAuctions = async () => {
     for (const auction of data) {
       const formattedData = await formatSkyblockEndedAuction(auction);
       auctions.push(formattedData);
+
       if (config.hypixel.persistData) {
         await HypixelSkyblockAuctionModel.create({ timestamp: new Date(), meta: formattedData.seller, data: formattedData });
         await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID, timestamp: new Date(formattedData.timestamp * 1000) }).catch(() => {});

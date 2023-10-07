@@ -19,10 +19,10 @@ export const calculateSkyblockAuctionPrices = async () => {
       timestamp: new Date(),
       meta: item,
       data: {
-        minPrice: Math.min.apply(Math, prices[item]),
-        maxPrice: Math.max.apply(Math, prices[item]),
+        minPrice: Math.floor(Math.min.apply(Math, prices[item])),
+        maxPrice: Math.floor(Math.max.apply(Math, prices[item])),
         averagePrice: Math.floor(average(prices[item])),
-        medianPrice: median(prices[item]),
+        medianPrice: Math.floor(median(prices[item])),
       },
     });
   }

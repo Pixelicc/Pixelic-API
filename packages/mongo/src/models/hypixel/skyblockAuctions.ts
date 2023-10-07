@@ -39,7 +39,6 @@ const itemSchema = new Schema(
     },
     tier: {
       type: String,
-      required: true,
     },
     attributes: attributeSchema,
   },
