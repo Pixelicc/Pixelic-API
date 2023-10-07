@@ -6,9 +6,7 @@ import { ratelimit } from "@pixelic/middlewares";
 
 const router = express.Router();
 
-router.use(ratelimit());
-
-router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(), async (req, res) => {
   try {
     const UUID = await parseUUID(req.params.player);
     if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
@@ -30,7 +28,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", async (req
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), async (req, res) => {
   try {
     const UUID = await parseUUID(req.params.player);
     if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
@@ -53,7 +51,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", async (req, res) 
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", ratelimit(), async (req, res) => {
   try {
     if (!validateUUID(formatUUID(req.params.item))) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item UUID" });
 
@@ -67,7 +65,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", async (req, res) => {
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
@@ -81,7 +79,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", async (req, res) => {
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", ratelimit(), async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
@@ -99,7 +97,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", async (req, re
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history/:timeframe", async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history/:timeframe", ratelimit(), async (req, res) => {
   try {
     if (!["day", "week", "month", "year"].includes(req.params.timeframe)) return res.status(422).json({ success: false, cause: "Invalid Timeframe" });
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
