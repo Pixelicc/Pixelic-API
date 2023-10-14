@@ -2,7 +2,7 @@ import nbt from "prismarine-nbt";
 import util from "util";
 // @ts-ignore
 import minecraftItems from "minecraft-items";
-import { getRatio, formatUUID, decodeNBT } from "@pixelic/utils";
+import { getRatio, formatUUID, decodeNBT, addObjects } from "@pixelic/utils";
 import { HypixelActiveAuction, HypixelEndedAuction } from "@pixelic/types";
 import { getSkyblockItems } from "./index.js";
 
@@ -204,610 +204,80 @@ const formatSkywars = (skywars: any) => {
 };
 
 const formatDuels = (duels: any) => {
-  const wins = duels?.wins || 0;
-  const winstreak = duels?.current_winstreak || 0;
-  const losses = duels?.losses || 0;
-  const wlr = getRatio(wins, losses);
-  const kills = duels?.kills || 0;
-  const deaths = duels?.deaths || 0;
-  const kdr = getRatio(kills, deaths);
-  const gamesPlayed = duels?.games_played_duels || 0;
-  const arenaWins = duels?.duel_arena_wins || 0;
-  const arenaWinstreak = duels?.current_winstreak_mode_duel_arena || 0;
-  const arenaLosses = duels?.duel_arena_losses || 0;
-  const arenaWlr = getRatio(arenaWins, arenaLosses);
-  const arenaKills = duels?.duel_arena_kills || 0;
-  const arenaDeaths = duels?.duel_arena_deaths || 0;
-  const arenaKdr = getRatio(arenaKills, arenaDeaths);
-  const arenaGamesPlayed = duels?.duel_arena_rounds_played || 0;
-  const blitzWins = duels?.blitz_duel_wins || 0;
-  const blitzWinstreak = duels?.current_winstreak_mode_blitz_duel || 0;
-  const blitzLosses = duels?.blitz_duel_losses || 0;
-  const blitzWlr = getRatio(blitzWins, blitzLosses);
-  const blitzKills = duels?.blitz_duel_kills || 0;
-  const blitzDeaths = duels?.blitz_duel_deaths || 0;
-  const blitzKdr = getRatio(blitzKills, blitzDeaths);
-  const blitzGamesPlayed = duels?.blitz_duel_rounds_played || 0;
-  const bowWins = duels?.bow_duel_wins || 0;
-  const bowWinstreak = duels?.current_winstreak_mode_bow_duel || 0;
-  const bowLosses = duels?.bow_duel_losses || 0;
-  const bowWlr = getRatio(bowWins, bowLosses);
-  const bowKills = duels?.bow_duel_kills || 0;
-  const bowDeaths = duels?.bow_duel_deaths || 0;
-  const bowKdr = getRatio(bowKills, bowDeaths);
-  const bowGamesPlayed = duels?.bow_duel_rounds_played || 0;
-  const bowspleefWins = duels?.bowspleef_duel_wins || 0;
-  const bowspleefWinstreak = duels?.current_winstreak_mode_bowspleef_duel || 0;
-  const bowspleefLosses = duels?.bowspleef_duel_losses || 0;
-  const bowspleefWlr = getRatio(bowspleefWins, bowspleefLosses);
-  const bowspleefKills = duels?.bowspleef_duel_kills || 0;
-  const bowspleefDeaths = duels?.bowspleef_duel_deaths || 0;
-  const bowspleefKdr = getRatio(bowspleefKills, bowspleefDeaths);
-  const bowspleefGamesPlayed = duels?.bowspleef_duel_rounds_played || 0;
-  const boxingWins = duels?.boxing_duel_wins || 0;
-  const boxingWinstreak = duels?.current_winstreak_mode_boxing_duel || 0;
-  const boxingLosses = duels?.boxing_duel_losses || 0;
-  const boxingWlr = getRatio(boxingWins, boxingLosses);
-  const boxingKills = duels?.boxing_duel_kills || 0;
-  const boxingDeaths = duels?.boxing_duel_deaths || 0;
-  const boxingKdr = getRatio(boxingKills, boxingDeaths);
-  const boxingGamesPlayed = duels?.boxing_duel_rounds_played || 0;
-  const bridgeSoloWins = duels?.bridge_duel_wins || 0;
-  const bridgeSoloWinstreak = duels?.current_winstreak_mode_bridge_duel || 0;
-  const bridgeSoloLosses = duels?.bridge_duel_losses || 0;
-  const bridgeSoloWlr = getRatio(bridgeSoloWins, bridgeSoloLosses);
-  const bridgeSoloKills = duels?.bridge_duel_bridge_kills || 0;
-  const bridgeSoloDeaths = duels?.bridge_duel_bridge_deaths || 0;
-  const bridgeSoloKdr = getRatio(bridgeSoloKills, bridgeSoloDeaths);
-  const bridgeSoloGamesPlayed = duels?.bridge_duel_rounds_played || 0;
-  const bridgeDoublesWins = duels?.bridge_doubles_wins || 0;
-  const bridgeDoublesWinstreak = duels?.current_winstreak_mode_bridge_doubles || 0;
-  const bridgeDoublesLosses = duels?.bridge_doubles_losses || 0;
-  const birdgeDoublesWlr = getRatio(bridgeDoublesWins, bridgeDoublesLosses);
-  const bridgeDoublesKills = duels?.bridge_doubles_kills || 0;
-  const bridgeDoublesDeaths = duels?.bridge_doubles_deaths || 0;
-  const bridgeDoublesKdr = getRatio(bridgeDoublesKills, bridgeDoublesDeaths);
-  const bridgeDoublesGamesPlayed = duels?.bridge_doubles_rounds_played || 0;
-  const bridgeThreesWins = duels?.bridge_threes_wins || 0;
-  const bridgeThreesWinstreak = duels?.current_winstreak_mode_bridge_threes || 0;
-  const bridgeThreesLosses = duels?.bridge_threes_losses || 0;
-  const bridgeThreesWlr = getRatio(bridgeThreesWins, bridgeThreesLosses);
-  const bridgeThreesKills = duels?.bridge_threes_kills || 0;
-  const bridgeThreesDeaths = duels?.bridge_threes_deaths || 0;
-  const bridgeThreesKdr = getRatio(bridgeThreesKills, bridgeThreesDeaths);
-  const bridgeThreesGamesPlayed = duels?.bridge_threes_rounds_played || 0;
-  const bridgeFoursWins = duels?.bridge_four_wins || 0;
-  const bridgeFoursWinstreak = duels?.current_winstreak_mode_bridge_threes || 0;
-  const bridgeFoursLosses = duels?.bridge_four_losses || 0;
-  const bridgeFoursWlr = getRatio(bridgeFoursWins, bridgeFoursLosses);
-  const bridgeFoursKills = duels?.bridge_four_kills || 0;
-  const bridgeFoursDeaths = duels?.bridge_four_deaths || 0;
-  const bridgeFoursKdr = getRatio(bridgeFoursKills, bridgeFoursDeaths);
-  const bridgeFoursGamesPlayed = duels?.bridge_four_rounds_played || 0;
-  const bridgeQuadDoublesWins = duels?.bridge_2v2v2v2_wins || 0;
-  const bridgeQuadDoublesWinstreak = duels?.current_winstreak_mode_bridge_2v2v2v2 || 0;
-  const bridgeQuadDoublesLosses = duels?.bridge_2v2v2v2_losses || 0;
-  const bridgeQuadDoublesWlr = getRatio(bridgeQuadDoublesWins, bridgeQuadDoublesLosses);
-  const bridgeQuadDoublesKills = duels?.bridge_2v2v2v2_bridge_kills || 0;
-  const bridgeQuadDoublesDeaths = duels?.bridge_2v2v2v2_bridge_deaths || 0;
-  const bridgeQuadDoublesKdr = getRatio(bridgeQuadDoublesKills, bridgeQuadDoublesDeaths);
-  const bridgeQuadDoublesGamesPlayed = duels?.bridge_2v2v2v2_rounds_played || 0;
-  const bridgeQuadThreesWins = duels?.bridge_3v3v3v3_wins || 0;
-  const bridgeQuadThreesWinstreak = duels?.current_winstreak_mode_bridge_3v3v3v3 || 0;
-  const bridgeQuadThreesLosses = duels?.bridge_3v3v3v3_losses || 0;
-  const bridgeQuadThreesWlr = getRatio(bridgeQuadThreesWins, bridgeQuadThreesLosses);
-  const bridgeQuadThreesKills = duels?.bridge_3v3v3v3_bridge_kills || 0;
-  const bridgeQuadThreesDeaths = duels?.bridge_3v3v3v3_bridge_deaths || 0;
-  const bridgeQuadThreesKdr = getRatio(bridgeQuadThreesKills, bridgeQuadThreesDeaths);
-  const bridgeQuadThreesGamesPlayed = duels?.bridge_3v3v3v3_rounds_played || 0;
-  const bridgeCTFWins = duels?.capture_threes_wins || 0;
-  const bridgeCTFWinstreak = duels?.current_winstreak_mode_capture_threes || 0;
-  const bridgeCTFLosses = duels?.capture_threes_losses || 0;
-  const bridgeCTFWlr = getRatio(bridgeCTFWins, bridgeCTFLosses);
-  const bridgeCTFKills = duels?.capture_threes_bridge_kills || 0;
-  const bridgeCTFDeaths = duels?.capture_threes_bridge_deaths || 0;
-  const bridgeCTFKdr = getRatio(bridgeCTFKills, bridgeCTFDeaths);
-  const bridgeCTFGamesPlayed = duels?.capture_threes_rounds_played || 0;
-  const bridgeWins = bridgeSoloWins + bridgeDoublesWins + bridgeThreesWins + bridgeFoursWins + bridgeQuadDoublesWins + bridgeQuadThreesWins + bridgeCTFWins;
-  const bridgeWinstreak = duels?.current_winstreak_mode_bridge_duel || 0;
-  const bridgeLosses = bridgeSoloLosses + bridgeDoublesLosses + bridgeThreesLosses + bridgeFoursLosses + bridgeQuadDoublesLosses + bridgeQuadThreesLosses + bridgeCTFLosses;
-  const bridgeWlr = getRatio(bridgeWins, bridgeLosses);
-  const bridgeKills = bridgeSoloKills + bridgeDoublesKills + bridgeThreesKills + bridgeFoursKills + bridgeQuadDoublesKills + bridgeQuadThreesKills + bridgeCTFKills;
-  const bridgeDeaths = bridgeSoloDeaths + bridgeDoublesDeaths + bridgeThreesDeaths + bridgeFoursDeaths + bridgeQuadDoublesDeaths + bridgeQuadThreesDeaths + bridgeCTFDeaths;
-  const bridgeKdr = getRatio(bridgeKills, bridgeLosses);
-  const bridgeGamesPlayed = bridgeSoloGamesPlayed + bridgeDoublesGamesPlayed + bridgeThreesGamesPlayed + bridgeFoursGamesPlayed + bridgeQuadDoublesGamesPlayed + bridgeQuadThreesGamesPlayed + bridgeCTFGamesPlayed;
-  const classicWins = duels?.classic_duel_wins || 0;
-  const classicWinstreak = duels?.current_winstreak_mode_classic_duel || 0;
-  const classicLosses = duels?.classic_duel_losses || 0;
-  const classicWlr = getRatio(classicWins, classicLosses);
-  const classicKills = duels?.classic_duel_kills || 0;
-  const classicDeaths = duels?.classic_duel_deaths || 0;
-  const classicKdr = getRatio(classicKills, classicDeaths);
-  const classicGamesPlayed = duels?.classic_duel_rounds_played || 0;
-  const comboWins = duels?.combo_duel_wins || 0;
-  const comboWinstreak = duels?.current_winstreak_mode_combo_duel || 0;
-  const comboLosses = duels?.combo_duel_losses || 0;
-  const comboWlr = getRatio(comboWins, comboLosses);
-  const comboKills = duels?.combo_duel_kills || 0;
-  const comboDeaths = duels?.combo_duel_deaths || 0;
-  const comboKdr = getRatio(comboKills, comboDeaths);
-  const comboGamesPlayed = duels?.combo_duel_rounds_played || 0;
-  const MWSoloWins = duels?.mw_duel_wins || 0;
-  const MWSoloWinstreak = duels?.current_winstreak_mode_mw_duel || 0;
-  const MWSoloLosses = duels?.mw_duel_losses || 0;
-  const MWSoloWlr = getRatio(MWSoloWins, MWSoloLosses);
-  const MWSoloKills = duels?.mw_duel_kills || 0;
-  const MWSoloDeaths = duels?.mw_duel_deaths || 0;
-  const MWSoloKdr = getRatio(MWSoloKills, MWSoloDeaths);
-  const MWSoloGamesPlayed = duels?.mw_duel_rounds_played || 0;
-  const MWDoublesWins = duels?.mw_doubles_wins || 0;
-  const MWDoublesWinstreak = duels?.current_winstreak_mode_mw_doubles || 0;
-  const MWDoublesLosses = duels?.mw_doubles_losses || 0;
-  const MWDoublesWlr = getRatio(MWDoublesWins, MWDoublesLosses);
-  const MWDoublesKills = duels?.mw_doubles_kills || 0;
-  const MWDoublesDeaths = duels?.mw_doubles_deaths || 0;
-  const MWDoublesKdr = getRatio(MWDoublesKills, MWDoublesDeaths);
-  const MWDoublesGamesPlayed = duels?.mw_doubles_rounds_played || 0;
-  const MWWins = MWSoloWins + MWDoublesWins;
-  const MWWinstreak = duels?.current_mega_walls_winstreak || 0;
-  const MWLosses = MWSoloLosses + MWDoublesLosses;
-  const MWWlr = getRatio(MWWins, MWLosses);
-  const MWKills = MWSoloKills + MWDoublesKills;
-  const MWDeaths = MWSoloDeaths + MWDoublesDeaths;
-  const MWKdr = getRatio(MWKills, MWDeaths);
-  const MWGamesPlayed = MWSoloGamesPlayed + MWDoublesGamesPlayed;
-  const no_debuffWins = duels?.potion_duel_wins || 0;
-  const no_debuffWinstreak = duels?.current_winstreak_mode_potion_duel || 0;
-  const no_debuffLosses = duels?.potion_duel_losses || 0;
-  const no_debuffWlr = getRatio(no_debuffWins, no_debuffLosses);
-  const no_debuffKills = duels?.potion_duel_kills || 0;
-  const no_debuffDeaths = duels?.potion_duel_deaths || 0;
-  const no_debuffKdr = getRatio(no_debuffKills, no_debuffDeaths);
-  const no_debuffGamesPlayed = duels?.potion_duel_rounds_played || 0;
-  const OPSoloWins = duels?.op_duel_wins || 0;
-  const OPSoloWinstreak = duels?.current_winstreak_mode_op_duel || 0;
-  const OPSoloLosses = duels?.op_duel_losses || 0;
-  const OPSoloWlr = getRatio(OPSoloWins, OPSoloLosses);
-  const OPSoloKills = duels?.op_duel_kills || 0;
-  const OPSoloDeaths = duels?.op_duel_deaths || 0;
-  const OPSoloKdr = getRatio(OPSoloKills, OPSoloDeaths);
-  const OPSoloGamesPlayed = duels?.op_duel_rounds_played || 0;
-  const OPDoublesWins = duels?.op_doubles_wins || 0;
-  const OPDoublesWinstreak = duels?.current_winstreak_mode_op_doubles || 0;
-  const OPDoublesLosses = duels?.op_doubles_losses || 0;
-  const OPDoublesWlr = getRatio(OPDoublesWins, OPDoublesLosses);
-  const OPDoublesKills = duels?.op_doubles_kills || 0;
-  const OPDoublesDeaths = duels?.op_doubles_deaths || 0;
-  const OPDoublesKdr = getRatio(OPDoublesKills, OPDoublesDeaths);
-  const OPDoublesGamesPlayed = duels?.op_doubles_rounds_played || 0;
-  const OPWins = OPSoloWins + OPDoublesWins;
-  const OPWinstreak = duels?.current_op_winstreak || 0;
-  const OPLosses = OPSoloLosses + OPDoublesLosses;
-  const OPWlr = getRatio(OPWins, OPLosses);
-  const OPKills = OPSoloKills + OPDoublesKills;
-  const OPDeaths = OPSoloDeaths + OPDoublesDeaths;
-  const OPKdr = getRatio(OPKills, OPLosses);
-  const OPGamesPlayed = OPSoloGamesPlayed + OPDoublesGamesPlayed;
-  const parkourWins = duels?.parkour_eight_wins || 0;
-  const parkourWinstreak = duels?.urrent_winstreak_mode_parkour_eight || 0;
-  const parkourLosses = duels?.parkour_eight_losses || 0;
-  const parkourWlr = getRatio(parkourWins, parkourLosses);
-  const parkourGamesPlayed = duels?.parkour_eight_rounds_played || 0;
-  const SkywarsSoloWins = duels?.sw_duel_wins || 0;
-  const SkywarsSoloWinstreak = duels?.current_winstreak_mode_sw_duel || 0;
-  const SkywarsSoloLosses = duels?.sw_duel_losses || 0;
-  const SkywarsSoloWlr = getRatio(SkywarsSoloWins, SkywarsSoloLosses);
-  const SkywarsSoloKills = duels?.sw_duel_kills || 0;
-  const SkywarsSoloDeaths = duels?.sw_duel_deaths || 0;
-  const SkywarsSoloKdr = getRatio(SkywarsSoloKills, SkywarsSoloDeaths);
-  const SkywarsSoloGamesPlayed = duels?.sw_duel_rounds_played || 0;
-  const SkywarsDoublesWins = duels?.sw_doubles_wins || 0;
-  const SkywarsDoublesWinstreak = duels?.current_winstreak_mode_sw_doubles || 0;
-  const SkywarsDoublesLosses = duels?.sw_doubles_losses || 0;
-  const SkywarsDoublesWlr = getRatio(SkywarsDoublesWins, SkywarsDoublesLosses);
-  const SkywarsDoublesKills = duels?.sw_doubles_kills || 0;
-  const SkywarsDoublesDeaths = duels?.sw_doubles_deaths || 0;
-  const SkywarsDoublesKdr = getRatio(SkywarsDoublesKills, SkywarsDoublesDeaths);
-  const SkywarsDoublesGamesPlayed = duels?.sw_doubles_rounds_played || 0;
-  const SkywarsWins = SkywarsSoloWins + SkywarsDoublesWins;
-  const SkywarsWinstreak = duels?.current_op_winstreak || 0;
-  const SkywarsLosses = SkywarsSoloLosses + SkywarsDoublesLosses;
-  const SkywarsWlr = getRatio(SkywarsWins, SkywarsLosses);
-  const SkywarsKills = SkywarsSoloKills + SkywarsDoublesKills;
-  const SkywarsDeaths = SkywarsSoloDeaths + SkywarsDoublesDeaths;
-  const SkywarsKdr = getRatio(SkywarsKills, SkywarsDeaths);
-  const SkywarsGamesPlayed = SkywarsSoloGamesPlayed + SkywarsDoublesGamesPlayed;
-  const sumoWins = duels?.sumo_duel_wins || 0;
-  const sumoWinstreak = duels?.current_winstreak_mode_sumo_duel || 0;
-  const sumoLosses = duels?.sumo_duel_losses || 0;
-  const sumoWlr = getRatio(sumoWins, sumoLosses);
-  const sumoKills = duels?.sumo_duel_kills || 0;
-  const sumoDeaths = duels?.sumo_duel_deaths || 0;
-  const sumoKdr = getRatio(sumoKills, sumoDeaths);
-  const sumoGamesPlayed = duels?.sumo_duel_rounds_played || 0;
-  const uhcSoloWins = duels?.uhc_duel_wins || 0;
-  const uhcSoloWinstreak = duels?.current_winstreak_mode_uhc_duel || 0;
-  const uhcSoloLosses = duels?.uhc_duel_losses || 0;
-  const uhcSoloWlr = getRatio(uhcSoloWins, uhcSoloLosses);
-  const uhcSoloKills = duels?.uhc_duel_kills || 0;
-  const uhcSoloDeaths = duels?.uhc_duel_deaths || 0;
-  const uhcSoloKdr = getRatio(uhcSoloKills, uhcSoloDeaths);
-  const uhcSoloGamesPlayed = duels?.uhc_duel_rounds_played || 0;
-  const uhcDoublesWins = duels?.uhc_doubles_wins || 0;
-  const uhcDoublesWinstreak = duels?.current_winstreak_mode_uhc_doubles || 0;
-  const uhcDoublesLosses = duels?.uhc_doubles_losses || 0;
-  const uhcDoublesWlr = getRatio(uhcDoublesWins, uhcDoublesLosses);
-  const uhcDoublesKills = duels?.uhc_doubles_kills || 0;
-  const uhcDoublesDeaths = duels?.uhc_doubles_deaths || 0;
-  const uhcDoublesKdr = getRatio(uhcDoublesKills, uhcDoublesDeaths);
-  const uhcDoublesGamesPlayed = duels?.uhc_doubles_rounds_played || 0;
-  const uhcFoursWins = duels?.uhc_four_wins || 0;
-  const uhcFoursWinstreak = duels?.current_winstreak_mode_uhc_four || 0;
-  const uhcFoursLosses = duels?.uhc_four_losses || 0;
-  const uhcFoursWlr = getRatio(uhcFoursWins, uhcFoursLosses);
-  const uhcFoursKills = duels?.uhc_four_kills || 0;
-  const uhcFoursDeaths = duels?.uhc_four_deaths || 0;
-  const uhcFoursKdr = getRatio(uhcFoursKills, uhcFoursDeaths);
-  const uhcFoursGamesPlayed = duels?.uhc_four_rounds_played || 0;
-  const uhcDeathmatchWins = duels?.uhc_meetup_wins || 0;
-  const uhcDeathmatchWinstreak = duels?.current_winstreak_mode_uhc_meetup || 0;
-  const uhcDeathmatchLosses = duels?.uhc_meetup_losses || 0;
-  const uhcDeathmatchWlr = getRatio(uhcDeathmatchWins, uhcDeathmatchLosses);
-  const uhcDeathmatchKills = duels?.uhc_meetup_kills || 0;
-  const uhcDeathmatchDeaths = duels?.uhc_meetup_deaths || 0;
-  const uhcDeathmatchKdr = getRatio(uhcDeathmatchKills, uhcDeathmatchDeaths);
-  const uhcDeathmatchGamesPlayed = duels?.uhc_meetup_rounds_played || 0;
-  const uhcWins = uhcSoloWins + uhcDoublesWins + uhcDeathmatchWins + uhcFoursWins;
-  const uhcWinstreak = duels?.current_winstreak_mode_uhc_duel || 0;
-  const uhcLosses = uhcSoloLosses + uhcDoublesLosses + uhcDeathmatchLosses + uhcFoursLosses;
-  const uhcWlr = getRatio(uhcWins, uhcLosses);
-  const uhcKills = uhcSoloKills + uhcDoublesKills + uhcDeathmatchKills + uhcFoursKills;
-  const uhcDeaths = uhcSoloDeaths + uhcDoublesDeaths + uhcDeathmatchDeaths + uhcFoursDeaths;
-  const uhcKdr = getRatio(uhcKills, uhcDeaths);
-  const uhcGamesPlayed = uhcSoloGamesPlayed + uhcDoublesGamesPlayed + uhcDeathmatchGamesPlayed + uhcFoursGamesPlayed;
+  const getStat = (prefix: string, stat: string) => duels?.[`${prefix}_${stat}`] || 0;
 
-  return {
+  const getMode = (prefix: string) => {
+    return {
+      wins: getStat(prefix, "wins"),
+      winstreak: duels[`current_winstreak_mode_${prefix}`] || 0,
+      losses: getStat(prefix, "losses"),
+      WLR: getRatio(getStat(prefix, "wins"), getStat(prefix, "losses")),
+      kills: getStat(prefix, "kills"),
+      deaths: getStat(prefix, "deaths"),
+      KDR: getRatio(getStat(prefix, "kills"), getStat(prefix, "deaths")),
+      gamesPlayed: duels[`${prefix}_rounds_played`] || 0,
+    };
+  };
+
+  const formattedDuels: any = {
     coins: duels?.coins || 0,
     chests: duels?.duels_chests || 0,
     activeTitle: duels?.active_cosmetictitle || null,
     overall: {
-      gamesPlayed: gamesPlayed,
-      winstreak: winstreak,
-      wins: wins,
-      losses: losses,
-      WLR: wlr,
-      kills: kills,
-      deaths: deaths,
-      KDR: kdr,
+      gamesPlayed: duels?.games_played_duels || 0,
+      winstreak: duels?.current_winstreak || 0,
+      wins: duels?.wins || 0,
+      losses: duels?.losses || 0,
+      WLR: getRatio(duels?.wins || 0, duels?.losses || 0),
+      kills: duels?.kills || 0,
+      deaths: duels?.deaths || 0,
+      KDR: getRatio(duels?.kills || 0, duels?.deaths || 0),
     },
-    arena: {
-      gamesPlayed: arenaGamesPlayed,
-      winstreak: arenaWinstreak,
-      wins: arenaWins,
-      losses: arenaLosses,
-      WLR: arenaWlr,
-      kills: arenaKills,
-      deaths: arenaDeaths,
-      KDR: arenaKdr,
-    },
-    blitz: {
-      gamesPlayed: blitzGamesPlayed,
-      winstreak: blitzWinstreak,
-      wins: blitzWins,
-      losses: blitzLosses,
-      WLR: blitzWlr,
-      kills: blitzKills,
-      deaths: blitzDeaths,
-      KDR: blitzKdr,
-    },
-    bow: {
-      gamesPlayed: bowGamesPlayed,
-      winstreak: bowWinstreak,
-      wins: bowWins,
-      losses: bowLosses,
-      WLR: bowWlr,
-      kills: bowKills,
-      deaths: bowDeaths,
-      KDR: bowKdr,
-    },
-    bowspleef: {
-      gamesPlayed: bowspleefGamesPlayed,
-      winstreak: bowspleefWinstreak,
-      wins: bowspleefWins,
-      losses: bowspleefLosses,
-      WLR: bowspleefWlr,
-      kills: bowspleefKills,
-      deaths: bowspleefDeaths,
-      KDR: bowspleefKdr,
-    },
-    boxing: {
-      gamesPlayed: boxingGamesPlayed,
-      winstreak: boxingWinstreak,
-      wins: boxingWins,
-      losses: boxingLosses,
-      WLR: boxingWlr,
-      kills: boxingKills,
-      deaths: boxingDeaths,
-      KDR: boxingKdr,
-    },
+    arena: getMode("duel_arena"),
+    blitz: getMode("blitz_duel"),
+    bow: getMode("bow_duel"),
+    bowspleef: getMode("bowspleef_duel"),
+    boxing: getMode("boxing_duel"),
     bridge: {
-      overall: {
-        gamesPlayed: bridgeGamesPlayed,
-        winstreak: bridgeWinstreak,
-        wins: bridgeWins,
-        losses: bridgeLosses,
-        WLR: bridgeWlr,
-        kills: bridgeKills,
-        deaths: bridgeDeaths,
-        KDR: bridgeKdr,
-      },
-      solo: {
-        gamesPlayed: bridgeSoloGamesPlayed,
-        winstreak: bridgeSoloWinstreak,
-        wins: bridgeSoloWins,
-        losses: bridgeSoloLosses,
-        WLR: bridgeSoloWlr,
-        kills: bridgeSoloKills,
-        deaths: bridgeSoloDeaths,
-        KDR: bridgeSoloKdr,
-      },
-      doubles: {
-        gamesPlayed: bridgeDoublesGamesPlayed,
-        winstreak: bridgeDoublesWinstreak,
-        wins: bridgeDoublesWins,
-        losses: bridgeDoublesLosses,
-        WLR: birdgeDoublesWlr,
-        kills: bridgeDoublesKills,
-        deaths: bridgeDoublesDeaths,
-        KDR: bridgeDoublesKdr,
-      },
-      threes: {
-        gamesPlayed: bridgeThreesGamesPlayed,
-        winstreak: bridgeThreesWinstreak,
-        wins: bridgeThreesWins,
-        losses: bridgeThreesLosses,
-        WLR: bridgeThreesWlr,
-        kills: bridgeThreesKills,
-        deaths: bridgeThreesDeaths,
-        KDR: bridgeThreesKdr,
-      },
-      fours: {
-        gamesPlayed: bridgeFoursGamesPlayed,
-        winstreak: bridgeFoursWinstreak,
-        wins: bridgeFoursWins,
-        losses: bridgeFoursLosses,
-        WLR: bridgeFoursWlr,
-        kills: bridgeFoursKills,
-        deaths: bridgeFoursDeaths,
-        KDR: bridgeFoursKdr,
-      },
-      ["2v2v2v2"]: {
-        gamesPlayed: bridgeQuadDoublesGamesPlayed,
-        winstreak: bridgeQuadDoublesWinstreak,
-        wins: bridgeQuadDoublesWins,
-        losses: bridgeQuadDoublesLosses,
-        WLR: bridgeQuadDoublesWlr,
-        kills: bridgeQuadDoublesKills,
-        deaths: bridgeQuadDoublesDeaths,
-        KDR: bridgeQuadDoublesKdr,
-      },
-      ["3v3v3v3"]: {
-        gamesPlayed: bridgeQuadThreesGamesPlayed,
-        winstreak: bridgeQuadThreesWinstreak,
-        wins: bridgeQuadThreesWins,
-        losses: bridgeQuadThreesLosses,
-        WLR: bridgeQuadThreesWlr,
-        kills: bridgeQuadThreesKills,
-        deaths: bridgeQuadThreesDeaths,
-        KDR: bridgeQuadThreesKdr,
-      },
-      CTF: {
-        gamesPlayed: bridgeCTFGamesPlayed,
-        winstreak: bridgeCTFWinstreak,
-        wins: bridgeCTFWins,
-        losses: bridgeCTFLosses,
-        WLR: bridgeCTFWlr,
-        kills: bridgeCTFKills,
-        deaths: bridgeCTFDeaths,
-        KDR: bridgeCTFKdr,
-      },
+      overall: addObjects(getMode("bridge_duel"), getMode("bridge_doubles"), getMode("bridge_threes"), getMode("bridge_fours"), getMode("bridge_2v2v2v2"), getMode("bridge_3v3v3v3"), getMode("capture_threes")),
+      solo: getMode("bridge_duel"),
+      doubles: getMode("bridge_doubles"),
+      threes: getMode("bridge_threes"),
+      fours: getMode("bridge_fours"),
+      "2v2v2v2": getMode("bridge_2v2v2v2"),
+      "3v3v3v3": getMode("bridge_3v3v3v3"),
+      CTF: getMode("capture_threes"),
     },
-    classic: {
-      gamesPlayed: classicGamesPlayed,
-      winstreak: classicWinstreak,
-      wins: classicWins,
-      losses: classicLosses,
-      WLR: classicWlr,
-      kills: classicKills,
-      deaths: classicDeaths,
-      KDR: classicKdr,
-    },
-    combo: {
-      gamesPlayed: comboGamesPlayed,
-      winstreak: comboWinstreak,
-      wins: comboWins,
-      losses: comboLosses,
-      WLR: comboWlr,
-      kills: comboKills,
-      deaths: comboDeaths,
-      KDR: comboKdr,
-    },
+    classic: getMode("classic_duel"),
+    combo: getMode("combo_duel"),
     megawalls: {
-      overall: {
-        gamesPlayed: MWGamesPlayed,
-        winstreak: MWWinstreak,
-        wins: MWWins,
-        losses: MWLosses,
-        WLR: MWWlr,
-        kills: MWKills,
-        deaths: MWDeaths,
-        KDR: MWKdr,
-      },
-      solo: {
-        gamesPlayed: MWSoloGamesPlayed,
-        winstreak: MWSoloWinstreak,
-        wins: MWSoloWins,
-        losses: MWSoloLosses,
-        WLR: MWSoloWlr,
-        kills: MWSoloKills,
-        deaths: MWSoloDeaths,
-        KDR: MWSoloKdr,
-      },
-      doubles: {
-        gamesPlayed: MWDoublesGamesPlayed,
-        winstreak: MWDoublesWinstreak,
-        wins: MWDoublesWins,
-        losses: MWDoublesLosses,
-        WLR: MWDoublesWlr,
-        kills: MWDoublesKills,
-        deaths: MWDoublesDeaths,
-        KDR: MWDoublesKdr,
-      },
+      overall: addObjects(getMode("mw_duel"), getMode("mw_doubles")),
+      solo: getMode("mw_duel"),
+      doubles: getMode("mw_doubles"),
     },
-    noDebuff: {
-      gamesPlayed: no_debuffGamesPlayed,
-      winstreak: no_debuffWinstreak,
-      wins: no_debuffWins,
-      losses: no_debuffLosses,
-      WLR: no_debuffWlr,
-      kills: no_debuffKills,
-      deaths: no_debuffDeaths,
-      KDR: no_debuffKdr,
-    },
+    noDebuff: getMode("potion_duel"),
     op: {
-      overall: {
-        gamesPlayed: OPGamesPlayed,
-        winstreak: OPWinstreak,
-        wins: OPWins,
-        losses: OPLosses,
-        WLR: OPWlr,
-        kills: OPKills,
-        deaths: OPDeaths,
-        KDR: OPKdr,
-      },
-      solo: {
-        gamesPlayed: OPSoloGamesPlayed,
-        winstreak: OPSoloWinstreak,
-        wins: OPSoloWins,
-        losses: OPSoloLosses,
-        WLR: OPSoloWlr,
-        kills: OPSoloKills,
-        deaths: OPSoloDeaths,
-        KDR: OPSoloKdr,
-      },
-      doubles: {
-        gamesPlayed: OPDoublesGamesPlayed,
-        winstreak: OPDoublesWinstreak,
-        wins: OPDoublesWins,
-        losses: OPDoublesLosses,
-        WLR: OPDoublesWlr,
-        kills: OPDoublesKills,
-        deaths: OPDoublesDeaths,
-        KDR: OPDoublesKdr,
-      },
+      overall: addObjects(getMode("op_duel"), getMode("op_doubles")),
+      solo: getMode("op_duel"),
+      doubles: getMode("op_doubles"),
     },
-    parkour: {
-      gamesPlayed: parkourGamesPlayed,
-      winstreak: parkourWinstreak,
-      wins: parkourWins,
-      losses: parkourLosses,
-      WLR: parkourWlr,
-    },
+    parkour: getMode("parkour_eight"),
     skywars: {
-      overall: {
-        gamesPlayed: SkywarsGamesPlayed,
-        winstreak: SkywarsWinstreak,
-        wins: SkywarsWins,
-        losses: SkywarsLosses,
-        WLR: SkywarsWlr,
-        kills: SkywarsKills,
-        deaths: SkywarsDeaths,
-        KDR: SkywarsKdr,
-      },
-      solo: {
-        gamesPlayed: SkywarsSoloGamesPlayed,
-        winstreak: SkywarsSoloWinstreak,
-        wins: SkywarsSoloWins,
-        losses: SkywarsSoloLosses,
-        WLR: SkywarsSoloWlr,
-        kills: SkywarsSoloKills,
-        deaths: SkywarsSoloDeaths,
-        KDR: SkywarsSoloKdr,
-      },
-      doubles: {
-        gamesPlayed: SkywarsDoublesGamesPlayed,
-        winstreak: SkywarsDoublesWinstreak,
-        wins: SkywarsDoublesWins,
-        losses: SkywarsDoublesLosses,
-        WLR: SkywarsDoublesWlr,
-        kills: SkywarsDoublesKills,
-        deaths: SkywarsDoublesDeaths,
-        KDR: SkywarsDoublesKdr,
-      },
+      overall: addObjects(getMode("sw_duel"), getMode("sw_doubles")),
+      solo: getMode("sw_duel"),
+      doubles: getMode("sw_doubles"),
     },
-    sumo: {
-      gamesPlayed: sumoGamesPlayed,
-      winstreak: sumoWinstreak,
-      wins: sumoWins,
-      losses: sumoLosses,
-      WLR: sumoWlr,
-      kills: sumoKills,
-      deaths: sumoDeaths,
-      KDR: sumoKdr,
-    },
+    sumo: getMode("sumo_duel"),
     uhc: {
-      overall: {
-        gamesPlayed: uhcGamesPlayed,
-        winstreak: uhcWinstreak,
-        wins: uhcWins,
-        losses: uhcLosses,
-        WLR: uhcWlr,
-        kills: uhcKills,
-        deaths: uhcDeaths,
-        KDR: uhcKdr,
-      },
-      solo: {
-        gamesPlayed: uhcSoloGamesPlayed,
-        winstreak: uhcSoloWinstreak,
-        wins: uhcSoloWins,
-        losses: uhcSoloLosses,
-        WLR: uhcSoloWlr,
-        kills: uhcSoloKills,
-        deaths: uhcSoloDeaths,
-        KDR: uhcSoloKdr,
-      },
-      doubles: {
-        gamesPlayed: uhcDoublesGamesPlayed,
-        winstreak: uhcDoublesWinstreak,
-        wins: uhcDoublesWins,
-        losses: uhcDoublesLosses,
-        WLR: uhcDoublesWlr,
-        kills: uhcDoublesKills,
-        deaths: uhcDoublesDeaths,
-        KDR: uhcDoublesKdr,
-      },
-      fours: {
-        gamesPlayed: uhcFoursGamesPlayed,
-        winstreak: uhcFoursWinstreak,
-        wins: uhcFoursWins,
-        losses: uhcFoursLosses,
-        WLR: uhcFoursWlr,
-        kills: uhcFoursKills,
-        deaths: uhcFoursDeaths,
-        KDR: uhcFoursKdr,
-      },
-      deathmatch: {
-        gamesPlayed: uhcDeathmatchGamesPlayed,
-        winstreak: uhcDeathmatchWinstreak,
-        wins: uhcDeathmatchWins,
-        losses: uhcDeathmatchLosses,
-        WLR: uhcDeathmatchWlr,
-        kills: uhcDeathmatchKills,
-        deaths: uhcDeathmatchDeaths,
-        KDR: uhcDeathmatchKdr,
-      },
+      overall: addObjects(getMode("uhc_duel"), getMode("uhc_doubles"), getMode("uhc_four"), getMode("uhc_meetup")),
+      solo: getMode("uhc_duel"),
+      doubles: getMode("uhc_doubles"),
+      fours: getMode("uhc_four"),
+      deathmatch: getMode("uhc_meetup"),
     },
   };
+
+  return formattedDuels;
 };
 
 const formatSkyblock = (skyblock: any) => {
