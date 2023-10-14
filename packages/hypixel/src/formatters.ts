@@ -2,11 +2,60 @@ import nbt from "prismarine-nbt";
 import util from "util";
 // @ts-ignore
 import minecraftItems from "minecraft-items";
-import { getRatio, formatUUID, decodeNBT, addObjects } from "@pixelic/utils";
+import { getRatio, formatUUID, decodeNBT } from "@pixelic/utils";
 import { HypixelActiveAuction, HypixelEndedAuction } from "@pixelic/types";
 import { getSkyblockItems } from "./index.js";
 
 const parseNbt = util.promisify(nbt.parse);
+
+const addObjects = (objects: { [key: string]: number | object }[], ratios?: string[]): { [key: string]: number | object } => {
+  const result: { [key: string]: number | object } = {};
+
+  const addNestedObjects = (source: { [key: string]: number }, target: { [key: string]: number }) => {
+    for (const key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (target[key] === undefined) {
+          target[key] = source[key];
+        } else {
+          if (ratios?.includes(key)) {
+            target[key] = (source[key] + target[key]) / (objects.length + 1);
+          } else {
+            target[key] += source[key];
+          }
+        }
+      }
+    }
+  };
+
+  for (const obj of objects) {
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (typeof obj[key] === "object") {
+          if (!result[key]) {
+            // @ts-ignore
+            result[key] = {};
+          }
+          // @ts-ignore
+          addNestedObjects(obj[key], result[key]);
+        } else {
+          if (result[key] === undefined) {
+            result[key] = obj[key];
+          } else {
+            if (ratios?.includes(key)) {
+              // @ts-ignore
+              result[key] = (obj[key] + result[key]) / (objects.length + 1);
+            } else {
+              // @ts-ignore
+              result[key] += obj[key];
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return result;
+};
 
 const parseRank = (rank: string, packageRank: string | null, newPackageRank: string | null, monthlyPackageRank: string | null, prefix: string) => {
   if (prefix === "§c[OWNER]") {
@@ -93,55 +142,118 @@ const formatBedwars = (bedwars: any) => {
     return level + EXPWithoutPrestiges / 5000;
   };
 
-  const hypixelModes = ["", "eight_one_", "eight_two_", "four_three_", "four_four_", "two_four_", "eight_two_lucky_", "four_four_lucky_", "eight_two_rush_", "four_four_rush_", "eight_two_ultimate_", "four_four_ultimate_", "eight_two_armed_", "four_four_armed_", "eight_two_voidless_", "four_four_voidless_", "castle_"];
-  const pixelicModes = ["overall", "solo", "doubles", "threes", "fours", "4v4", "luckyDoubles", "luckyFours", "rushDoubles", "rushFours", "ultimateDoubles", "ultimateFours", "armedDoubles", "armedFours", "voidlessDoubles", "voidlessFours", "castle"];
+  const getStat = (prefix: string, stat: string) => bedwars?.[`${prefix}${stat}`] || 0;
 
-  const stats: any = {};
-
-  stats["EXP"] = bedwars?.Experience || 0;
-  stats["level"] = getLevelForEXP(stats["EXP"]);
-  stats["coins"] = bedwars?.coins || 0;
-  stats["chests"] = bedwars?.bedwars_boxes || 0;
-
-  stats["quickbuy"] = ["wool", "stone_sword", "chainmail_boots", null, "bow", "speed_ii_potion_(45_seconds)", "tnt", "oak_wood_planks", "iron_sword", "iron_boots", "shears", "arrow", "jump_v_potion_(45_seconds)", "water_bucket", null, null, null, null, null, null, null];
-  if (bedwars?.["favourites_2"]) {
-    stats["quickbuy"] = bedwars["favourites_2"].toLowerCase().split(",");
-    for (const slot in stats["quickbuy"]) {
-      if (stats["quickbuy"][slot] === "null") stats["quickbuy"][slot] = null;
-    }
-  }
-  stats["preferedSlots"] = [null, null, null, null, null, null, null, null, null];
-  if (bedwars?.["favorite_slots"]) {
-    stats["preferedSlots"] = bedwars["favorite_slots"].toLowerCase().split(",");
-    for (const slot in stats["preferedSlots"]) {
-      if (stats["preferedSlots"][slot] === "null") stats["preferedSlots"][slot] = null;
-    }
-  }
-
-  for (const mode in hypixelModes) {
-    stats[pixelicModes[mode]] = {};
-    stats[pixelicModes[mode]]["gamesPlayed"] = bedwars?.[`${hypixelModes[mode]}games_played_bedwars`] || 0;
-    stats[pixelicModes[mode]]["winstreak"] = bedwars?.[`${hypixelModes[mode]}winstreak`] || 0;
-    stats[pixelicModes[mode]]["wins"] = bedwars?.[`${hypixelModes[mode]}wins_bedwars`] || 0;
-    stats[pixelicModes[mode]]["losses"] = bedwars?.[`${hypixelModes[mode]}losses_bedwars`] || 0;
-    stats[pixelicModes[mode]]["WLR"] = getRatio(stats[pixelicModes[mode]]["wins"], stats[pixelicModes[mode]]["losses"]);
-    stats[pixelicModes[mode]]["finalKills"] = bedwars?.[`${hypixelModes[mode]}final_kills_bedwars`] || 0;
-    stats[pixelicModes[mode]]["finalDeaths"] = bedwars?.[`${hypixelModes[mode]}final_deaths_bedwars`] || 0;
-    stats[pixelicModes[mode]]["FKDR"] = getRatio(stats[pixelicModes[mode]]["finalKills"], stats[pixelicModes[mode]]["finalDeaths"]);
-    stats[pixelicModes[mode]]["kills"] = bedwars?.[`${hypixelModes[mode]}kills_bedwars`] || 0;
-    stats[pixelicModes[mode]]["deaths"] = bedwars?.[`${hypixelModes[mode]}deaths_bedwars`] || 0;
-    stats[pixelicModes[mode]]["KDR"] = getRatio(stats[pixelicModes[mode]]["kills"], stats[pixelicModes[mode]]["deaths"]);
-    stats[pixelicModes[mode]]["bedsBroken"] = bedwars?.[`${hypixelModes[mode]}beds_broken_bedwars`] || 0;
-    stats[pixelicModes[mode]]["bedsLost"] = bedwars?.[`${hypixelModes[mode]}beds_lost_bedwars`] || 0;
-    stats[pixelicModes[mode]]["BBLR"] = getRatio(stats[pixelicModes[mode]]["bedsBroken"], stats[pixelicModes[mode]]["bedsLost"]);
-    stats[pixelicModes[mode]]["resourcesCollected"] = {
-      iron: bedwars?.[`${hypixelModes[mode]}iron_resources_collected_bedwars`] || 0,
-      gold: bedwars?.[`${hypixelModes[mode]}gold_resources_collected_bedwars`] || 0,
-      diamond: bedwars?.[`${hypixelModes[mode]}diamond_resources_collected_bedwars`] || 0,
-      emerald: bedwars?.[`${hypixelModes[mode]}emerald_resources_collected_bedwars`] || 0,
+  const getMode = (prefix: string) => {
+    return {
+      wins: getStat(prefix, "wins_bedwars"),
+      winstreak: getStat(prefix, "winstreak"),
+      losses: getStat(prefix, "losses_bedwars"),
+      WLR: getRatio(getStat(prefix, "wins_bedwars"), getStat(prefix, "losses_bedwars")),
+      finalKills: getStat(prefix, "final_kills_bedwars"),
+      finalDeaths: getStat(prefix, "final_deaths_bedwars"),
+      FKDR: getRatio(getStat(prefix, "final_kills_bedwars"), getStat(prefix, "final_deaths_bedwars")),
+      kills: getStat(prefix, "kills_bedwars"),
+      deaths: getStat(prefix, "deaths_bedwars"),
+      KDR: getRatio(getStat(prefix, "kills_bedwars"), getStat(prefix, "deaths_bedwars")),
+      bedsBroken: getStat(prefix, "beds_broken_bedwars"),
+      bedsLost: getStat(prefix, "beds_lost_bedwars"),
+      BBLR: getRatio(getStat(prefix, "beds_broken_bedwars"), getStat(prefix, "beds_lost_bedwars")),
+      gamesPlayed: getStat(prefix, "games_played_bedwars"),
+      resourcesCollected: {
+        iron: getStat(prefix, "iron_resources_collected_bedwars"),
+        gold: getStat(prefix, "gold_resources_collected_bedwars"),
+        diamond: getStat(prefix, "diamond_resources_collected_bedwars"),
+        emerald: getStat(prefix, "emerald_resources_collected_bedwars"),
+      },
     };
+  };
+
+  const formattedBedwars: any = {
+    EXP: bedwars?.Experience || 0,
+    level: getLevelForEXP(bedwars?.Experience || 0),
+    coins: bedwars?.coins || 0,
+    chests: bedwars?.bedwars_boxes || 0,
+    quickbuy: ["wool", "stone_sword", "chainmail_boots", null, "bow", "speed_ii_potion_(45_seconds)", "tnt", "oak_wood_planks", "iron_sword", "iron_boots", "shears", "arrow", "jump_v_potion_(45_seconds)", "water_bucket", null, null, null, null, null, null, null],
+    preferedSlots: [null, null, null, null, null, null, null, null, null],
+    overall: getMode(""),
+    solo: getMode("eight_one_"),
+    doubles: getMode("eight_two_"),
+    threes: getMode("four_three_"),
+    fours: getMode("four_four_"),
+    "4v4": getMode("two_four_"),
+    dreams: {
+      lucky: {
+        overall: addObjects([getMode("eight_two_lucky_"), getMode("four_four_lucky_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_lucky_"),
+        fours: getMode("four_four_lucky_"),
+      },
+      rush: {
+        overall: addObjects([getMode("eight_two_rush_"), getMode("four_four_rush_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_rush_"),
+        fours: getMode("four_four_rush_"),
+      },
+      ultimate: {
+        overall: addObjects([getMode("eight_two_ultimate_"), getMode("four_four_ultimate_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_ultimate_"),
+        fours: getMode("four_four_ultimate_"),
+      },
+      armed: {
+        overall: addObjects([getMode("eight_two_armed_"), getMode("four_four_armed_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_armed_"),
+        fours: getMode("four_four_armed_"),
+      },
+      voidless: {
+        overall: addObjects([getMode("eight_two_voidless_"), getMode("four_four_voidless_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_voidless_"),
+        fours: getMode("four_four_voidless_"),
+      },
+      swap: {
+        overall: addObjects([getMode("eight_two_swap_"), getMode("four_four_swap_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        doubles: getMode("eight_two_swap_"),
+        fours: getMode("four_four_swap_"),
+      },
+      castle: getMode("castle_"),
+    },
+    practice: {
+      selected: bedwars?.practice?.selected || null,
+      bridging: {
+        successes: bedwars?.practice?.bridging?.successful_attempts || 0,
+        fails: bedwars?.practice?.bridging?.failed_attempts || 0,
+        blocksPlaced: bedwars?.practice?.bridging?.blocks_placed || 0,
+      },
+      MLG: {
+        successes: bedwars?.practice?.mlg?.successful_attempts || 0,
+        fails: bedwars?.practice?.mlg?.failed_attempts || 0,
+        blocksPlaced: bedwars?.practice?.mlg?.blocks_placed || 0,
+      },
+      fireballJumping: {
+        successes: bedwars?.practice?.fireball_jumping?.successful_attempts || 0,
+        fails: bedwars?.practice?.fireball_jumping?.failed_attempts || 0,
+        blocksPlaced: bedwars?.practice?.fireball_jumping?.blocks_placed || 0,
+      },
+      pearlClutching: {
+        successes: bedwars?.practice?.fireball_jumping?.successful_attempts || 0,
+        fails: bedwars?.practice?.fireball_jumping?.failed_attempts || 0,
+      },
+    },
+  };
+
+  if (bedwars?.["favourites_2"]) {
+    formattedBedwars["quickbuy"] = bedwars["favourites_2"].toLowerCase().split(",");
+    for (const slot in formattedBedwars["quickbuy"]) {
+      if (formattedBedwars["quickbuy"][slot] === "null") formattedBedwars["quickbuy"][slot] = null;
+    }
   }
-  return stats;
+
+  if (bedwars?.["favorite_slots"]) {
+    formattedBedwars["preferedSlots"] = bedwars["favorite_slots"].toLowerCase().split(",");
+    for (const slot in formattedBedwars["preferedSlots"]) {
+      if (formattedBedwars["preferedSlots"][slot] === "null") formattedBedwars["preferedSlots"][slot] = null;
+    }
+  }
+
+  return formattedBedwars;
 };
 
 const formatSkywars = (skywars: any) => {
@@ -158,49 +270,51 @@ const formatSkywars = (skywars: any) => {
     return level;
   };
 
-  const hypixelModes = ["", "_solo", "_team"];
-  const pixelicModes = ["overall", "solo", "doubles"];
+  const getStat = (prefix: string, stat: string) => skywars?.[`${stat}${prefix}`] || 0;
 
-  const stats: any = {};
-
-  stats["EXP"] = skywars?.skywars_experience || 0;
-  stats["level"] = getLevelForEXP(stats["EXP"]);
-  stats["coins"] = skywars?.coins || 0;
-  stats["tokens"] = skywars?.cosmetic_tokens || 0;
-  stats["souls"] = skywars?.souls || 0;
-  stats["chests"] = skywars?.skywars_chests || 0;
-  stats["heads"] = {
-    total: skywars?.heads || 0,
-    eww: skywars?.heads_eww || 0,
-    yucky: skywars?.heads_yucky || 0,
-    meh: skywars?.heads_meh || 0,
-    decent: skywars?.heads_decent || 0,
-    salty: skywars?.heads_salty || 0,
-    tasty: skywars?.heads_tasty || 0,
-    succulent: skywars?.heads_succulent || 0,
-    sweet: skywars?.heads_sweet || 0,
-    divine: skywars?.heads_divine || 0,
-    heavenly: skywars?.heads_heavenly || 0,
+  const getMode = (prefix: string) => {
+    return {
+      wins: getStat(prefix, "wins"),
+      losses: getStat(prefix, "losses"),
+      WLR: getRatio(getStat(prefix, "wins"), getStat(prefix, "losses")),
+      kills: getStat(prefix, "kills"),
+      deaths: getStat(prefix, "deaths"),
+      KDR: getRatio(getStat(prefix, "kills"), getStat(prefix, "deaths")),
+      assists: getStat(prefix, "assists"),
+      arrowsShot: getStat(prefix, "arrows_shot"),
+      arrowsHit: getStat(prefix, "arrows_hit"),
+      AHMR: getRatio(getStat(prefix, "arrows_shot"), getStat(prefix, "arrows_hit")),
+      timePlayed: getStat(prefix, "time_played"),
+    };
   };
 
-  for (const mode in hypixelModes) {
-    stats[pixelicModes[mode]] = {};
-    stats[pixelicModes[mode]]["timePlayed"] = skywars?.[`time_played${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["wins"] = skywars?.[`wins${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["losses"] = skywars?.[`losses${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["WLR"] = getRatio(stats[pixelicModes[mode]]["wins"], stats[pixelicModes[mode]]["losses"]);
-    stats[pixelicModes[mode]]["kills"] = skywars?.[`kills${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["deaths"] = skywars?.[`deaths${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["KDR"] = getRatio(stats[pixelicModes[mode]]["kills"], stats[pixelicModes[mode]]["deaths"]);
-    stats[pixelicModes[mode]]["assists"] = skywars?.[`assists${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["arrowsShot"] = skywars?.[`arrows_shot${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["arrowsHit"] = skywars?.[`arrows_hit${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["AHMR"] = getRatio(stats[pixelicModes[mode]]["arrowsHit"], stats[pixelicModes[mode]]["arrowsShot"]);
-  }
-
-  stats["overall"]["gamesPlayed"] = skywars?.games_played_skywars || 0;
-
-  return stats;
+  return {
+    EXP: skywars?.skywars_experience || 0,
+    level: getLevelForEXP(skywars?.skywars_experience || 0),
+    coins: skywars?.coins || 0,
+    tokens: skywars?.cosmetic_tokens || 0,
+    souls: skywars?.souls || 0,
+    chests: skywars?.skywars_chests || 0,
+    totalHeads: skywars?.heads || 0,
+    heads: {
+      eww: skywars?.heads_eww || 0,
+      yucky: skywars?.heads_yucky || 0,
+      meh: skywars?.heads_meh || 0,
+      decent: skywars?.heads_decent || 0,
+      salty: skywars?.heads_salty || 0,
+      tasty: skywars?.heads_tasty || 0,
+      succulent: skywars?.heads_succulent || 0,
+      sweet: skywars?.heads_sweet || 0,
+      divine: skywars?.heads_divine || 0,
+      heavenly: skywars?.heads_heavenly || 0,
+    },
+    overall: {
+      ...getMode(""),
+      gamesPlayed: skywars?.games_played_skywars || 0,
+    },
+    solo: getMode("_solo"),
+    doubles: getMode("_team"),
+  };
 };
 
 const formatDuels = (duels: any) => {
@@ -219,7 +333,7 @@ const formatDuels = (duels: any) => {
     };
   };
 
-  const formattedDuels: any = {
+  return {
     coins: duels?.coins || 0,
     chests: duels?.duels_chests || 0,
     activeTitle: duels?.active_cosmetictitle || null,
@@ -239,7 +353,7 @@ const formatDuels = (duels: any) => {
     bowspleef: getMode("bowspleef_duel"),
     boxing: getMode("boxing_duel"),
     bridge: {
-      overall: addObjects(getMode("bridge_duel"), getMode("bridge_doubles"), getMode("bridge_threes"), getMode("bridge_fours"), getMode("bridge_2v2v2v2"), getMode("bridge_3v3v3v3"), getMode("capture_threes")),
+      overall: addObjects([getMode("bridge_duel"), getMode("bridge_doubles"), getMode("bridge_threes"), getMode("bridge_fours"), getMode("bridge_2v2v2v2"), getMode("bridge_3v3v3v3"), getMode("capture_threes")], ["WLR", "KDR"]),
       solo: getMode("bridge_duel"),
       doubles: getMode("bridge_doubles"),
       threes: getMode("bridge_threes"),
@@ -251,39 +365,37 @@ const formatDuels = (duels: any) => {
     classic: getMode("classic_duel"),
     combo: getMode("combo_duel"),
     megawalls: {
-      overall: addObjects(getMode("mw_duel"), getMode("mw_doubles")),
+      overall: addObjects([getMode("mw_duel"), getMode("mw_doubles")], ["WLR", "KDR"]),
       solo: getMode("mw_duel"),
       doubles: getMode("mw_doubles"),
     },
     noDebuff: getMode("potion_duel"),
     op: {
-      overall: addObjects(getMode("op_duel"), getMode("op_doubles")),
+      overall: addObjects([getMode("op_duel"), getMode("op_doubles")], ["WLR", "KDR"]),
       solo: getMode("op_duel"),
       doubles: getMode("op_doubles"),
     },
     parkour: getMode("parkour_eight"),
     skywars: {
-      overall: addObjects(getMode("sw_duel"), getMode("sw_doubles")),
+      overall: addObjects([getMode("sw_duel"), getMode("sw_doubles")], ["WLR", "KDR"]),
       solo: getMode("sw_duel"),
       doubles: getMode("sw_doubles"),
     },
     sumo: getMode("sumo_duel"),
     uhc: {
-      overall: addObjects(getMode("uhc_duel"), getMode("uhc_doubles"), getMode("uhc_four"), getMode("uhc_meetup")),
+      overall: addObjects([getMode("uhc_duel"), getMode("uhc_doubles"), getMode("uhc_four"), getMode("uhc_meetup")], ["WLR", "KDR"]),
       solo: getMode("uhc_duel"),
       doubles: getMode("uhc_doubles"),
       fours: getMode("uhc_four"),
       deathmatch: getMode("uhc_meetup"),
     },
   };
-
-  return formattedDuels;
 };
 
 const formatSkyblock = (skyblock: any) => {
   const profiles = [];
   for (const profile of Object.keys(skyblock?.profiles || {})) {
-    profiles.push({ ID: formatUUID(skyblock.profiles[profile]["profile_id"]), cuteName: skyblock.profiles[profile]["cute_name"] });
+    profiles.push({ UUID: formatUUID(skyblock.profiles[profile]["profile_id"]), name: skyblock.profiles[profile]["cute_name"] });
   }
   return { profiles };
 };
@@ -472,10 +584,23 @@ const formatArcade = (arcade: any) => {
 };
 
 const formatArena = (arena: any) => {
-  const hypixelModes = ["_1v1", "_2v2", "_4v4"];
-  const pixelicModes = ["solo", "doubles", "4v4"];
+  const getStat = (prefix: string, stat: string) => arena?.[`${stat}_${prefix}`] || 0;
 
-  const stats: any = {
+  const getMode = (prefix: string) => {
+    return {
+      wins: getStat(prefix, "wins"),
+      losses: getStat(prefix, "losses"),
+      WLR: getRatio(getStat(prefix, "wins"), getStat(prefix, "losses")),
+      kills: getStat(prefix, "kills"),
+      deaths: getStat(prefix, "deaths"),
+      KDR: getRatio(getStat(prefix, "kills"), getStat(prefix, "deaths")),
+      damage: getStat(prefix, "damage"),
+      healed: getStat(prefix, "healed"),
+      gamesPlayed: getStat(prefix, "games"),
+    };
+  };
+
+  return {
     coins: arena?.coins || 0,
     coinsSpent: arena?.coins_spent || 0,
     chests: arena?.magical_chest || 0,
@@ -501,33 +626,11 @@ const formatArena = (arena: any) => {
       slowing: arena?.rune_level_slowing || 0,
       speed: arena?.rune_level_speed || 0,
     },
+    overall: addObjects([getMode("1v1"), getMode("2v2"), getMode("4v4")], ["WLR", "KDR"]),
+    solo: getMode("1v1"),
+    doubles: getMode("2v2"),
+    "4v4": getMode("4v4"),
   };
-
-  stats["overall"] = {};
-  stats["overall"]["gamesPlayed"] = arena?.games_1v1 || 0 + arena?.games_2v2 || 0 + arena?.games_4v4 || 0;
-  stats["overall"]["wins"] = arena?.wins_1v1 || 0 + arena?.wins_2v2 || 0 + arena?.wins_4v4 || 0;
-  stats["overall"]["losses"] = arena?.losses_1v1 || 0 + arena?.losses_2v2 || 0 + arena?.losses_4v4 || 0;
-  stats["overall"]["WLR"] = getRatio(stats["overall"]["wins"], stats["overall"]["losses"]);
-  stats["overall"]["kills"] = arena?.kills_1v1 || 0 + arena?.kills_2v2 || 0 + arena?.kills_4v4 || 0;
-  stats["overall"]["deaths"] = arena?.deaths_1v1 || 0 + arena?.deaths_2v2 || 0 + arena?.deaths_4v4 || 0;
-  stats["overall"]["KDR"] = getRatio(stats["overall"]["kills"], stats["overall"]["deaths"]);
-  stats["overall"]["damage"] = arena?.damage_1v1 || 0 + arena?.damage_2v2 || 0 + arena?.damage_4v4 || 0;
-  stats["overall"]["healed"] = arena?.healed_1v1 || 0 + arena?.healed_2v2 || 0 + arena?.healed_4v4 || 0;
-
-  for (const mode in hypixelModes) {
-    stats[pixelicModes[mode]] = {};
-    stats[pixelicModes[mode]]["gamesPlayed"] = arena?.[`games${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["wins"] = arena?.[`wins${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["losses"] = arena?.[`losses${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["WLR"] = getRatio(stats[pixelicModes[mode]]["wins"], stats[pixelicModes[mode]]["losses"]);
-    stats[pixelicModes[mode]]["kills"] = arena?.[`kills${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["deaths"] = arena?.[`deaths${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["KDR"] = getRatio(stats[pixelicModes[mode]]["kills"], stats[pixelicModes[mode]]["deaths"]);
-    stats[pixelicModes[mode]]["damage"] = arena?.[`damage${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["healed"] = arena?.[`healed${hypixelModes[mode]}`] || 0;
-  }
-
-  return stats;
 };
 
 const formatWarlords = (battleground: any) => {
@@ -1388,13 +1491,13 @@ export const formatPlayer = async (player: any) => {
       tokens: player?.adsense_tokens || 0,
     },
     socialMedia: {
-      HYPIXEL: player?.socialMedia?.links?.HYPIXEL?.toLowerCase() || null,
-      DISCORD: player?.socialMedia?.links?.DISCORD?.toLowerCase() || null,
-      YOUTUBE: player?.socialMedia?.links?.YOUTUBE?.toLowerCase() || null,
-      TWITCH: player?.socialMedia?.links?.TWITCH?.toLowerCase() || null,
-      TWITTER: player?.socialMedia?.links?.TWITTER?.toLowerCase() || null,
-      INSTAGRAM: player?.socialMedia?.links?.INSTAGRAM?.toLowerCase() || null,
-      TIKTOK: player?.socialMedia?.links?.TIKTOK?.toLowerCase() || null,
+      HYPIXEL: player?.socialMedia?.links?.HYPIXEL || null,
+      DISCORD: player?.socialMedia?.links?.DISCORD || null,
+      YOUTUBE: player?.socialMedia?.links?.YOUTUBE || null,
+      TWITCH: player?.socialMedia?.links?.TWITCH || null,
+      TWITTER: player?.socialMedia?.links?.TWITTER || null,
+      INSTAGRAM: player?.socialMedia?.links?.INSTAGRAM || null,
+      TIKTOK: player?.socialMedia?.links?.TIKTOK || null,
     },
     stats: {
       Bedwars: formatBedwars(player?.stats?.Bedwars),
