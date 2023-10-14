@@ -41,19 +41,3 @@ export const deepCompare = (obj1: any, obj2: any) => {
     return result;
   }, {} as any);
 };
-
-export const addObjects = (...objects: { [key: string]: number }[]): { [key: string]: number } => {
-  const result: { [key: string]: number } = {};
-  for (const obj of objects) {
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (result[key] === undefined) {
-          result[key] = obj[key];
-        } else {
-          result[key] += obj[key];
-        }
-      }
-    }
-  }
-  return result;
-};
