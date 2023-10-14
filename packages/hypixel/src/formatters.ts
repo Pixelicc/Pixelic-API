@@ -233,8 +233,8 @@ const formatBedwars = (bedwars: any) => {
         blocksPlaced: bedwars?.practice?.fireball_jumping?.blocks_placed || 0,
       },
       pearlClutching: {
-        successes: bedwars?.practice?.fireball_jumping?.successful_attempts || 0,
-        fails: bedwars?.practice?.fireball_jumping?.failed_attempts || 0,
+        successes: bedwars?.practice?.pearl_clutching?.successful_attempts || 0,
+        fails: bedwars?.practice?.pearl_clutching?.failed_attempts || 0,
       },
     },
   };
