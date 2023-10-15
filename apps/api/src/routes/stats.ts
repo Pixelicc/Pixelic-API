@@ -10,7 +10,8 @@ const router = express.Router();
 router.get("/v1/stats/code", async (req, res) => {
   res.set("Cache-Control", "public, max-age=300");
   if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
-  exec("pnpm exec cloc --json --docstring-as-code --include-lang=TypeScript,JavaScript --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
+  exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
+    console.log(error || stderr);
     if (error || stderr) return res.status(500).json({ success: false });
     const raw = JSON.parse(stdout);
     delete raw.header;
