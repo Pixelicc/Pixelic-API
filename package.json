@@ -8,9 +8,10 @@
     "url": "git+https://github.com/pixelicc/pixelic-api.git"
   },
   "scripts": {
-    "build": "turbo run build --parallel --cache-dir=.turbo --no-daemon",
+    "build": "turbo run build --filter=!documentation --parallel --cache-dir=.turbo --no-daemon",
     "api": "pnpm --filter api",
-    "collector": "pnpm --filter collector"
+    "collector": "pnpm --filter collector",
+    "web:docs": "pnpm --filter documentation"
   },
   "devDependencies": {
     "@swc/cli": "0.1.62",
