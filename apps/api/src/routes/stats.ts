@@ -148,6 +148,7 @@ router.get("/v1/stats", async (req, res) => {
       success: true,
       requests: requests,
       requestsFormatted: formatNumber(requests, 3),
+      requestsHistory: await redis.hgetall("API:Analytics:RequestsHistory"),
     });
   } catch {
     return res.status(500).json({ success: false });
