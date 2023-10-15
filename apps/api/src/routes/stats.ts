@@ -131,7 +131,7 @@ router.get("/v1/stats/mongo", async (req, res) => {
       total["bytesStored"] += data.storageSize;
     }
     total["documentsFormatted"] = formatNumber(total.documents, 3);
-    total["averageDocumentSizeFormatted"] = formatNumber(total.averageDocumentSize / Object.keys(parsedDBs).length, 3);
+    total["averageDocumentSizeFormatted"] = formatBytes(total.averageDocumentSize, 3);
     total["bytesStoredFormatted"] = formatBytes(total.bytesStored, 3);
     return res.json({ success: true, ...total, databases: parsedDBs });
   } catch {
