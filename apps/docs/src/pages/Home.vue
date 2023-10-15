@@ -85,7 +85,7 @@ APIStats.value = {
 };
 
 const fetchAPIStats = () => {
-  fetch("http://localhost:3000/v1/stats", { headers: { "Cache-Control": "max-age=0" } })
+  fetch("https://api.pixelic.de/v1/stats", { headers: { "Cache-Control": "max-age=0" } })
     .then(async (res) => {
       if (res.status === 200) {
         const stats = await res.json();
@@ -95,7 +95,7 @@ const fetchAPIStats = () => {
       }
     })
     .catch(() => console.error("Failed to fetch API Overall Stats!"));
-  fetch("http://localhost:3000/v1/stats/mongo", { headers: { "Cache-Control": "max-age=0" } })
+  fetch("https://api.pixelic.de/v1/stats/mongo", { headers: { "Cache-Control": "max-age=0" } })
     .then(async (res) => {
       if (res.status === 200) {
         const stats = await res.json();
@@ -105,7 +105,7 @@ const fetchAPIStats = () => {
       }
     })
     .catch(() => console.error("Failed to fetch API Mongo Stats!"));
-  fetch("http://localhost:3000/v1/stats/redis", { headers: { "Cache-Control": "max-age=0" } })
+  fetch("https://api.pixelic.de/v1/stats/redis", { headers: { "Cache-Control": "max-age=0" } })
     .then(async (res) => {
       if (res.status === 200) {
         const stats = await res.json();
