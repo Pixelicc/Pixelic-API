@@ -50,3 +50,8 @@ export const formatTimeseries = (array: any[], options?: { meta: string }) => {
   }
   return formattedArray;
 };
+
+/**
+ * Converts all string values of the given object into number values
+ */
+export const objectStringToNumber = (obj: any) => Object.keys(obj).reduce((acc: any, key: string) => ((acc[key] = parseFloat(obj[key])), acc), {});
