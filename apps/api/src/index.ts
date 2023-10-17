@@ -1,20 +1,49 @@
-import cluster from "node:cluster";
-import log from "@pixelic/logger";
+import express from "express";
+import * as Sentry from "@sentry/node";
+import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
+import { requestID, JSONHandler, requestAnalytics, defaultNoCacheHeaders } from "@pixelic/middlewares";
 import { config } from "@pixelic/utils";
+import log from "@pixelic/logger";
+import router from "./routes/index.js";
 
-if (cluster.isPrimary) {
-  log("API", `Primary ${process.pid} started...`, "info");
+const API = express();
 
-  const threads = config.environment === "DEV" ? config.API.threads.DEV : config.API.threads.PROD;
-  for (var i = 0; i < threads; i++) {
-    cluster.fork();
-  }
+Sentry.init({
+  dsn: config.API.sentry.dsn,
+  integrations: [
+    new Sentry.Integrations.Http({
+      tracing: false,
+      breadcrumbs: true,
+    }),
+    new Sentry.Integrations.Express({
+      app: API,
+    }),
+  ],
+  tracesSampleRate: config.API.sentry.tracesSampleRate,
+  normalizeDepth: 3,
+  environment: config.environment,
+});
 
-  cluster.on("exit", (worker) => {
-    log("API", `Worker ${worker.process.pid} died...`, "error");
-    cluster.fork();
-  });
-} else {
-  log("API", `Worker ${process.pid} started...`, "info");
-  import("./API.js");
-}
+API.use(Sentry.Handlers.requestHandler());
+API.use(Sentry.Handlers.tracingHandler());
+
+API.disable("etag");
+
+API.use(mongoSanitize(), cors(), requestID, requestAnalytics, express.json(), JSONHandler, defaultNoCacheHeaders);
+
+API.use(router);
+
+API.get("/health", async (req, res) => {
+  return res.set("Cache-Control", "public, max-age=10").status(200).json({ success: true });
+});
+
+API.all("/*", async (req, res) => {
+  return res.status(404).json({ success: false, cause: "Unkown Endpoint" });
+});
+
+API.use(Sentry.Handlers.errorHandler());
+
+API.listen(config.API.port);
+
+log("API", `Listening on port ${config.API.port} ...`, "info");

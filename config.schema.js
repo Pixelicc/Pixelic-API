@@ -16,16 +16,6 @@ export default {
     redis: "",
   },
   API: {
-    threads: {
-      /**
-       * How many threads/workers the API should use during development
-       */
-      DEV: 4,
-      /**
-       * How many threads/workers the API should use during production
-       */
-      PROD: 4,
-    },
     /**
      * Port the API is running on
      */
