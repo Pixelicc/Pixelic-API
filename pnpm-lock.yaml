@@ -240,6 +240,9 @@ importers:
 
   packages/mongo:
     dependencies:
+      '@pixelic/logger':
+        specifier: '*'
+        version: link:../logger
       '@pixelic/types':
         specifier: '*'
         version: link:../../types
@@ -252,6 +255,9 @@ importers:
 
   packages/redis:
     dependencies:
+      '@pixelic/logger':
+        specifier: '*'
+        version: link:../logger
       '@pixelic/utils':
         specifier: '*'
         version: link:../utils
