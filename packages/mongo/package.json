@@ -8,6 +8,7 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/logger": "*",
     "@pixelic/utils": "*",
     "@pixelic/types": "*",
     "mongoose": "^7.4.4"
