@@ -8,7 +8,8 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
-    "ioredis": "^5.3.2",
-    "@pixelic/utils": "*"
+    "@pixelic/logger": "*",
+    "@pixelic/utils": "*",
+    "ioredis": "^5.3.2"
   }
 }
