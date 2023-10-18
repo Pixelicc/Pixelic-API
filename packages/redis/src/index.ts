@@ -4,14 +4,20 @@ import { config } from "@pixelic/utils";
 
 const connection = new Redis(config.database.redis);
 
-connection.once("ready", () => log("Redis", "Connection established", "info"));
 var disconnected = false;
 var initalConnect = true;
+connection.once("ready", () => {
+  log("Redis", "Connection established", "info");
+  setTimeout(() => (initalConnect = false), 100);
+});
 connection.on("error", () => {
   if (!disconnected) {
-    log("Redis", "Connection closed", "error");
+    if (initalConnect) {
+      log("Redis", "Connection not establishable", "error");
+    } else {
+      log("Redis", "Connection closed", "error");
+    }
     disconnected = true;
-    initalConnect = false;
   }
 });
 connection.on("ready", () => {
