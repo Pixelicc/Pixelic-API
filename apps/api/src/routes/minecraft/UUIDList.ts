@@ -21,7 +21,6 @@ router.get("/v1/minecraft/uuids", async (req, res) => {
       success: true,
       totalPages: totalPages,
       currentPage: page,
-      totalUUIDs: totalUUIDs,
       UUIDs: await redis.zrange("Mojang:UUIDList", page * 100000, page * 100000 + 100000),
     });
   } catch {
