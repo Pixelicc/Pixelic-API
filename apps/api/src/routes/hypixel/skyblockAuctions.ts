@@ -2,9 +2,49 @@ import express from "express";
 import { parseUUID } from "@pixelic/mojang";
 import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID } from "@pixelic/utils";
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
-import { ratelimit } from "@pixelic/middlewares";
+import { authorization, ratelimit } from "@pixelic/middlewares";
+import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
 
 const router = express.Router();
+
+router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["STAFF", "ADMIN"], scope: "hypixel:queryAuctions" }), async (req, res) => {
+  try {
+    const { seller, sellerProfile, coop, category, bin, price, priceRange, name, lore, tier, itemID } = req.query as { [key: string]: string };
+
+    const query: string[] = [];
+
+    if (validateUUID(seller)) query.push(`@seller:{${seller}}`);
+    if (validateUUID(sellerProfile)) query.push(`@sellerProfile:{${sellerProfile}}`);
+    if (["true", "false"].includes(coop)) query.push(`@coop:{${coop}}`);
+    if (["WEAPON", "ARMOR", "ACCESSORIES", "CONSUMABLES", "BLOCKS", "MISC"].includes(category)) query.push(`@category:{${category}}`);
+    if (["true", "false"].includes(bin)) query.push(`@bin:{${bin}}`);
+    if (!isNaN(Number(price))) query.push(`@price:[${price},${price}]`);
+    if (/^\[\-?(\d+|inf),\-?(\d+|inf)\]$/.test(priceRange)) query.push(`@price:${priceRange}`);
+    if (name) query.push(`@itemName:${decodeURI(name)}`);
+    if (lore) query.push(`@itemLore:${decodeURI(lore)}`);
+    if (tier) query.push(`@itemTier:{${tier}}`);
+    if (validateUUID(itemID)) query.push(`@itemID:{${itemID}}`);
+
+    return res.json({
+      success: true,
+      filter: {
+        seller,
+        sellerProfile,
+        coop: coop ? Boolean(coop) : undefined,
+        category,
+        bin: bin ? Boolean(bin) : undefined,
+        price: price ? Number(price) : undefined,
+        name,
+        lore,
+        tier,
+        itemID,
+      },
+      ...(await querySkyblockActiveAuctions(query.join(" "))),
+    });
+  } catch {
+    return res.status(500).json({ sucess: false });
+  }
+});
 
 router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(), async (req, res) => {
   try {
