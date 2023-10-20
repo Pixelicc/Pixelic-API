@@ -9,7 +9,6 @@ const requestSchema = new Schema(
     method: { type: String, enum: ["GET", "POST", "PUT", "PATCH", "DELETE"] },
     userAgent: { type: String },
     IP: { type: String },
-    key: { type: String },
   },
   { _id: false }
 );
@@ -19,9 +18,6 @@ const keySchema = new Schema<APIKeyMongo>({
     type: String,
     required: true,
     index: true,
-  },
-  usageHistory: {
-    type: Object,
   },
   requestHistory: [requestSchema],
 });

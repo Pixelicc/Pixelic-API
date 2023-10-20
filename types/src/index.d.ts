@@ -1,3 +1,3 @@
-export * from "./APIKey.js";
+export * from "./api/index.js";
 export * from "./functions.js";
-export * from "./hypixel/skyblockAuctions.js";
+export * from "./hypixel/index.js";
