@@ -10,10 +10,6 @@ export interface APIKeyRedis {
 }
 
 export interface APIKeyMongo {
-  /**
-   * Discord Snowflake
-   * @example "619208257721860108"
-   */
   owner: DiscordSnowflake;
   requestHistory: {
     /**

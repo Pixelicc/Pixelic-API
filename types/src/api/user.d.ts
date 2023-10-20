@@ -5,7 +5,7 @@ import { APIAuthRole, APIAuthScope } from "./auth.ts";
 export interface APIUser {
   timestamp: number;
   /**
-   * Contains all the data about the Users connected Discord Account
+   * Contains all the data about the User's connected Discord Account
    */
   discord:
     | {
@@ -16,7 +16,7 @@ export interface APIUser {
   role: APIAuthRole | string;
   scopes: APIAuthScope[] | string;
   /**
-   * SHA-512 Hash of the Users actual API-Key
+   * SHA-512 Hash of the User's actual API-Key
    *
    * The originally shown API-Key **cannot** be retrieved from the API-Keys's Hash
    */
