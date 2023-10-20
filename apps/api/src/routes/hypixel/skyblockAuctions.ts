@@ -34,6 +34,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
         category,
         bin: bin ? Boolean(bin) : undefined,
         price: price ? Number(price) : undefined,
+        priceRange,
         name,
         lore,
         tier,
