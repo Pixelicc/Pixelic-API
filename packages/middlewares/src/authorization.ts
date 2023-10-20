@@ -17,12 +17,13 @@ export const authorization = ({ role, scope }: RequireOneObjParam<{ role?: APIAu
     if (!(await redis.exists(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`))) return res.status(403).json({ success: false, cause: "Invalid API-Key" });
 
     const data = await redis.hmget(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`, "scopes", "role", "owner");
-    if (scope && !data?.[0]?.includes(scope as APIAuthScope)) return res.status(403).json({ success: false, cause: "Insufficient Permissions", requires: role });
-    if (typeof role === "string" && data[1] !== role) return res.status(403).json({ success: false, cause: "Insufficient Permissions", requires: scope });
-    if (role && !role.includes(data[1] as APIAuthRole)) return res.status(403).json({ success: false, cause: "Insufficient Permissions", requires: scope });
 
     Sentry.setUser({ id: data[2] as DiscordSnowflake });
 
-    return next();
+    if (scope && data?.[0]?.includes(scope as APIAuthScope)) return next();
+    if (typeof role === "string" && data[1] === role) return next();
+    if (Array.isArray(role) && role.includes(data[1] as APIAuthRole)) return next();
+
+    return res.status(403).json({ success: false, cause: "Insufficient Permissions", requires: { role, scope } });
   };
 };
