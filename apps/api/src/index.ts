@@ -2,8 +2,8 @@ import express from "express";
 import * as Sentry from "@sentry/node";
 import mongoSanitize from "express-mongo-sanitize";
 import cors from "cors";
-import { requestID, JSONHandler, requestAnalytics, defaultNoCacheHeaders } from "@pixelic/middlewares";
-import { config } from "@pixelic/utils";
+import { requestID, serverID, JSONHandler, requestAnalytics, defaultNoCacheHeaders } from "@pixelic/middlewares";
+import { config, generateULID } from "@pixelic/utils";
 import log from "@pixelic/logger";
 import router from "./routes/index.js";
 
@@ -30,7 +30,7 @@ API.use(Sentry.Handlers.tracingHandler());
 
 API.disable("etag");
 
-API.use(mongoSanitize(), cors(), requestID, requestAnalytics, express.json(), JSONHandler, defaultNoCacheHeaders);
+API.use(mongoSanitize(), cors(), requestID, serverID(generateULID()), requestAnalytics, express.json(), JSONHandler, defaultNoCacheHeaders);
 
 API.use(router);
 
