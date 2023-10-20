@@ -5,3 +5,4 @@ export * from "./calcs.js";
 export * from "./generators.js";
 export * from "./decoders.js";
 export * from "./SLPPing.js";
+export * from "./hashes.js";
