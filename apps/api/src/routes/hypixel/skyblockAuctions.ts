@@ -16,7 +16,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     const sanitize = (str: string) => str.replace(/[&<>"'/]/g, "");
 
     if (validateUUID(seller) || validateUsername(seller)) query.push(`@seller:{${await parseUUID(seller)}}`);
-    if (validateUUID(sellerProfile)) query.push(`@sellerProfile:{${sellerProfile}}`);
+    if (validateUUID(seller)) query.push(`@sellerProfile:{${formatUUID(seller)}}`);
     if (["true", "false"].includes(coop)) query.push(`@coop:{${coop}}`);
     if (["WEAPON", "ARMOR", "ACCESSORIES", "CONSUMABLES", "BLOCKS", "MISC"].includes(category)) query.push(`@category:{${category}}`);
     if (["true", "false"].includes(bin)) query.push(`@bin:{${bin}}`);
@@ -25,7 +25,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     if (name) query.push(`@itemName:${sanitize(decodeURI(name))}`);
     if (lore) query.push(`@itemLore:${sanitize(decodeURI(lore))}`);
     if (["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "DIVINE", "SPECIAL", "VERY_SPECIAL"].includes(tier)) query.push(`@itemTier:{${tier}}`);
-    if (validateUUID(itemID)) query.push(`@itemID:{${itemID}}`);
+    if (validateUUID(itemID)) query.push(`@itemID:{${formatUUID(itemID)}}`);
 
     return res.json({
       success: true,

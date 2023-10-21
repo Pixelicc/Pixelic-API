@@ -12,7 +12,7 @@ router.get("/v1/minecraft/uuids", async (req, res) => {
     const totalPages = Math.ceil(totalUUIDs / 100000);
 
     if (isNaN(Number(req.query.page)) && req.query.page !== undefined) return res.status(422).json({ success: false, cause: "Invalid Page" });
-    if (Number(req.query.page) < 0 && req.query.page !== undefined) return res.status(422).json({ success: false, cause: "Invalid Page" });
+    if (Number(req.query.page) < 0) return res.status(422).json({ success: false, cause: "Invalid Page" });
     if (req.query.page !== undefined) page = Number(req.query.page);
     if (page > totalPages) return res.status(422).json({ success: false, cause: "Invalid Page" });
     if (page === totalPages) res.set("Cache-Control", `public, max-age=900, stale-while-revalidate=60`);
