@@ -1616,7 +1616,7 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
   if (rawTier.includes("MYTHIC")) tier = "MYTHIC";
   if (rawTier.includes("DIVINE")) tier = "DIVINE";
   if (rawTier.includes("SPECIAL")) tier = "SPECIAL";
-  if (rawTier.includes("VERY SPECIAL")) tier = "VERY SPECIAL";
+  if (rawTier.includes("VERY SPECIAL")) tier = "VERY_SPECIAL";
   if (rawTier.includes("SUPREME")) tier = "DIVINE"; // This should never occure as SUPREME got replaced by DIVINE
   if (rawTier.includes("ADMIN")) tier = "ADMIN"; // This should never occure
 
