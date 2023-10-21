@@ -4,6 +4,7 @@ import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID, val
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
 import { authorization, ratelimit } from "@pixelic/middlewares";
 import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
+import { readSync } from "fs";
 
 const router = express.Router();
 
@@ -13,6 +14,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
 
     const query: string[] = [];
 
+    const sanitize = (str: string) => str.replace(/[&<>"'/]/g, "");
+
     if (validateUUID(seller) || validateUsername(seller)) query.push(`@seller:{${await parseUUID(seller)}}`);
     if (validateUUID(sellerProfile)) query.push(`@sellerProfile:{${sellerProfile}}`);
     if (["true", "false"].includes(coop)) query.push(`@coop:{${coop}}`);
@@ -20,9 +23,9 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     if (["true", "false"].includes(bin)) query.push(`@bin:{${bin}}`);
     if (!isNaN(Number(price))) query.push(`@price:[${price},${price}]`);
     if (/^\[\-?(\d+|inf),\-?(\d+|inf)\]$/.test(priceRange)) query.push(`@price:${priceRange}`);
-    if (name) query.push(`@itemName:${decodeURI(name)}`);
-    if (lore) query.push(`@itemLore:${decodeURI(lore)}`);
-    if (tier) query.push(`@itemTier:{${tier}}`);
+    if (name) query.push(`@itemName:${sanitize(decodeURI(name))}`);
+    if (lore) query.push(`@itemLore:${sanitize(decodeURI(lore))}`);
+    if (["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "DIVINE", "SPECIAL", "VERY_SPECIAL"].includes(tier)) query.push(`@itemTier:{${tier}}`);
     if (validateUUID(itemID)) query.push(`@itemID:{${itemID}}`);
 
     return res.json({
