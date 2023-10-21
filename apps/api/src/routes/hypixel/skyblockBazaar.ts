@@ -28,7 +28,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
   }
 });
 
-router.get("/v1/hypixel/skyblock/bazaar/price/:id/history", ratelimit(), async (req, res) => {
+router.get("/v1/hypixel/skyblock/bazaar/:id/history", ratelimit(), async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
@@ -46,7 +46,7 @@ router.get("/v1/hypixel/skyblock/bazaar/price/:id/history", ratelimit(), async (
   }
 });
 
-router.get("/v1/hypixel/skyblock/bazaar/price/:id/history/:timeframe", ratelimit(), async (req, res) => {
+router.get("/v1/hypixel/skyblock/bazaar/:id/history/:timeframe", ratelimit(), async (req, res) => {
   try {
     if (!["hour", "day", "week", "month", "year"].includes(req.params.timeframe)) return res.status(422).json({ success: false, cause: "Invalid Timeframe" });
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });

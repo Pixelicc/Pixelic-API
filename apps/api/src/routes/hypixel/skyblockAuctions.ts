@@ -4,7 +4,6 @@ import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID, val
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
 import { authorization, ratelimit } from "@pixelic/middlewares";
 import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
-import { readSync } from "fs";
 
 const router = express.Router();
 
