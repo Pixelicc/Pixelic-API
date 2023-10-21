@@ -31,6 +31,22 @@ export default {
       tracesSampleRate: 0.5,
     },
   },
+  collector: {
+    minecraft: {
+      serverPlayercounts: true,
+    },
+    hypixel: {
+      skyblock: {
+        activeAuctions: true,
+        endedAuctions: true,
+        bazaar: true,
+        election: true,
+      },
+    },
+    wynncraft: {
+      serverPlayercounts: true,
+    },
+  },
   mojang: {
     /**
      * Wether to create & maintain a UUIDList in Redis
