@@ -1,6 +1,6 @@
 import express from "express";
 import { parseUUID } from "@pixelic/mojang";
-import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID } from "@pixelic/utils";
+import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID, validateUsername } from "@pixelic/utils";
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
 import { authorization, ratelimit } from "@pixelic/middlewares";
 import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
@@ -13,7 +13,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
 
     const query: string[] = [];
 
-    if (validateUUID(seller)) query.push(`@seller:{${seller}}`);
+    if (validateUUID(seller) || validateUsername(seller)) query.push(`@seller:{${await parseUUID(seller)}}`);
     if (validateUUID(sellerProfile)) query.push(`@sellerProfile:{${sellerProfile}}`);
     if (["true", "false"].includes(coop)) query.push(`@coop:{${coop}}`);
     if (["WEAPON", "ARMOR", "ACCESSORIES", "CONSUMABLES", "BLOCKS", "MISC"].includes(category)) query.push(`@category:{${category}}`);
