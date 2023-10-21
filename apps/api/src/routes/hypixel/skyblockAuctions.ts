@@ -36,7 +36,12 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
         category,
         bin: bin ? Boolean(bin) : undefined,
         price: price ? Number(price) : undefined,
-        priceRange,
+        priceRange: priceRange
+          ? {
+              min: priceRange.slice(1, priceRange.indexOf(",")).includes("inf") ? priceRange.slice(1, priceRange.indexOf(",")) : Number(priceRange.slice(1, priceRange.indexOf(","))),
+              max: priceRange.slice(priceRange.indexOf(",") + 1, -1).includes("inf") ? priceRange.slice(priceRange.indexOf(",") + 1, -1) : Number(priceRange.slice(priceRange.indexOf(",") + 1, -1)),
+            }
+          : undefined,
         name,
         lore,
         tier,
