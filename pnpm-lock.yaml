@@ -109,6 +109,9 @@ importers:
       '@pixelic/wynncraft':
         specifier: '*'
         version: link:../../packages/wynncraft
+      '@sentry/node':
+        specifier: ^7.65.0
+        version: 7.74.1
       cron:
         specifier: ^3.0.0
         version: 3.1.3
