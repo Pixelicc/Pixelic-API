@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import redis from "@pixelic/redis";
 
 /**
- * Tracks data like requests processed
+ * Tracks data like requests processed or other custom Analytics
  */
 export const requestAnalytics = async (req: Request, res: Response, next: NextFunction) => {
   try {
