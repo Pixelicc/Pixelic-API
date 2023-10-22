@@ -1639,7 +1639,11 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
     if (petData?.candyUsed) item.attributes.candyUsed = petData.candyUsed;
     if (petData?.heldItem) item.attributes.heldItem = petData.heldItem;
     if (petData?.skin) item.attributes.skin = petData.skin;
-    if (NBT?.tag?.ExtraAttributes?.timestamp) item.attributes.timestamp = Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000);
+    if (NBT?.tag?.ExtraAttributes?.timestamp) {
+      item.attributes.timestamp = Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000);
+    } else {
+      item.attributes.timestamp = null;
+    }
 
     delete item.attributes.petInfo;
   } else if (NBT?.tag?.ExtraAttributes?.id === "POTION") {
@@ -1661,7 +1665,7 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
       ID: NBT.tag.ExtraAttributes.id,
       UUID: NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : null,
       texture: NBT?.SkullOwner?.Properties?.textures?.[0]?.Value,
-      timestamp: Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000) || null,
+      timestamp: NBT?.tag?.ExtraAttributes?.timestamp ? Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000) : null,
     };
   }
 
