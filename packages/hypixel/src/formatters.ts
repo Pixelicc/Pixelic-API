@@ -1682,7 +1682,7 @@ export const formatSkyblockActiveAuction = async (auction: HypixelActiveAuction)
   for (const bid of auction.bids.sort((a, b) => a.amount - b.amount)) {
     auctionBids.push({
       bidder: bid.bidder,
-      profileID: bid.profile_id,
+      bidderProfile: bid.profile_id,
       amount: bid.amount,
       timestamp: Math.floor(bid.timestamp / 1000),
     });
