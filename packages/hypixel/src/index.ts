@@ -5,7 +5,7 @@ import { parseUUID } from "@pixelic/mojang";
 import { requestHypixel } from "./requestHandler.js";
 import redis from "@pixelic/redis";
 import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockitems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
-import { HypixelActiveAuction, HypixelEndedAuction, RequireOneObjParam } from "@pixelic/types";
+import { RequireOneObjParam } from "@pixelic/types";
 import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockAuctionTrackingModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 import { calculateSkyblockAuctionPrices } from "./calcs.js";
 import { requestTracker } from "@pixelic/interceptors";
@@ -170,7 +170,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
     const UUIDsBefore = await redis.smembers("Hypixel:Auctions:UUIDs");
 
     const firstPage = (await axios.get("https://api.hypixel.net/skyblock/auctions")).data;
-    log("Hypixel", `Fetching Hypixel Auctions (1/${firstPage.totalPages})`, "info");
+    log("Hypixel", `Fetching Hypixel Skyblock Auctions (1/${firstPage.totalPages})`, "info");
     const pipeline = redis.pipeline();
     for (const auction of firstPage.auctions) {
       const formattedData = await formatSkyblockActiveAuction(auction);
@@ -182,7 +182,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
 
     for (var i = 1; i < firstPage.totalPages; i++) {
       const page = (await axios.get(`https://api.hypixel.net/skyblock/auctions?page=${i}`)).data;
-      log("Hypixel", `Fetching Hypixel Auctions (${i + 1}/${firstPage.totalPages})`, "info");
+      log("Hypixel", `Fetching Hypixel Skyblock Auctions (${i + 1}/${firstPage.totalPages})`, "info");
       const pipeline = redis.pipeline();
       for (const auction of page.auctions) {
         const formattedData = await formatSkyblockActiveAuction(auction);
@@ -192,7 +192,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
       }
       pipeline.exec();
     }
-    log("Hypixel", "Fetched all Hypixel Auctions", "info");
+    log("Hypixel", "Fetched all Hypixel Skyblock Auctions", "info");
 
     const removeInvalid = redis.pipeline();
     for (const UUID of UUIDsBefore.filter((UUID) => !UUIDs.includes(UUID))) {
@@ -202,7 +202,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
 
     removeInvalid.exec();
   } catch {
-    log("Hypixel", "Failed to fetch Hypixel Auctions", "warn");
+    log("Hypixel", "Failed to fetch Hypixel Skyblock Auctions", "warn");
   }
 };
 
@@ -228,15 +228,15 @@ export const getSkyblockEndedAuctions = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockEndedAuctions"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockEndedAuctions")) as string);
     const auctions: any[] = [];
-    const data: HypixelEndedAuction[] = (await axios.get("https://api.hypixel.net/skyblock/auctions_ended")).data.auctions;
-    log("Hypixel", "Fetched Ended Hypixel Auctions", "info");
+    const data = (await axios.get("https://api.hypixel.net/skyblock/auctions_ended")).data.auctions;
+    log("Hypixel", "Fetched Hypixel Skyblock Ended Auctions", "info");
     for (const auction of data) {
       const formattedData = await formatSkyblockEndedAuction(auction);
       auctions.push(formattedData);
 
       if (config.hypixel.persistData) {
         await HypixelSkyblockAuctionModel.create({ timestamp: new Date(), meta: formattedData.seller, data: formattedData });
-        await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID, timestamp: new Date(formattedData.timestamp * 1000) }).catch(() => {});
+        await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID, timestamp: new Date(formattedData.timestamp * 1000) });
       }
       // Checks wether the last ingestion was over an hour ago
       if (!(await redis.exists("Hypixel:lastSkyblockAuctionhouseIngestion"))) {
@@ -245,8 +245,8 @@ export const getSkyblockEndedAuctions = async () => {
     }
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return auctions;
-  } catch {
-    log("Hypixel", "Failed to fetch Hypixel Ended Auctions", "warn");
+  } catch (e) {
+    log("Hypixel", "Failed to fetch Hypixel Skyblock Ended Auctions", "warn");
     return null;
   }
 };
@@ -257,7 +257,7 @@ export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) =>
       return itemInfo ? await formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: true }) : await formatSkyblockBazaar(JSON.parse((await redis.get("Hypixel:Cache:skyblockBazaar")) as string), { itemInfo: false });
     }
     const data = (await axios.get("https://api.hypixel.net/skyblock/bazaar")).data.products;
-    log("Hypixel", "Fetched Hypixel Bazaar", "info");
+    log("Hypixel", "Fetched Hypixel Skyblock Bazaar", "info");
     const formattedData = itemInfo ? await formatSkyblockBazaar(data, { itemInfo: true }) : await formatSkyblockBazaar(data, { itemInfo: false });
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockBazaar", 55, JSON.stringify(data));
     if (config.hypixel.persistData) {
@@ -275,6 +275,7 @@ export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) =>
     }
     return formattedData;
   } catch {
+    log("Hypixel", "Failed to fetch Hypixel Skyblock Bazaar", "warn");
     return null;
   }
 };
@@ -283,6 +284,7 @@ export const getSkyblockItems = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockItems"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockItems")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/skyblock/items")).data.items;
+    log("Hypixel", "Fetched Hypixel Skyblock Items", "info");
     const formattedData = formatSkyblockitems(data);
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockItems", 1800, JSON.stringify(formattedData));
     return formattedData;
@@ -295,6 +297,7 @@ export const getSkyblockElection = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockElection"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockElection")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/skyblock/election")).data;
+    log("Hypixel", "Fetched Hypixel Skyblock Election", "info");
     const formattedData = formatSkyblockElection(data);
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockElection", 600, JSON.stringify(formattedData));
     if (config.hypixel.persistHistoricalData) {
@@ -312,6 +315,7 @@ export const getSkyblockCollections = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockCollections"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockCollections")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/skyblock/collections")).data.collections;
+    log("Hypixel", "Fetched Hypixel Skyblock Collections", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockCollections", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -323,6 +327,7 @@ export const getSkyblockSkills = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockSkills"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockSkills")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/skyblock/skills")).data.skills;
+    log("Hypixel", "Fetched Hypixel Skyblock Skills", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockSkills", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -334,6 +339,7 @@ export const getGames = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:games"))) return JSON.parse((await redis.get("Hypixel:Cache:games")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/games")).data.games;
+    log("Hypixel", "Fetched Hypixel Games", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:games", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -345,6 +351,7 @@ export const getAchievements = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:achievements"))) return JSON.parse((await redis.get("Hypixel:Cache:achievements")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/achievements")).data.achievements;
+    log("Hypixel", "Fetched Hypixel Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:achievements", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -356,6 +363,7 @@ export const getChallenges = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:challenges"))) return JSON.parse((await redis.get("Hypixel:Cache:challenges")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/challenges")).data.challenges;
+    log("Hypixel", "Fetched Hypixel Challenges", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:challenges", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -367,6 +375,7 @@ export const getQuests = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:quests"))) return JSON.parse((await redis.get("Hypixel:Cache:quests")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/quests")).data.quests;
+    log("Hypixel", "Fetched Hypixel Quests", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:quests", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -378,6 +387,7 @@ export const getGuildAchievements = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:guildAchievements"))) return JSON.parse((await redis.get("Hypixel:Cache:guildAchievements")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/guilds/achievements")).data;
+    log("Hypixel", "Fetched Hypixel Guild Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:guildAchievements", 600, JSON.stringify({ one_time: data.one_time, tiered: data.tiered }));
     return { one_time: data.one_time, tiered: data.tiered };
   } catch {
@@ -389,6 +399,7 @@ export const getPets = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:pets"))) return JSON.parse((await redis.get("Hypixel:Cache:pets")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/vanity/pets")).data.types;
+    log("Hypixel", "Fetched Hypixel Pets", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:pets", 600, JSON.stringify(data));
     return data;
   } catch {
@@ -400,6 +411,7 @@ export const getCompanions = async () => {
   try {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:companions"))) return JSON.parse((await redis.get("Hypixel:Cache:companions")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/vanity/companions")).data.types;
+    log("Hypixel", "Fetched Hypixel Companions", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:companions", 600, JSON.stringify(data));
     return data;
   } catch {
