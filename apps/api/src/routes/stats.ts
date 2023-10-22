@@ -136,14 +136,14 @@ router.get("/v1/stats/mongo", async (req, res) => {
         bytesStored: data.storageSize,
         bytesStoredFormatted: formatBytes(data.storageSize, 3),
       };
-      total["collections"] += data.collections;
-      total["documents"] += data.objects;
-      total["averageDocumentSize"] += data.avgObjSize;
-      total["bytesStored"] += data.storageSize;
+      total.collections += data.collections;
+      total.documents += data.objects;
+      total.averageDocumentSize += data.avgObjSize;
+      total.bytesStored += data.storageSize;
     }
-    total["documentsFormatted"] = formatNumber(total.documents, 3);
-    total["averageDocumentSizeFormatted"] = formatBytes(total.averageDocumentSize, 3);
-    total["bytesStoredFormatted"] = formatBytes(total.bytesStored, 3);
+    total.documentsFormatted = formatNumber(total.documents, 3);
+    total.averageDocumentSizeFormatted = formatBytes(total.averageDocumentSize, 3);
+    total.bytesStoredFormatted = formatBytes(total.bytesStored, 3);
     return res.json({ success: true, ...total, databases: parsedDBs });
   } catch (e) {
     Sentry.captureException(e);
