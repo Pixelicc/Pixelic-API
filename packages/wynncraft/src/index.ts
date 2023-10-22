@@ -1,15 +1,16 @@
+import axios from "axios";
+import * as Sentry from "@sentry/node";
 import { parseUUID } from "@pixelic/mojang";
 import { requestWynncraft } from "./requestHandler.js";
 import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from "./formatters.js";
 import { config, dashUUID, deepCompare } from "@pixelic/utils";
 import redis from "@pixelic/redis";
-import axios from "axios";
 import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel, WynncraftServerPlayercountModel } from "@pixelic/mongo";
 
 export const getPlayer = async (player: string) => {
-  const UUID = await parseUUID(player);
-  if (UUID === null) return "Invalid UUID or Username";
   try {
+    const UUID = await parseUUID(player);
+    if (UUID === null) return "Invalid UUID or Username";
     if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
     const data = await requestWynncraft(`https://api.wynncraft.com/v2/player/${dashUUID(UUID)}/stats`);
     if (data.data.length === 0) return "This player never played on Wynncraft";
@@ -66,7 +67,8 @@ export const getPlayer = async (player: string) => {
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -109,7 +111,8 @@ export const getGuild = async (guild: string) => {
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -121,7 +124,8 @@ export const getGuildList = async () => {
     if (data.error) return null;
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:guildList", 300, JSON.stringify(data.guilds));
     return data.guilds;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -147,7 +151,8 @@ export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -160,7 +165,8 @@ export const getTerritoryList = async () => {
     const formattedData = formatTerritoryList(data.territories);
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:territoryList", 300, JSON.stringify(formattedData));
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };

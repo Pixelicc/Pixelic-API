@@ -317,6 +317,9 @@ importers:
       '@pixelic/utils':
         specifier: '*'
         version: link:../utils
+      '@sentry/node':
+        specifier: ^7.65.0
+        version: 7.74.1
       axios-retry:
         specifier: ^3.7.0
         version: 3.8.0
