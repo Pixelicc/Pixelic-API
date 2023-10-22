@@ -3,7 +3,6 @@ import util from "util";
 // @ts-ignore
 import minecraftItems from "minecraft-items";
 import { getRatio, formatUUID, decodeNBT } from "@pixelic/utils";
-import { HypixelActiveAuction, HypixelEndedAuction } from "@pixelic/types";
 import { getSkyblockItems } from "./index.js";
 
 const parseNbt = util.promisify(nbt.parse);
@@ -323,13 +322,13 @@ const formatDuels = (duels: any) => {
   const getMode = (prefix: string) => {
     return {
       wins: getStat(prefix, "wins"),
-      winstreak: duels[`current_winstreak_mode_${prefix}`] || 0,
+      winstreak: duels?.[`current_winstreak_mode_${prefix}`] || 0,
       losses: getStat(prefix, "losses"),
       WLR: getRatio(getStat(prefix, "wins"), getStat(prefix, "losses")),
       kills: getStat(prefix, "kills"),
       deaths: getStat(prefix, "deaths"),
       KDR: getRatio(getStat(prefix, "kills"), getStat(prefix, "deaths")),
-      gamesPlayed: duels[`${prefix}_rounds_played`] || 0,
+      gamesPlayed: duels?.[`${prefix}_rounds_played`] || 0,
     };
   };
 
@@ -1675,11 +1674,11 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
   return item;
 };
 
-export const formatSkyblockActiveAuction = async (auction: HypixelActiveAuction) => {
+export const formatSkyblockActiveAuction = async (auction: any) => {
   const NBT: any = await decodeNBT(Buffer.from(auction.item_bytes, "base64"));
 
   const auctionBids = [];
-  for (const bid of auction.bids.sort((a, b) => a.amount - b.amount)) {
+  for (const bid of auction.bids.sort((a: any, b: any) => a.amount - b.amount)) {
     auctionBids.push({
       bidder: bid.bidder,
       bidderProfile: bid.profile_id,
@@ -1705,7 +1704,7 @@ export const formatSkyblockActiveAuction = async (auction: HypixelActiveAuction)
   };
 };
 
-export const formatSkyblockEndedAuction = async (auction: HypixelEndedAuction) => {
+export const formatSkyblockEndedAuction = async (auction: any) => {
   const NBT: any = await decodeNBT(Buffer.from(auction.item_bytes, "base64"));
 
   return {

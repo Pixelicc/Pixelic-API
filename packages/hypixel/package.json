@@ -17,6 +17,7 @@
     "@pixelic/utils": "*",
     "axios-retry": "^3.7.0",
     "bottleneck": "^2.19.5",
-    "minecraft-items": "^0.4.3"
+    "minecraft-items": "^0.4.3",
+    "@sentry/node": "^7.65.0"
   }
 }

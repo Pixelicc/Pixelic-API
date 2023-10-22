@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as Sentry from "@sentry/node";
 import log from "@pixelic/logger";
 import { config, deepCompare } from "@pixelic/utils";
 import { parseUUID } from "@pixelic/mojang";
@@ -13,9 +14,9 @@ import { requestTracker } from "@pixelic/interceptors";
 axios.interceptors.response.use(requestTracker);
 
 export const getPlayer = async (player: string) => {
-  const UUID = await parseUUID(player);
-  if (UUID === null) return "Invalid UUID or Username";
   try {
+    const UUID = await parseUUID(player);
+    if (UUID === null) return "Invalid UUID or Username";
     if (config.hypixel.cache && (await redis.exists(`Hypixel:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Hypixel:Cache:Players:${UUID}`)) as string);
     const data = await requestHypixel(`https://api.hypixel.net/player?uuid=${UUID}`);
     if (data.player === null) return "This player never played on Hypixel";
@@ -72,14 +73,15 @@ export const getPlayer = async (player: string) => {
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
 
 export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player?: string; ID?: string; name?: string }>) => {
-  var data;
   try {
+    var data;
     if (player) {
       const UUID = await parseUUID(player);
       if (UUID === null) return "Invalid UUID or Username";
@@ -96,7 +98,6 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       if (config.hypixel.cache && (await redis.exists(`Hypixel:Cache:Guilds:${name.toLowerCase()}`))) return JSON.parse((await redis.get(`Hypixel:Cache:Guilds:${await redis.get(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`)) as string);
       data = await requestHypixel(`https://api.hypixel.net/guild?name=${name}`);
     }
-
     if (data.guild === null) return "This Guild does not exist";
     const formattedData = formatGuild(data.guild);
     if (config.hypixel.cache) {
@@ -154,7 +155,8 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -201,7 +203,8 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
     }
 
     removeInvalid.exec();
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Hypixel Skyblock Auctions", "warn");
   }
 };
@@ -219,7 +222,8 @@ export const querySkyblockActiveAuctions = async (query: string, limit?: number)
       count: result[0],
       matches: parsedMatches,
     };
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -246,6 +250,7 @@ export const getSkyblockEndedAuctions = async () => {
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return auctions;
   } catch (e) {
+    Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Hypixel Skyblock Ended Auctions", "warn");
     return null;
   }
@@ -274,7 +279,8 @@ export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) =>
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Hypixel Skyblock Bazaar", "warn");
     return null;
   }
@@ -288,7 +294,8 @@ export const getSkyblockItems = async () => {
     const formattedData = formatSkyblockitems(data);
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockItems", 1800, JSON.stringify(formattedData));
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -306,7 +313,8 @@ export const getSkyblockElection = async () => {
       }
     }
     return formattedData;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -318,7 +326,8 @@ export const getSkyblockCollections = async () => {
     log("Hypixel", "Fetched Hypixel Skyblock Collections", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockCollections", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -330,7 +339,8 @@ export const getSkyblockSkills = async () => {
     log("Hypixel", "Fetched Hypixel Skyblock Skills", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockSkills", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -342,7 +352,8 @@ export const getGames = async () => {
     log("Hypixel", "Fetched Hypixel Games", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:games", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -354,7 +365,8 @@ export const getAchievements = async () => {
     log("Hypixel", "Fetched Hypixel Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:achievements", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -366,7 +378,8 @@ export const getChallenges = async () => {
     log("Hypixel", "Fetched Hypixel Challenges", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:challenges", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -378,7 +391,8 @@ export const getQuests = async () => {
     log("Hypixel", "Fetched Hypixel Quests", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:quests", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -390,7 +404,8 @@ export const getGuildAchievements = async () => {
     log("Hypixel", "Fetched Hypixel Guild Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:guildAchievements", 600, JSON.stringify({ one_time: data.one_time, tiered: data.tiered }));
     return { one_time: data.one_time, tiered: data.tiered };
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -402,7 +417,8 @@ export const getPets = async () => {
     log("Hypixel", "Fetched Hypixel Pets", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:pets", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
@@ -414,7 +430,8 @@ export const getCompanions = async () => {
     log("Hypixel", "Fetched Hypixel Companions", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:companions", 600, JSON.stringify(data));
     return data;
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return null;
   }
 };
