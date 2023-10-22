@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import { formatTimeseries, validateSkyblockItemID } from "@pixelic/utils";
 import { HypixelSkyblockBazaarModel } from "@pixelic/mongo";
 import { ratelimit } from "@pixelic/middlewares";
@@ -10,7 +11,8 @@ router.get("/v1/hypixel/skyblock/bazaar", async (req, res) => {
   try {
     res.set("Cache-Control", "public, max-age=60");
     return res.json({ success: true, products: await getSkyblockBazaar({ itemInfo: true }) });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -23,7 +25,8 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
     if (!data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
     res.set("Cache-Control", "public, max-age=60");
     return res.json({ sucess: true, ...data[req.params.product] });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -41,7 +44,8 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history", ratelimit(), async (req, r
       success: true,
       data: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -75,7 +79,8 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history/:timeframe", ratelimit(), as
       success: true,
       data: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });

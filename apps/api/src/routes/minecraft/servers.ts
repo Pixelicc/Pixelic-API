@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import redis from "@pixelic/redis";
 import { formatTimeseries, formatUUID, validateUUID } from "@pixelic/utils";
 import { MinecraftServerPlayercountModel } from "@pixelic/mongo";
@@ -15,7 +16,8 @@ router.get("/v1/minecraft/server/list", async (req, res) => {
       success: true,
       servers: serverList,
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -36,7 +38,8 @@ router.get("/v1/minecraft/server/:server", async (req, res) => {
       MOTD: SLPData.description,
       icon: SLPData.favicon,
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -55,7 +58,8 @@ router.get("/v1/minecraft/server/:server/history", async (req, res) => {
       success: true,
       data: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ meta: formatUUID(req.params.server) }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -89,7 +93,8 @@ router.get("/v1/minecraft/server/:server/history/:timeframe", async (req, res) =
       success: true,
       data: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: formatUUID(req.params.server) }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });

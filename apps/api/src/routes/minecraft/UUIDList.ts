@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import redis from "@pixelic/redis";
 
 const router = express.Router();
@@ -23,7 +24,8 @@ router.get("/v1/minecraft/uuids", async (req, res) => {
       currentPage: page,
       UUIDs: await redis.zrange("Mojang:UUIDList", page * 100000, page * 100000 + 100000),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });

@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import { parseUUID } from "@pixelic/mojang";
 import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID, validateUsername } from "@pixelic/utils";
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
@@ -49,7 +50,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
       },
       ...(await querySkyblockActiveAuctions(query.join(" "))),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -71,7 +73,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
         { meta: "seller" }
       ),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -94,7 +97,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
         { meta: "seller" }
       ),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -108,7 +112,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", ratelimit(), async (r
       success: true,
       data: formatTimeseries(await HypixelSkyblockAuctionModel.find({ "data.item.attributes.UUID": formatUUID(req.params.item) }, ["-_id", "-__v"]).lean(), { meta: "seller" }),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -122,7 +127,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (re
       success: true,
       ...formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).sort({ timestamp: -1 }).limit(1).lean())[0],
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -140,7 +146,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", ratelimit(), a
       success: true,
       data: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });
@@ -163,7 +170,8 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history/:timeframe", rat
       success: true,
       data: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ sucess: false });
   }
 });

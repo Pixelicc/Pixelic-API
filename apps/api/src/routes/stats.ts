@@ -1,4 +1,5 @@
 import express from "express";
+import * as Sentry from "@sentry/node";
 import { exec } from "child_process";
 import redis from "@pixelic/redis";
 import { client as mongo } from "@pixelic/mongo";
@@ -9,73 +10,82 @@ const router = express.Router();
 
 router.get("/v1/stats/code", async (req, res) => {
   res.set("Cache-Control", "public, max-age=300");
-  if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
-  exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
-    console.log(error || stderr);
-    if (error || stderr) return res.status(500).json({ success: false });
-    const raw = JSON.parse(stdout);
-    delete raw.header;
-    const languages: any = {};
-    var total;
-    for (const lang in raw) {
-      if (lang === "SUM") {
-        total = {
+  try {
+    if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
+    exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
+      if (error || stderr) return res.status(500).json({ success: false });
+      const raw = JSON.parse(stdout);
+      delete raw.header;
+      const languages: any = {};
+      var total;
+      for (const lang in raw) {
+        if (lang === "SUM") {
+          total = {
+            files: raw[lang].nFiles,
+            lines: raw[lang].code,
+            comments: raw[lang].comment,
+          };
+          continue;
+        }
+        languages[lang] = {
           files: raw[lang].nFiles,
           lines: raw[lang].code,
           comments: raw[lang].comment,
         };
-        continue;
       }
-      languages[lang] = {
-        files: raw[lang].nFiles,
-        lines: raw[lang].code,
-        comments: raw[lang].comment,
-      };
-    }
 
-    const parsed = { languages, ...total };
-    await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
-    return res.json({
-      success: true,
-      ...parsed,
-    });
-  });
-});
-
-router.get("/v1/stats/repo", async (req, res) => {
-  res.set("Cache-Control", "public, max-age=300");
-  if (await redis.exists("API:Cache:Repo-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Repo-Stats")) as string) });
-  axios
-    .get("https://api.github.com/repos/pixelicc/pixelic-api")
-    .then(async (github) => {
-      const parsed = {
-        ID: github.data.id,
-        name: github.data.name,
-        fullName: github.data.full_name,
-        description: github.data.description,
-        tags: github.data.topics,
-        owner: {
-          ID: github.data.owner.id,
-          username: github.data.owner.login,
-        },
-        created: Math.floor(new Date(github.data.created_at).valueOf() / 1000),
-        lastUpdated: Math.floor(new Date(github.data.updated_at).valueOf() / 1000),
-        lastPushed: Math.floor(new Date(github.data.pushed_at).valueOf() / 1000),
-        watchers: github.data.watchers_count,
-        stars: github.data.stargazers_count,
-        forks: github.data.forks_count,
-        openIssues: github.data.open_issues_count,
-      };
-
-      await redis.setex("API:Cache:Repo-Stats", 3600, JSON.stringify(parsed));
+      const parsed = { languages, ...total };
+      await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
       return res.json({
         success: true,
         ...parsed,
       });
-    })
-    .catch(() => {
-      return res.status(500).json({ success: false });
     });
+  } catch (e) {
+    Sentry.captureException(e);
+    return res.status(500).json({ success: false });
+  }
+});
+
+router.get("/v1/stats/repo", async (req, res) => {
+  res.set("Cache-Control", "public, max-age=300");
+  try {
+    if (await redis.exists("API:Cache:Repo-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Repo-Stats")) as string) });
+    axios
+      .get("https://api.github.com/repos/pixelicc/pixelic-api")
+      .then(async (github) => {
+        const parsed = {
+          ID: github.data.id,
+          name: github.data.name,
+          fullName: github.data.full_name,
+          description: github.data.description,
+          tags: github.data.topics,
+          owner: {
+            ID: github.data.owner.id,
+            username: github.data.owner.login,
+          },
+          created: Math.floor(new Date(github.data.created_at).valueOf() / 1000),
+          lastUpdated: Math.floor(new Date(github.data.updated_at).valueOf() / 1000),
+          lastPushed: Math.floor(new Date(github.data.pushed_at).valueOf() / 1000),
+          watchers: github.data.watchers_count,
+          stars: github.data.stargazers_count,
+          forks: github.data.forks_count,
+          openIssues: github.data.open_issues_count,
+        };
+
+        await redis.setex("API:Cache:Repo-Stats", 3600, JSON.stringify(parsed));
+        return res.json({
+          success: true,
+          ...parsed,
+        });
+      })
+      .catch(() => {
+        return res.status(500).json({ success: false });
+      });
+  } catch (e) {
+    Sentry.captureException(e);
+    return res.status(500).json({ success: false });
+  }
 });
 
 router.get("/v1/stats/redis", async (req, res) => {
@@ -94,7 +104,8 @@ router.get("/v1/stats/redis", async (req, res) => {
       keys: Number(info.db0.split("=")[1].split(",")[0]),
       keysFormatted: formatNumber(Number(info.db0.split("=")[1].split(",")[0]), 3),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ success: false });
   }
 });
@@ -134,7 +145,8 @@ router.get("/v1/stats/mongo", async (req, res) => {
     total["averageDocumentSizeFormatted"] = formatBytes(total.averageDocumentSize, 3);
     total["bytesStoredFormatted"] = formatBytes(total.bytesStored, 3);
     return res.json({ success: true, ...total, databases: parsedDBs });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ success: false });
   }
 });
@@ -150,7 +162,8 @@ router.get("/v1/stats", async (req, res) => {
       requestsFormatted: formatNumber(requests, 3),
       requestsHistory: await redis.hgetall("API:Analytics:RequestsHistory"),
     });
-  } catch {
+  } catch (e) {
+    Sentry.captureException(e);
     return res.status(500).json({ success: false });
   }
 });
