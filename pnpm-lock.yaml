@@ -238,6 +238,9 @@ importers:
       '@pixelic/utils':
         specifier: '*'
         version: link:../utils
+      '@sentry/node':
+        specifier: ^7.65.0
+        version: 7.74.1
       axios:
         specifier: ^1.4.0
         version: 1.5.1
@@ -314,6 +317,9 @@ importers:
       '@pixelic/redis':
         specifier: '*'
         version: link:../redis
+      '@pixelic/types':
+        specifier: '*'
+        version: link:../../types
       '@pixelic/utils':
         specifier: '*'
         version: link:../utils

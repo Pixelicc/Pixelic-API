@@ -31,8 +31,14 @@ export const deepCompare = (obj1: any, obj2: any) => {
             result[key] = obj2[key];
           }
         } else {
-          const compared = deepCompare(obj1[key], obj2[key]);
-          if (Object.keys(compared).length !== 0) result[key] = compared;
+          if (obj1[key] === null && obj2[key] !== null) {
+            result[key] = null;
+          } else if (obj2[key] === null && obj1[key] !== null) {
+            result[key] = null;
+          } else {
+            const compared = deepCompare(obj1[key], obj2[key]);
+            if (Object.keys(compared).length !== 0) result[key] = compared;
+          }
         }
       } else {
         result[key] = obj2[key];

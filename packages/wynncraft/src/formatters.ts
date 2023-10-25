@@ -9,82 +9,102 @@ export const formatPlayer = (player: any) => {
   return {
     UUID: formatUUID(player.uuid),
     username: player.username,
-    playtime: Math.floor((player?.meta?.playtime || 0) * 4.7),
-    firstLogin: player?.meta?.firstJoin ? Math.floor(new Date(player?.meta?.firstJoin).valueOf() / 1000) : null,
-    lastLogin: player?.meta?.lastJoin ? Math.floor(new Date(player?.meta?.lastJoin).valueOf() / 1000) : null,
-    status: {
-      online: player?.meta?.location?.online || false,
-      server: player?.meta?.location?.server || null,
-    },
+    playtime: player?.playtime || null,
+    firstLogin: player?.firstJoin ? Math.floor(new Date(player?.firstJoin).valueOf() / 1000) : null,
+    lastLogin: player?.lastJoin ? Math.floor(new Date(player?.lastJoin).valueOf() / 1000) : null,
+    online: player?.online || false,
+    server: player?.server || null,
     rank: player?.rank?.toUpperCase() || "PLAYER",
-    purchasedRank: player?.meta?.tag?.value?.toUpperCase() || null,
-    veteran: player?.meta?.veteran || false,
-    global: player?.global || {},
-    characters: characters,
+    purchasedRank: player?.supportRank?.toUpperCase() || null,
+    global: player?.globalData || {},
+    characters,
+    rankings: player?.ranking || {},
     guild: player?.guild || null,
   };
 };
 
 export const formatGuild = (guild: any) => {
   const members = [];
-  for (const member of guild.members) {
-    members.push({
-      username: member.name,
-      UUID: formatUUID(member.uuid),
-      rank: member?.rank || null,
-      contributed: member?.contributed || 0,
-      joined: member?.joined ? Math.floor(new Date(member?.joined).valueOf() / 1000) : null,
-    });
+
+  for (const rank of ["owner", "chief", "strategist", "captain", "recruiter", "recruit"]) {
+    for (const [username, data] of Object.entries(guild.members[rank] as [string, any])) {
+      members.push({
+        username,
+        UUID: formatUUID(data.uuid),
+        rank: rank.toUpperCase(),
+        online: data?.online || false,
+        contributed: data?.contributed || 0,
+        contributionRank: data?.contributionRank || null,
+        joined: data?.joined ? Math.floor(new Date(data?.joined).valueOf() / 1000) : null,
+      });
+    }
   }
   return {
     name: guild.name,
     prefix: guild?.prefix || null,
+    onlineMembers: guild?.online || 0,
     members: members,
-    XP: guild?.xp || 0,
+    xpPercent: guild?.xpPercent || 0,
     level: guild?.level || 0,
     created: guild?.created ? Math.floor(new Date(guild?.created).valueOf() / 1000) : null,
     territories: guild?.territories || 0,
+    wars: guild?.wars || 0,
     banner: guild?.banner || null,
   };
 };
 
 export const formatServerList = async (data: any, { UUIDs }: { UUIDs?: boolean }) => {
-  const parsedData: any = [];
-  for (const server of Object.keys(data)) {
-    if (server === "request") continue;
-    var players = [];
-    for (const player of data[server]) {
-      if (UUIDs) {
-        players.push({
-          UUID: await requestUUID(player).catch(() => {
-            return null;
-          }),
-          username: player,
-        });
-      } else {
-        players = data[server];
-        break;
-      }
+  const parsedData: any = {
+    playercount: data.total,
+    servercount: 0,
+    servers: {},
+  };
+
+  for (const [player, server] of Object.entries(data.players as { [key: string]: string })) {
+    if (parsedData.servers[server] === undefined) {
+      parsedData.servers[server] = {
+        playercount: 0,
+        players: [],
+      };
+      parsedData.servercount++;
     }
-    parsedData[server] = {
-      playercount: data[server].length,
-      players: players.sort(),
-    };
+    parsedData.servers[server].playercount++;
+
+    if (UUIDs) {
+      parsedData.servers[server].players.push({
+        UUID: await requestUUID(player).catch(() => {
+          return null;
+        }),
+        username: player,
+      });
+    } else {
+      parsedData.servers[server].players.push(player);
+    }
   }
-  return parsedData;
+  for (const server in parsedData.servers) {
+    if (UUIDs) {
+      parsedData.servers[server].players = parsedData.servers[server].players.sort((a: { UUID: string; username: string }, b: { UUID: string; username: string }) => a.username.localeCompare(b.username, undefined, { sensitivity: "base" }));
+    } else {
+      parsedData.servers[server].players = parsedData.servers[server].players.sort();
+    }
+  }
+  return parsedData as {
+    playercount: number;
+    servercount: number;
+    servers: {
+      [key: string]: { playercount: number; players: string[] | { UUID: string | null; username: string }[] };
+    };
+  };
 };
 
-export const formatTerritoryList = async (territories: any) => {
-  const parsedTerritories = [];
+export const formatTerritoryList = (territories: any) => {
+  const parsedTerritories: any = {};
   for (const territory in territories) {
-    parsedTerritories.push({
-      territory: territories[territory].territory,
-      guild: territories[territory].guild !== "Nobody" ? territories[territory].guild : null,
-      guildPrefix: territories[territory].guildPrefix,
-      attacker: territories[territory].attacker || null,
+    parsedTerritories[territory] = {
+      guild: territories[territory]?.guild ? territories[territory].guild : null,
       acquired: territories[territory]?.acquired ? Math.floor(new Date(territories[territory].acquired).valueOf() / 1000) : null,
       location: territories[territory].location,
-    });
+    };
   }
   return parsedTerritories;
 };

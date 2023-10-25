@@ -22,6 +22,14 @@ const playerSchema = new Schema({
     type: Number,
     required: true,
   },
+  online: {
+    type: Boolean,
+    required: true,
+  },
+  server: {
+    type: String,
+    required: true,
+  },
   status: {
     type: Object,
     required: true,
@@ -35,10 +43,6 @@ const playerSchema = new Schema({
     type: String,
     required: true,
     index: true,
-  },
-  veteran: {
-    type: Boolean,
-    required: true,
   },
   global: {
     type: Object,

@@ -6,15 +6,16 @@ import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from
 import { config, dashUUID, deepCompare } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel, WynncraftServerPlayercountModel } from "@pixelic/mongo";
+import { RequireOneObjParam } from "@pixelic/types";
 
 export const getPlayer = async (player: string) => {
   try {
     const UUID = await parseUUID(player);
     if (UUID === null) return "Invalid UUID or Username";
-    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
-    const data = await requestWynncraft(`https://api.wynncraft.com/v2/player/${dashUUID(UUID)}/stats`);
-    if (data.data.length === 0) return "This player never played on Wynncraft";
-    const formattedData = formatPlayer(data.data[0]);
+    // if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
+    const data = await requestWynncraft(`https://api.wynncraft.com/v3/player/${dashUUID(UUID)}?fullResult=true`);
+    //if (data.data.length === 0) return "This player never played on Wynncraft";
+    const formattedData = formatPlayer(data);
     if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(formattedData));
     if (config.wynncraft.persistData) {
       const operation = await WynncraftPlayerModel.updateOne({ _id: UUID }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
@@ -73,13 +74,25 @@ export const getPlayer = async (player: string) => {
   }
 };
 
-export const getGuild = async (guild: string) => {
+export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: string; prefix?: string }>) => {
   try {
-    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`)) as string);
-    const data = await requestWynncraft(`https://api.wynncraft.com/public_api.php?action=guildStats&command=${guild}`);
+    var data;
+    if (name) {
+      if (!/^[a-zA-Z ]{3,32}$/.test(name)) return "Invalid Guild Name";
+      if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`)) as string);
+      data = await requestWynncraft(`https://api.wynncraft.com/v3/guild/${name}`);
+    }
+    if (prefix) {
+      if (!/^[a-zA-Z]{3,4}$/.test(prefix)) return "Invalid Guild Prefix";
+      if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`)) as string);
+      data = await requestWynncraft(`https://api.wynncraft.com/v3/guild/prefix/${prefix}`);
+    }
     if (data.error) return "This Guild does not exist";
     const formattedData = formatGuild(data);
-    if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Guilds:${guild.toLowerCase()}`, 300, JSON.stringify(formattedData));
+    if (config.wynncraft.cache) {
+      await redis.setex(`Wynncraft:Cache:Guilds:${formattedData.prefix.toLowerCase()}`, 600, formattedData.name.toLowerCase());
+      await redis.setex(`Wynncraft:Cache:Guilds:${formattedData.name.toLowerCase()}`, 600, JSON.stringify(formattedData));
+    }
     if (config.wynncraft.persistData) {
       const operation = await WynncraftGuildModel.updateOne({ _id: formattedData.name.toLowerCase() }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
       if (config.wynncraft.webhooks.newGuildEvent.enabled && operation.upsertedId !== null) {
@@ -120,27 +133,26 @@ export const getGuild = async (guild: string) => {
 export const getGuildList = async () => {
   try {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:guildList"))) return JSON.parse((await redis.get("Wynncraft:Cache:guildList")) as string);
-    const data = await requestWynncraft("https://api.wynncraft.com/public_api.php?action=guildList");
+    const data = await requestWynncraft("https://api.wynncraft.com/v3/guild/list/guild");
     if (data.error) return null;
-    if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:guildList", 300, JSON.stringify(data.guilds));
-    return data.guilds;
+    if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:guildList", 300, JSON.stringify({ guildcount: data.length, guilds: data }));
+    return { guildcount: data.length, guilds: data };
   } catch (e) {
     Sentry.captureException(e);
     return null;
   }
 };
 
-export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
+export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }): Promise<{ playercount: number; servercount: number; servers: { [key: string]: { playercount: number; players: string[] | { UUID: string | null; username: string }[] } } } | null> => {
   try {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:serverList"))) return JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string);
-    const data = await requestWynncraft("https://api.wynncraft.com/public_api.php?action=onlinePlayers");
-    if (data.error) return null;
+    const data = await requestWynncraft("https://api.wynncraft.com/v3/player");
     const formattedData = await formatServerList(data, { UUIDs: UUIDs });
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(formattedData));
     if (config.wynncraft.persistData) {
       const persistableData = [];
-      for (const server of Object.keys(formattedData)) {
-        persistableData.push({ timestamp: new Date(), meta: server, data: formattedData[server].playercount });
+      for (const server of Object.keys(formattedData.servers)) {
+        persistableData.push({ timestamp: new Date(), meta: server, data: formattedData.servers[server].playercount });
       }
       await WynncraftServerPlayercountModel.shortTerm.insertMany(persistableData);
 
@@ -159,10 +171,10 @@ export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
 
 export const getTerritoryList = async () => {
   try {
-    if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:territoryList"))) return JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string);
-    const data = await requestWynncraft("https://api.wynncraft.com/public_api.php?action=territoryList");
+    if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:territoryList"))) return JSON.parse((await redis.get("Wynncraft:Cache:territoryList")) as string);
+    const data = await requestWynncraft("https://api.wynncraft.com/v3/guild/list/territory");
     if (data.error) return null;
-    const formattedData = formatTerritoryList(data.territories);
+    const formattedData = formatTerritoryList(data);
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:territoryList", 300, JSON.stringify(formattedData));
     return formattedData;
   } catch (e) {
