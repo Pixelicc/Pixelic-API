@@ -10,7 +10,6 @@
   "dependencies": {
     "@pixelic/logger": "*",
     "@pixelic/utils": "*",
-    "@pixelic/types": "*",
     "mongoose": "^7.4.4"
   }
 }

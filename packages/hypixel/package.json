@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@pixelic/interceptors": "*",
-    "@pixelic/types": "*",
     "@pixelic/logger": "*",
     "@pixelic/mojang": "*",
     "@pixelic/mongo": "*",

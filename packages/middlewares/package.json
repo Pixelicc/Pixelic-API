@@ -11,8 +11,7 @@
     "@pixelic/utils": "*",
     "@pixelic/logger": "*",
     "@pixelic/redis": "*",
-    "@pixelic/mongo": "*",
-    "@pixelic/types": "*"
+    "@pixelic/mongo": "*"
   },
   "devDependencies": {
     "@types/express": "^4.17.17"
