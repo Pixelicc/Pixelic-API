@@ -133,89 +133,92 @@ const statsSchema = new Schema(
   { _id: false, minimize: false }
 );
 
-const historicalPlayerSchema = new Schema({
-  UUID: {
-    type: String,
-    required: true,
-    index: true,
+const historicalPlayerSchema = new Schema(
+  {
+    UUID: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    username: {
+      type: String,
+    },
+    rank: {
+      type: String,
+    },
+    plusColor: {
+      type: String,
+    },
+    plusPlusColor: {
+      type: String,
+    },
+    APISettings: APISettingsSchema,
+    EXP: {
+      type: Number,
+    },
+    level: {
+      type: Number,
+    },
+    karma: {
+      type: Number,
+    },
+    achievementPoints: {
+      type: Number,
+    },
+    questsCompleted: {
+      type: Number,
+    },
+    challengesCompleted: {
+      type: Number,
+    },
+    online: {
+      type: Boolean,
+    },
+    firstLogin: {
+      type: Number,
+    },
+    lastLogin: {
+      type: Number,
+    },
+    lastLogout: {
+      type: Number,
+    },
+    lastModePlayed: {
+      type: String,
+    },
+    language: {
+      type: String,
+    },
+    chatChannel: {
+      type: String,
+    },
+    giftsSent: {
+      type: Number,
+    },
+    giftsReceived: {
+      type: Number,
+    },
+    ranksGifted: {
+      type: Number,
+    },
+    rewards: rewardSchema,
+    socialMedia: socialMediaSchema,
+    stats: statsSchema,
+    /**
+     * Shows wether the current data was ingested by the libary itself or a third-party source
+     */
+    thirdParty: {
+      type: Boolean,
+      required: false,
+      index: { sparse: true },
+    },
+    thirdPartySource: {
+      type: String,
+      required: false,
+      index: { sparse: true },
+    },
   },
-  username: {
-    type: String,
-  },
-  rank: {
-    type: String,
-  },
-  plusColor: {
-    type: String,
-  },
-  plusPlusColor: {
-    type: String,
-  },
-  APISettings: APISettingsSchema,
-  EXP: {
-    type: Number,
-  },
-  level: {
-    type: Number,
-  },
-  karma: {
-    type: Number,
-  },
-  achievementPoints: {
-    type: Number,
-  },
-  questsCompleted: {
-    type: Number,
-  },
-  challengesCompleted: {
-    type: Number,
-  },
-  online: {
-    type: Boolean,
-  },
-  firstLogin: {
-    type: Number,
-  },
-  lastLogin: {
-    type: Number,
-  },
-  lastLogout: {
-    type: Number,
-  },
-  lastModePlayed: {
-    type: String,
-  },
-  language: {
-    type: String,
-  },
-  chatChannel: {
-    type: String,
-  },
-  giftsSent: {
-    type: Number,
-  },
-  giftsReceived: {
-    type: Number,
-  },
-  ranksGifted: {
-    type: Number,
-  },
-  rewards: rewardSchema,
-  socialMedia: socialMediaSchema,
-  stats: statsSchema,
-  /**
-   * Shows wether the current data was ingested by the libary itself or a third-party source
-   */
-  thirdParty: {
-    type: Boolean,
-    required: false,
-    index: { sparse: true },
-  },
-  thirdPartySource: {
-    type: String,
-    required: false,
-    index: { sparse: true },
-  },
-});
+  { minimize: false }
+);
 
 export const HypixelHistoricalPlayerModel = client.useDb("Hypixel").model("historicalPlayers", historicalPlayerSchema);

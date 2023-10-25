@@ -39,65 +39,68 @@ const achievementsSchema = new Schema(
   { _id: false }
 );
 
-const historicalGuildSchema = new Schema({
-  ID: {
-    type: String,
-    required: true,
-    index: true,
+const historicalGuildSchema = new Schema(
+  {
+    ID: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    name: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    tag: {
+      type: String,
+    },
+    tagColor: {
+      type: String,
+    },
+    EXP: {
+      type: Number,
+    },
+    level: {
+      type: Number,
+    },
+    publiclyListed: {
+      type: Boolean,
+    },
+    EXPHistory: {
+      type: Object,
+    },
+    created: {
+      type: Number,
+    },
+    ranks: { type: [rankSchema], default: undefined },
+    memberCount: {
+      type: Number,
+    },
+    members: { type: [memberSchema], default: undefined },
+    preferredGames: {
+      type: Array,
+      default: undefined,
+    },
+    EXPPerGame: {
+      type: Object,
+    },
+    achievements: achievementsSchema,
+    /**
+     * Shows wether the current data was ingested by the libary itself or a third-party source
+     */
+    thirdParty: {
+      type: Boolean,
+      required: false,
+      index: { sparse: true },
+    },
+    thirdPartySource: {
+      type: String,
+      required: false,
+      index: { sparse: true },
+    },
   },
-  name: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
-  tag: {
-    type: String,
-  },
-  tagColor: {
-    type: String,
-  },
-  EXP: {
-    type: Number,
-  },
-  level: {
-    type: Number,
-  },
-  publiclyListed: {
-    type: Boolean,
-  },
-  EXPHistory: {
-    type: Object,
-  },
-  created: {
-    type: Number,
-  },
-  ranks: { type: [rankSchema], default: undefined },
-  memberCount: {
-    type: Number,
-  },
-  members: { type: [memberSchema], default: undefined },
-  preferredGames: {
-    type: Array,
-    default: undefined,
-  },
-  EXPPerGame: {
-    type: Object,
-  },
-  achievements: achievementsSchema,
-  /**
-   * Shows wether the current data was ingested by the libary itself or a third-party source
-   */
-  thirdParty: {
-    type: Boolean,
-    required: false,
-    index: { sparse: true },
-  },
-  thirdPartySource: {
-    type: String,
-    required: false,
-    index: { sparse: true },
-  },
-});
+  { minimize: false }
+);
 
 export const HypixelHistoricalGuildModel = client.useDb("Hypixel").model("historicalGuilds", historicalGuildSchema);
