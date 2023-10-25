@@ -16,7 +16,7 @@ const Limiter = new Bottleneck({
 });
 
 axiosRetry(axios, {
-  retries: 10,
+  retries: 5,
   retryDelay: (retryCount) => {
     log("Hypixel", `Retrying to fetch Hypixel Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2) * 5}s)`, "warn");
     return Math.pow(retryCount, 2) * 5000;
@@ -29,7 +29,7 @@ axiosRetry(axios, {
 export const requestHypixel = async (URL: string) => {
   try {
     return await Limiter.schedule(async () => {
-      const request = await axios.get(URL, { timeout: 10000, headers: { "API-Key": config.hypixel.key } });
+      const request = await axios.get(URL, { headers: { "API-Key": config.hypixel.key } });
       return request.data;
     });
   } catch (e: any) {
