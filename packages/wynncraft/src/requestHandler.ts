@@ -7,6 +7,12 @@ import { requestTracker } from "@pixelic/interceptors";
 
 axios.interceptors.response.use(requestTracker);
 
+/**
+ * TODO: Adjust Limiter.reservoir... to new Wynncraft API V3 Values when they are made public
+ *
+ * TODO : Add Auth Tokens to requestHandler when they are made required
+ */
+
 const Limiter = new Bottleneck({
   reservoir: 180,
   reservoirRefreshAmount: 180,
@@ -19,7 +25,7 @@ const Limiter = new Bottleneck({
 });
 
 axiosRetry(axios, {
-  retries: 10,
+  retries: 5,
   retryDelay: (retryCount) => {
     log("Wynncraft", `Retrying to fetch Wynncraft Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2) * 5}s)`, "warn");
     return Math.pow(retryCount, 2) * 5000;
@@ -32,7 +38,7 @@ axiosRetry(axios, {
 export const requestWynncraft = async (URL: string) => {
   try {
     return await Limiter.schedule(async () => {
-      const request = await axios.get(URL, { timeout: 10000 });
+      const request = await axios.get(URL);
       return request.data;
     });
   } catch {
