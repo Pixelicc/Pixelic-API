@@ -87,7 +87,7 @@ export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: str
       if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`)) as string);
       data = await requestWynncraft(`https://api.wynncraft.com/v3/guild/prefix/${prefix}`);
     }
-    if (data.error) return "This Guild does not exist";
+    if (data.name === null) return "This Guild does not exist";
     const formattedData = formatGuild(data);
     if (config.wynncraft.cache) {
       await redis.setex(`Wynncraft:Cache:Guilds:${formattedData.prefix.toLowerCase()}`, 600, formattedData.name.toLowerCase());
@@ -134,7 +134,6 @@ export const getGuildList = async () => {
   try {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:guildList"))) return JSON.parse((await redis.get("Wynncraft:Cache:guildList")) as string);
     const data = await requestWynncraft("https://api.wynncraft.com/v3/guild/list/guild");
-    if (data.error) return null;
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:guildList", 300, JSON.stringify({ guildcount: data.length, guilds: data }));
     return { guildcount: data.length, guilds: data };
   } catch (e) {
@@ -164,6 +163,7 @@ export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }): Promise<{ p
     }
     return formattedData;
   } catch (e) {
+    console.log(e);
     Sentry.captureException(e);
     return null;
   }
@@ -173,7 +173,6 @@ export const getTerritoryList = async () => {
   try {
     if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:territoryList"))) return JSON.parse((await redis.get("Wynncraft:Cache:territoryList")) as string);
     const data = await requestWynncraft("https://api.wynncraft.com/v3/guild/list/territory");
-    if (data.error) return null;
     const formattedData = formatTerritoryList(data);
     if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:territoryList", 300, JSON.stringify(formattedData));
     return formattedData;
