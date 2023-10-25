@@ -16,7 +16,6 @@
     "@pixelic/mojang": "*",
     "@pixelic/types": "*",
     "axios-retry": "^3.7.0",
-    "bottleneck": "^2.19.5",
-    "@sentry/node": "^7.65.0"
+    "bottleneck": "^2.19.5"
   }
 }

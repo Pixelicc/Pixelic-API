@@ -18,7 +18,6 @@
     "@pixelic/interceptors": "*",
     "@pixelic/utils": "*",
     "@pixelic/wynncraft": "*",
-    "cron": "^3.0.0",
-    "@sentry/node": "^7.65.0"
+    "cron": "^3.0.0"
   }
 }

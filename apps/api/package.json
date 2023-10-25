@@ -18,7 +18,6 @@
     "@pixelic/wynncraft": "*",
     "@pixelic/hypixel": "*",
     "@pixelic/types": "*",
-    "@sentry/node": "^7.65.0",
     "axios": "^1.4.0",
     "cloc": "1.98.0-cloc",
     "cors": "^2.8.5",
