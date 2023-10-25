@@ -12,9 +12,8 @@ export const getPlayer = async (player: string) => {
   try {
     const UUID = await parseUUID(player);
     if (UUID === null) return "Invalid UUID or Username";
-    // if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
+    if (config.wynncraft.cache && (await redis.exists(`Wynncraft:Cache:Players:${UUID}`))) return JSON.parse((await redis.get(`Wynncraft:Cache:Players:${UUID}`)) as string);
     const data = await requestWynncraft(`https://api.wynncraft.com/v3/player/${dashUUID(UUID)}?fullResult=true`);
-    //if (data.data.length === 0) return "This player never played on Wynncraft";
     const formattedData = formatPlayer(data);
     if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(formattedData));
     if (config.wynncraft.persistData) {
