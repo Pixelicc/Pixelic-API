@@ -1639,11 +1639,6 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
     if (petData?.candyUsed) item.attributes.candyUsed = petData.candyUsed;
     if (petData?.heldItem) item.attributes.heldItem = petData.heldItem;
     if (petData?.skin) item.attributes.skin = petData.skin;
-    if (NBT?.tag?.ExtraAttributes?.timestamp) {
-      item.attributes.timestamp = Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000);
-    } else {
-      item.attributes.timestamp = null;
-    }
 
     delete item.attributes.petInfo;
   } else if (NBT?.tag?.ExtraAttributes?.id === "POTION") {
@@ -1663,9 +1658,7 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
     item.attributes = {
       ...NBT.tag.ExtraAttributes,
       ID: NBT.tag.ExtraAttributes.id,
-      UUID: NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : null,
-      texture: NBT?.SkullOwner?.Properties?.textures?.[0]?.Value,
-      timestamp: NBT?.tag?.ExtraAttributes?.timestamp ? Math.floor(new Date(NBT.tag.ExtraAttributes.timestamp).valueOf() / 1000) : null,
+      UUID: NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : undefined,
     };
   }
 
@@ -1674,6 +1667,8 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
   delete item.attributes.color;
   delete item.attributes.originTag;
   delete item.attributes.modifier;
+
+  item.attributes.timestamp = item?.attributes?.timestamp ? Math.floor(new Date(item.attributes.timestamp).valueOf() / 1000) : undefined;
 
   return item;
 };
@@ -1746,14 +1741,34 @@ export const formatSkyblockBazaar = async (bazaar: any, { itemInfo }: { itemInfo
   return formattedData;
 };
 
-export const formatSkyblockitems = (items: any) => {
+export const formatSkyblockItems = (items: any) => {
   const formattedItems: any = {};
   for (const item of items) {
     const ID = item.id;
-    var texture;
-    if (item?.skin) texture = JSON.parse(Buffer.from(item.skin, "base64").toString())?.textures?.SKIN?.url?.split("/")?.slice(-1)?.[0];
-    delete item.skin;
+
+    let texture;
+    if (item?.skin) {
+      texture = JSON.parse(Buffer.from(item.skin, "base64").toString())?.textures?.SKIN?.url?.split("/")?.slice(-1)?.[0];
+      delete item.skin;
+    }
+
+    if (item?.color) {
+      const RGB = item.color.split(",");
+      for (const i in RGB) {
+        RGB[i] = Number(RGB[i]);
+      }
+
+      const decimal = (RGB[0] << 16) + (RGB[1] << 8) + RGB[2];
+
+      item.color = {
+        RGB,
+        decimal,
+        hex: "#" + decimal.toString(16).toUpperCase(),
+      };
+    }
+
     delete item.id;
+
     formattedItems[ID] = { ...item, texture };
   }
   return formattedItems;

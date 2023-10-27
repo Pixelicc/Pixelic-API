@@ -5,7 +5,7 @@ import { config, deepCompare } from "@pixelic/utils";
 import { parseUUID } from "@pixelic/mojang";
 import { requestHypixel } from "./requestHandler.js";
 import redis from "@pixelic/redis";
-import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockitems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
+import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockItems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
 import { RequireOneObjParam } from "@pixelic/types";
 import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockAuctionTrackingModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 import { calculateSkyblockAuctionPrices } from "./calcs.js";
@@ -291,7 +291,7 @@ export const getSkyblockItems = async () => {
     if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockItems"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockItems")) as string);
     const data = (await axios.get("https://api.hypixel.net/resources/skyblock/items")).data.items;
     log("Hypixel", "Fetched Hypixel Skyblock Items", "info");
-    const formattedData = formatSkyblockitems(data);
+    const formattedData = formatSkyblockItems(data);
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockItems", 1800, JSON.stringify(formattedData));
     return formattedData;
   } catch (e) {
