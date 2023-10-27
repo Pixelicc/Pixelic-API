@@ -143,10 +143,10 @@ export const getGuildList = async () => {
 
 export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }): Promise<{ playercount: number; servercount: number; servers: { [key: string]: { playercount: number; players: string[] | { UUID: string | null; username: string }[] } } } | null> => {
   try {
-    if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:serverList"))) return JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string);
+    if (config.wynncraft.cache && (await redis.exists("Wynncraft:Cache:serverList"))) return await formatServerList(JSON.parse((await redis.get("Wynncraft:Cache:serverList")) as string), { UUIDs });
     const data = await requestWynncraft("https://api.wynncraft.com/v3/player");
     const formattedData = await formatServerList(data, { UUIDs: UUIDs });
-    if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(formattedData));
+    if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(data));
     if (config.wynncraft.persistData) {
       const persistableData = [];
       for (const server of Object.keys(formattedData.servers)) {
