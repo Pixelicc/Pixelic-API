@@ -26,10 +26,6 @@ const itemSchema = new Schema(
       type: Number,
       required: true,
     },
-    lore: {
-      type: Array,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
@@ -42,7 +38,7 @@ const itemSchema = new Schema(
     },
     attributes: attributeSchema,
   },
-  { strict: false, _id: false }
+  { strict: true, _id: false }
 );
 
 const retentionSchema = new Schema(
