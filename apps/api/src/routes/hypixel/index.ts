@@ -1,9 +1,8 @@
 import express from "express";
-import skyblockAuctions from "./skyblockAuctions.js";
-import skyblockBazaar from "./skyblockBazaar.js";
+import skyblock from "./skyblock/index.js";
 
 const router = express.Router();
 
-router.use(skyblockAuctions, skyblockBazaar);
+router.use(skyblock);
 
 export default router;
