@@ -34,17 +34,21 @@ axiosRetry(axios, {
 
 export const requestUUID = async (username: string): Promise<string | null> => {
   username = username.toLowerCase();
-  if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${username}`))) return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
+  if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${username}`))) {
+    redis.hincrby("Mojang:Stats", "cachedRequests", 1);
+    return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
+  }
   try {
     return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${username}`)) {
         limiter.incrementReservoir(1);
+        redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
         return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
       }
-      await axios
+      return await axios
         .get(`https://api.mojang.com/users/profiles/minecraft/${username}`)
         .then(async (request) => {
-          log("Mojang", `Requested UUID of ${username}`, "info");
+          log("Mojang", `Fetched UUID (${username})`, "info");
           const data = { UUID: formatUUID(request.data.id), username: request.data.name };
           if (config.mojang.UUIDList && (await redis.zscore("Mojang:UUIDList", data.UUID)) === null) await redis.zadd("Mojang:UUIDList", Math.floor(Date.now() / 1000), data.UUID);
           if (config.mojang.cache) {
@@ -67,17 +71,21 @@ export const requestUUID = async (username: string): Promise<string | null> => {
 
 export const requestUsername = async (UUID: string): Promise<string | null> => {
   UUID = formatUUID(UUID);
-  if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${UUID}`))) return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
+  if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${UUID}`))) {
+    redis.hincrby("Mojang:Stats", "cachedRequests", 1);
+    return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
+  }
   try {
     return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${UUID}`)) {
         limiter.incrementReservoir(1);
+        redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
         return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
       }
-      await axios
-        .get(`https://api.mojang.com/user/profile/${UUID}`, { timeout: 10000 })
+      return await axios
+        .get(`https://api.mojang.com/user/profile/${UUID}`)
         .then(async (request) => {
-          log("Mojang", `Requested Username of ${UUID}`, "info");
+          log("Mojang", `Fetched Username (${UUID})`, "info");
           const data = { UUID: formatUUID(request.data.id), username: request.data.name };
           if (config.mojang.UUIDList && (await redis.zscore("Mojang:UUIDList", data.UUID)) === null) await redis.zadd("Mojang:UUIDList", Math.floor(Date.now() / 1000), data.UUID);
           if (config.mojang.cache) {
@@ -99,6 +107,7 @@ export const requestUsername = async (UUID: string): Promise<string | null> => {
 };
 
 export const parseUUID = async (player: string) => {
+  if (typeof player !== "string") return null;
   if (validateUUID(player)) return formatUUID(player);
   if (!validateUsername(player)) return null;
   return await requestUUID(player);
