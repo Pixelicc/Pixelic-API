@@ -8,18 +8,18 @@ const historicalPlayerSchema = new Schema(
       required: true,
       index: true,
     },
-    playtime: {
-      type: Number,
-      required: false,
-    },
-    global: {
-      type: Object,
-      required: false,
-    },
-    characters: {
-      type: Object,
-      required: false,
-    },
+    username: String,
+    playtime: Number,
+    firstLogin: Number,
+    lastLogin: Number,
+    online: Boolean,
+    server: String,
+    rank: String,
+    purchasedRank: String,
+    global: Object,
+    characters: Object,
+    guild: Object,
+    publicProfile: Boolean,
   },
   { minimize: false }
 );

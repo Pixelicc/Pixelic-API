@@ -3,23 +3,91 @@ import { formatUUID } from "@pixelic/utils";
 
 export const formatPlayer = (player: any) => {
   const characters: any = {};
-  for (const character in player?.characters || {}) {
-    characters[formatUUID(character)] = player.characters[character];
+  for (const [UUID, character] of Object.entries((player?.characters || {}) as { [key: string]: any })) {
+    const parseProfessions = (professions: string[]) => {
+      const formattedProfessions: any = {};
+      for (const profession of professions) {
+        formattedProfessions[profession] = {
+          level: character?.professions?.[profession]?.level || 0,
+          EXPPercent: character?.professions?.[profession]?.xpPercent || 0,
+        };
+      }
+      return formattedProfessions;
+    };
+
+    characters[formatUUID(UUID)] = {
+      class: character.type.toUpperCase(),
+      nick: character.nickname,
+      level: character?.level || 0,
+      totalLevels: character?.totalLevels || 0,
+      EXP: character?.xp || 0,
+      EXPPercent: character?.xpPercent || 0,
+      wars: character?.wars || 0,
+      mobsKilled: character?.mobsKilled || 0,
+      chestsFound: character?.chestsFound || 0,
+      blocksWalked: character?.blocksWalked || 0,
+      playtime: character?.playtime || 0,
+      logins: character?.logins || 0,
+      deaths: character?.deaths || 0,
+      discoveries: character?.discoveries || 0,
+      pvp: {
+        kills: character?.pvp?.kills || 0,
+        deaths: character?.pvp?.deaths || 0,
+      },
+      gamemodes: character?.gamemode?.map((gamemode: string) => gamemode.toUpperCase()) || [],
+      skillPoints: character?.skillPoints || {},
+      professions: parseProfessions(["fishing", "woodcutting", "mining", "farming", "scribing", "jeweling", "alchemism", "cooking", "weaponsmithing", "tailoring", "woodworking", "armouring"]),
+      dungeons: {
+        total: character?.dungeons?.total || 0,
+        list: character?.dungeons?.list || {},
+      },
+      raids: {
+        total: character?.raids?.total || 0,
+        list: character?.raids?.list || {},
+      },
+      questsCompleted: character?.quests?.length || 0,
+      quests: character?.quests || [],
+    };
   }
   return {
     UUID: formatUUID(player.uuid),
     username: player.username,
-    playtime: player?.playtime || null,
+    playtime: player?.playtime || 0,
     firstLogin: player?.firstJoin ? Math.floor(new Date(player?.firstJoin).valueOf() / 1000) : null,
     lastLogin: player?.lastJoin ? Math.floor(new Date(player?.lastJoin).valueOf() / 1000) : null,
     online: player?.online || false,
     server: player?.server || null,
     rank: player?.rank?.toUpperCase() || "PLAYER",
-    purchasedRank: player?.supportRank?.toUpperCase() || null,
-    global: player?.globalData || {},
+    purchasedRank: player?.supportRank === "vipplus" ? "VIP_PLUS" : player?.supportRank?.toUpperCase() || null,
+    global: {
+      wars: player?.globalData?.wars || 0,
+      totalLevels: player?.globalData?.totalLevels || 0,
+      mobsKilled: player?.globalData?.killedMobs || 0,
+      chestsFound: player?.globalData?.chestsFound || 0,
+      dungeons: {
+        total: player?.globalData?.dungeons?.total || 0,
+        list: player?.globalData?.dungeons?.list || {},
+      },
+      raids: {
+        total: player?.globalData?.raids?.total || 0,
+        list: player?.globalData?.raids?.list || {},
+      },
+      questsCompleted: player?.globalData?.completedQuests || 0,
+      pvp: {
+        kills: player?.globalData?.pvp?.kills || 0,
+        deaths: player?.globalData?.pvp?.deaths || 0,
+      },
+    },
     characters,
     rankings: player?.ranking || {},
-    guild: player?.guild || null,
+    guild: player?.guild
+      ? {
+          name: player.guild.name,
+          prefix: player.guild.prefix,
+          rank: player.guild.rank,
+        }
+      : null,
+    publicProfile: player?.publicProfile || false,
   };
 };
 
@@ -33,8 +101,8 @@ export const formatGuild = (guild: any) => {
         UUID: formatUUID(data.uuid),
         rank: rank.toUpperCase(),
         online: data?.online || false,
+        server: data?.server || null,
         contributed: data?.contributed || 0,
-        contributionRank: data?.contributionRank || null,
         joined: data?.joined ? Math.floor(new Date(data?.joined).valueOf() / 1000) : null,
       });
     }
@@ -44,7 +112,7 @@ export const formatGuild = (guild: any) => {
     prefix: guild?.prefix || null,
     onlineMembers: guild?.online || 0,
     members: members,
-    xpPercent: guild?.xpPercent || 0,
+    EXPPercent: guild?.xpPercent || 0,
     level: guild?.level || 0,
     created: guild?.created ? Math.floor(new Date(guild?.created).valueOf() / 1000) : null,
     territories: guild?.territories || 0,

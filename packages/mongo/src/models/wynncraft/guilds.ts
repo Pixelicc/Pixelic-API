@@ -14,21 +14,27 @@ const guildSchema = new Schema({
     type: String,
     required: true,
   },
+  onlineMembers: {
+    type: String,
+    required: true,
+  },
   members: [
     {
       username: { type: String },
       UUID: { type: String },
       rank: { type: String },
+      online: { type: Boolean },
+      server: { type: String },
       contributed: { type: Number },
       joined: { type: Number },
     },
     { _id: false },
   ],
-  XP: {
+  level: {
     type: Number,
     required: true,
   },
-  level: {
+  EXPPercent: {
     type: Number,
     required: true,
   },
