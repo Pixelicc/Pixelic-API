@@ -24,8 +24,8 @@ const limiter = new Bottleneck({
 axiosRetry(axios, {
   retries: 5,
   retryDelay: (retryCount) => {
-    log("Mojang", `Retrying to fetch Mojang Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2) * 5}s)`, "warn");
-    return Math.pow(retryCount, 2) * 5000;
+    log("Mojang", `Retrying to fetch Mojang Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2)}s)`, "warn");
+    return Math.pow(retryCount, 2) * 1000;
   },
   retryCondition: (error) => {
     return error?.response?.status === 429 || error?.response?.status === 502 || error?.response?.status === 503 || error?.response?.status === 504;
