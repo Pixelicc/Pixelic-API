@@ -4,6 +4,7 @@ import util from "util";
 import minecraftItems from "minecraft-items";
 import { getRatio, formatUUID, decodeNBT } from "@pixelic/utils";
 import { getSkyblockItems } from "./index.js";
+import { ISOString } from "@pixelic/types";
 
 const parseNbt = util.promisify(nbt.parse);
 
@@ -1543,6 +1544,16 @@ export const formatGuild = (guild: any) => {
     return 1000;
   };
 
+  const parseCappedEXPHistory = (EXPHistory: { [key: string]: number }) => {
+    const cappedEXPHistory: { [key: string]: number } = {};
+    for (const day in EXPHistory) {
+      if (EXPHistory[day] <= 200000) cappedEXPHistory[day] = EXPHistory[day];
+      else if (EXPHistory[day] <= 250000) cappedEXPHistory[day] = Math.floor(200000 + (EXPHistory[day] - 200000) * 0.1);
+      else cappedEXPHistory[day] = Math.floor(200000 + 5000 + (EXPHistory[day] - 250000) * 0.03);
+    }
+    return cappedEXPHistory;
+  };
+
   const ranks = [];
   if (guild?.ranks) {
     for (const rank of guild.ranks.sort((a: any, b: any) => parseFloat(b.priority) - parseFloat(a.priority))) {
@@ -1566,6 +1577,7 @@ export const formatGuild = (guild: any) => {
         rank: member.rank,
         joined: member?.joined ? Math.floor(member.joined / 1000) : null,
         questParticipation: member?.questParticipation || 0,
+        weeklyEXP: Object.values((member?.expHistory || {}) as { [key: string]: number }).reduce((total, value) => total + value, 0),
         EXPHistory: member?.expHistory || {},
         mutedTill: member?.mutedTill || null,
       };
@@ -1588,7 +1600,10 @@ export const formatGuild = (guild: any) => {
     tag: guild?.tag || null,
     tagColor: guild?.tagColor || null,
     EXP: guild?.exp || 0,
-    EXPHistory: EXPHistory,
+    weeklyEXP: Object.values(EXPHistory as { [key: ISOString["YYYY_MM_DD"]]: number }).reduce((total, value) => total + value, 0),
+    cappedWeeklyEXP: Object.values(parseCappedEXPHistory(EXPHistory) as { [key: ISOString["YYYY_MM_DD"]]: number }).reduce((total, value) => total + value, 0),
+    EXPHistory: EXPHistory as { [key: ISOString["YYYY_MM_DD"]]: number },
+    cappedEXPHistory: parseCappedEXPHistory(EXPHistory) as { [key: ISOString["YYYY_MM_DD"]]: number },
     level: getLevel(guild?.exp || 0),
     ranks: ranks,
     memberCount: memberCount,

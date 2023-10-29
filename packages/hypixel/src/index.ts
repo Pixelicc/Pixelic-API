@@ -77,12 +77,12 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       if (UUID === null) return "Invalid UUID or Username";
       if (await checkCache(`Hypixel:Cache:Guilds:${UUID}`)) {
         if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return null;
-        return await getCache(`Hypixel:Cache:Guilds:${await redis.get(`Hypixel:Cache:Guilds:${UUID}`)}`);
+        return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`);
       }
       await Limiter.schedule(async () => {
         if (await checkCache(`Hypixel:Cache:Guilds:${UUID}`)) {
           if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return null;
-          return await getCache(`Hypixel:Cache:Guilds:${await redis.get(`Hypixel:Cache:Guilds:${UUID}`)}`, { raceCondition: true });
+          return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`, { raceCondition: true });
         }
         try {
           data = (await HypixelAPI.get("/guild", { params: { player: UUID } })).data;
@@ -111,12 +111,12 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       if (!/^[a-zA-Z0-9_ ]{3,32}$/.test(name)) return "Invalid Guild Name";
       if (await checkCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) {
         if ((await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) === null) return null;
-        return await getCache(`Hypixel:Cache:Guilds:${await redis.get(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`);
+        return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`);
       }
       await Limiter.schedule(async () => {
         if (await checkCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) {
           if ((await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) === null) return null;
-          return await getCache(`Hypixel:Cache:Guilds:${await redis.get(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`, { raceCondition: true });
+          return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`, { raceCondition: true });
         }
         try {
           data = (await HypixelAPI.get("/guild", { params: { name } })).data;
@@ -131,8 +131,8 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
     const formattedData = formatGuild(data.guild);
     if (config.hypixel.cache) {
       const pipeline = redis.pipeline();
-      formattedData.members.forEach((member) => pipeline.setex(`Hypixel:Cache:Guilds:${member.UUID}`, 600, formattedData.ID));
-      pipeline.setex(`Hypixel:Cache:Guilds:${formattedData.name.toLowerCase()}`, 600, formattedData.ID);
+      formattedData.members.forEach((member) => pipeline.setex(`Hypixel:Cache:Guilds:${member.UUID}`, 600, JSON.stringify(formattedData.ID)));
+      pipeline.setex(`Hypixel:Cache:Guilds:${formattedData.name.toLowerCase()}`, 600, JSON.stringify(formattedData.ID));
       pipeline.setex(`Hypixel:Cache:Guilds:${formattedData.ID}`, 600, JSON.stringify(formattedData));
       pipeline.exec();
     }
@@ -162,6 +162,7 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
     }
     return formattedData;
   } catch (e) {
+    console.log(e);
     Sentry.captureException(e);
     return null;
   }

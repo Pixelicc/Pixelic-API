@@ -18,6 +18,7 @@ const memberSchema = new Schema(
     rank: { type: String },
     joined: { type: Number },
     questParticipation: { type: Number },
+    weeklyEXP: { type: Number },
     EXPHistory: { type: Object },
     mutedTill: { type: Number },
   },
@@ -71,7 +72,19 @@ const guildSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  weeklyEXP: {
+    type: Number,
+    required: true,
+  },
+  cappedWeeklyEXP: {
+    type: Number,
+    required: true,
+  },
   EXPHistory: {
+    type: Object,
+    required: true,
+  },
+  cappedEXPHistory: {
     type: Object,
     required: true,
   },
