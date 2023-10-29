@@ -13,7 +13,7 @@ const checkCache = async (key: string): Promise<boolean> => {
   return config.wynncraft.cache && (await redis.exists(key)) === 1;
 };
 
-const getCache = async (key: string, options?: { raceCondition: boolean }) => {
+const getCache = async (key: string, options?: { raceCondition: boolean }): Promise<any> => {
   if (options?.raceCondition) {
     Limiter.incrementReservoir(1);
     redis.hincrby("Wynncraft:Stats", "raceConditionCachedRequests", 1);
