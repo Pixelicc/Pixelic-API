@@ -1,37 +1,37 @@
-import { CronJob } from "cron";
 import * as Sentry from "@sentry/node";
+import { CronJob } from "cron";
 import { config } from "@pixelic/utils";
-import { getSkyblockActiveAuctions, getSkyblockBazaar, getSkyblockElection, getSkyblockEndedAuctions } from "@pixelic/hypixel";
-import { getServerList } from "@pixelic/wynncraft";
-import { pingServers } from "./SLPCollector.js";
+import hypixel from "./hypixel.js";
+import wynncraft from "./wynncraft.js";
+import minecraft from "./minecraft/minecraft.js";
 
 Sentry.init({
-  dsn: config.collector.sentry.dsn,
-  tracesSampleRate: config.collector.sentry.tracesSampleRate,
+  dsn: config.sentry.dsn,
+  integrations: [
+    new Sentry.Integrations.Mongo({
+      useMongoose: true,
+    }),
+  ],
+  tracesSampleRate: config.sentry.tracesSampleRate,
   normalizeDepth: 3,
   environment: config.environment,
 });
 
-new CronJob("* * * * *", () => {
-  // Hypixel
-  if (config.collector.hypixel.skyblock.endedAuctions) getSkyblockEndedAuctions().catch((e) => Sentry.captureException(e));
-  if (config.collector.hypixel.skyblock.bazaar) getSkyblockBazaar({ itemInfo: false }).catch((e) => Sentry.captureException(e));
-
-  // Wynncraft
-  if (config.collector.wynncraft.serverPlayercounts) getServerList({ UUIDs: false }).catch((e) => Sentry.captureException(e));
-}).start();
+Sentry.setTag("App", "Collector");
 
 new CronJob("30 * * * * *", () => {
-  // Offset by 30s so Minecraft Server Latency can be measured more precisely
-  if (config.collector.minecraft.serverPlayercounts) pingServers().catch((e) => Sentry.captureException(e));
+  minecraft.collect();
 }).start();
 
-new CronJob("*/5 * * * *", () => {
-  // Hypixel
-  if (config.collector.hypixel.skyblock.activeAuctions) getSkyblockActiveAuctions().catch((e) => Sentry.captureException(e));
+new CronJob("5 * * * * *", () => {
+  hypixel.collect();
+  wynncraft.collect();
 }).start();
 
-new CronJob("0 * * * *", () => {
-  // Hypixel
-  if (config.collector.hypixel.skyblock.election) getSkyblockElection().catch((e) => Sentry.captureException(e));
+new CronJob("5 */5 * * * *", () => {
+  hypixel.collectSkyblockActiveAuctions();
+}).start();
+
+new CronJob("5 0 * * * *", () => {
+  hypixel.collectSkyblockElection();
 }).start();

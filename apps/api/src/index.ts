@@ -10,7 +10,7 @@ import router from "./routes/index.js";
 const API = express();
 
 Sentry.init({
-  dsn: config.API.sentry.dsn,
+  dsn: config.sentry.dsn,
   integrations: [
     new Sentry.Integrations.Http({
       tracing: false,
@@ -19,11 +19,16 @@ Sentry.init({
     new Sentry.Integrations.Express({
       app: API,
     }),
+    new Sentry.Integrations.Mongo({
+      useMongoose: true,
+    }),
   ],
-  tracesSampleRate: config.API.sentry.tracesSampleRate,
+  tracesSampleRate: config.sentry.tracesSampleRate,
   normalizeDepth: 3,
   environment: config.environment,
 });
+
+Sentry.setTag("App", "API");
 
 API.use(Sentry.Handlers.requestHandler());
 API.use(Sentry.Handlers.tracingHandler());

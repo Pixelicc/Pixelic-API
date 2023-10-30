@@ -20,16 +20,6 @@ export default {
      * Port the API is running on
      */
     port: 3000,
-    sentry: {
-      /**
-       * Your Sentry DSN for error tracking: https://sentry.io
-       */
-      dsn: "",
-      /**
-       * Your Sentry tracesSampleRate: https://docs.sentry.io/platforms/node/guides/express/configuration/options/#sample-rate
-       */
-      tracesSampleRate: 0.5,
-    },
   },
   collector: {
     minecraft: {
@@ -94,6 +84,16 @@ export default {
      * Wether to cache API responses in Redis
      */
     cache: true,
+  },
+  sentry: {
+    /**
+     * Your Sentry DSN for error tracking: https://sentry.io
+     */
+    dsn: "",
+    /**
+     * Your Sentry tracesSampleRate: https://docs.sentry.io/platforms/node/guides/express/configuration/options/#sample-rate
+     */
+    tracesSampleRate: 0.1,
   },
   /**
    * The current environment the code is running in
