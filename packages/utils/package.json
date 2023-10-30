@@ -8,6 +8,7 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/logger": "*",
     "ioredis": "^5.3.2",
     "minecraft-protocol": "^1.44.0",
     "prismarine-nbt": "^2.2.1",
