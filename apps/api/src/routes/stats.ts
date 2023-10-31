@@ -4,7 +4,7 @@ import { exec } from "child_process";
 import redis from "@pixelic/redis";
 import { client as mongo } from "@pixelic/mongo";
 import axios from "axios";
-import { formatBytes, formatNumber } from "@pixelic/utils";
+import { formatBytes, formatNumber, objectStringToNumber } from "@pixelic/utils";
 
 const router = express.Router();
 
@@ -100,9 +100,11 @@ router.get("/v1/stats/redis", async (req, res) => {
     return res.json({
       success: true,
       bytesStored: Number(info.used_memory),
-      bytesStoredFormatted: formatBytes(Number(info.used_memory), 3),
+      bytesStoredFormatted: formatBytes(Number(info.used_memory), 2),
       keys: Number(info.db0.split("=")[1].split(",")[0]),
-      keysFormatted: formatNumber(Number(info.db0.split("=")[1].split(",")[0]), 3),
+      keysFormatted: formatNumber(Number(info.db0.split("=")[1].split(",")[0]), 2),
+      averageKeySize: Number(info.used_memory) / Number(info.db0.split("=")[1].split(",")[0]),
+      averageKeySizeFormatted: formatBytes(Number(info.used_memory) / Number(info.db0.split("=")[1].split(",")[0]), 2),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -130,11 +132,11 @@ router.get("/v1/stats/mongo", async (req, res) => {
       parsedDBs[db.name] = {
         collections: data.collections,
         documents: data.objects,
-        documentsFormatted: formatNumber(data.objects, 3),
+        documentsFormatted: formatNumber(data.objects, 2),
         averageDocumentSize: data.avgObjSize,
-        averageDocumentSizeFormatted: formatBytes(data.avgObjSize, 3),
+        averageDocumentSizeFormatted: formatBytes(data.avgObjSize, 2),
         bytesStored: data.storageSize,
-        bytesStoredFormatted: formatBytes(data.storageSize, 3),
+        bytesStoredFormatted: formatBytes(data.storageSize, 2),
       };
       total.collections += data.collections;
       total.documents += data.objects;
@@ -159,8 +161,8 @@ router.get("/v1/stats", async (req, res) => {
     return res.json({
       success: true,
       requests: requests,
-      requestsFormatted: formatNumber(requests, 3),
-      requestsHistory: await redis.hgetall("API:Analytics:RequestsHistory"),
+      requestsFormatted: formatNumber(requests, 2),
+      requestsHistory: objectStringToNumber(await redis.hgetall("API:Analytics:RequestsHistory")),
     });
   } catch (e) {
     Sentry.captureException(e);
