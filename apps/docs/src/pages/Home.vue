@@ -15,11 +15,11 @@
       </v-card>
       <v-card class="pa-4 ma-10" variant="tonal" color="primary">
         <v-icon>mdi-chart-donut</v-icon>
-        {{ formatNumber(APIStats.mongo.documents + APIStats.redis.keys, 3) }} Datapoints</v-card
+        {{ formatNumber(APIStats.mongo.documents + APIStats.redis.keys, 2) }} Datapoints</v-card
       >
       <v-card class="pa-4 ma-10" variant="tonal" color="primary">
         <v-icon>mdi-database</v-icon>
-        {{ formatBytes(APIStats.mongo.bytesStored + APIStats.redis.bytesStored, 3) }} Stored</v-card
+        {{ formatBytes(APIStats.mongo.bytesStored + APIStats.redis.bytesStored, 2) }} Stored</v-card
       >
     </v-row>
     <v-row justify="center" class="text-center">
