@@ -10,7 +10,7 @@ export default {
     try {
       const persistableData = [];
       for (const server of servers) {
-        const SLPData = await sendSLP(server.host, 25565);
+        const SLPData = await sendSLP(server.host, 25565, { timeout: 3000 });
 
         if (SLPData !== null && SLPData?.latency) {
           await redis.set(`Minecraft:Servers:${server.ID}`, JSON.stringify(SLPData)).catch(() => {});
