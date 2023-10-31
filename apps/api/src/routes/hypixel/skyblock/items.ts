@@ -8,7 +8,11 @@ const router = express.Router();
 router.get("/v1/hypixel/skyblock/items", async (req, res) => {
   try {
     res.set("Cache-Control", "public, max-age=3600");
-    return res.json({ success: true, items: await getSkyblockItems() });
+
+    const data = await getSkyblockItems();
+    if (!data) return res.status(500).json({ success: false });
+
+    return res.json({ success: true, items: data });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -17,12 +21,12 @@ router.get("/v1/hypixel/skyblock/items", async (req, res) => {
 
 router.get("/v1/hypixel/skyblock/items/:item", async (req, res) => {
   try {
-    res.set("Cache-Control", "public, max-age=3600");
     if (!validateSkyblockItemID(req.params.item)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
     const data = await getSkyblockItems();
-
+    if (!data) return res.status(500).json({ success: false });
     if (!data[req.params.item]) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
+    res.set("Cache-Control", "public, max-age=3600");
 
     return res.json({ sucess: true, ...data[req.params.item] });
   } catch (e) {

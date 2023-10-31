@@ -9,7 +9,11 @@ const router = express.Router();
 router.get("/v1/hypixel/skyblock/election", async (req, res) => {
   try {
     res.set("Cache-Control", "public, max-age=3600");
-    return res.json({ success: true, ...(await getSkyblockElection()) });
+
+    const data = await getSkyblockElection();
+    if (!data) return res.status(500).json({ success: false });
+
+    return res.json({ success: true, ...data });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
