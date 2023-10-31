@@ -16,7 +16,7 @@ router.get("/v1/minecraft/server/list", async (req, res) => {
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -40,7 +40,7 @@ router.get("/v1/minecraft/server/:server", async (req, res) => {
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -59,7 +59,7 @@ router.get("/v1/minecraft/server/:server/history", async (req, res) => {
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -93,7 +93,7 @@ router.get("/v1/minecraft/server/:server/history/:timeframe", async (req, res) =
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 

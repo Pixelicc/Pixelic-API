@@ -28,7 +28,7 @@ router.get("/v1/hypixel/skyblock/items/:item", async (req, res) => {
     if (!data[req.params.item]) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
     res.set("Cache-Control", "public, max-age=3600");
 
-    return res.json({ sucess: true, ...data[req.params.item] });
+    return res.json({ success: true, ...data[req.params.item] });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

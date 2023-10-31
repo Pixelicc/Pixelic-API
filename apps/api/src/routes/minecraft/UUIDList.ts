@@ -26,7 +26,7 @@ router.get("/v1/minecraft/uuids", async (req, res) => {
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 

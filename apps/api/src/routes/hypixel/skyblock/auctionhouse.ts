@@ -52,7 +52,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -75,7 +75,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -99,7 +99,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -114,7 +114,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", ratelimit(), async (r
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -129,7 +129,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (re
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -148,7 +148,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", ratelimit(), a
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -172,7 +172,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history/:timeframe", rat
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 

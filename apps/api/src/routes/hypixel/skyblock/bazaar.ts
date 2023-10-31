@@ -17,7 +17,7 @@ router.get("/v1/hypixel/skyblock/bazaar", async (req, res) => {
     return res.json({ success: true, products: data });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -30,10 +30,10 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
     if (!data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
     res.set("Cache-Control", "public, max-age=60");
 
-    return res.json({ sucess: true, ...data[req.params.product] });
+    return res.json({ success: true, ...data[req.params.product] });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -52,7 +52,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history", ratelimit(), async (req, r
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
@@ -87,7 +87,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history/:timeframe", ratelimit(), as
     });
   } catch (e) {
     Sentry.captureException(e);
-    return res.status(500).json({ sucess: false });
+    return res.status(500).json({ success: false });
   }
 });
 
