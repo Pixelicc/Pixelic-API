@@ -14,9 +14,7 @@
       "matchUpdateTypes": [
         "minor",
         "patch"
-      ],
-      "matchCurrentVersion": "!/^0/",
-      "commitMessagePrefix": "chore(deps):"
+      ]
     },
     {
       "matchPackagePatterns": [
