@@ -1,3 +1,5 @@
+import { RequireOneObjParam } from "@pixelic/types";
+
 export const formatUUID = (UUID: string) => UUID.replace(/-/g, "").toLowerCase();
 
 export const dashUUID = (UUID: string) => UUID.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
@@ -38,13 +40,21 @@ export const formatBytes = (bytes: number, digits: number) => {
   return item ? (bytes / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
 };
 
-export const formatTimeseries = (array: any[], options?: { meta: string }) => {
+export const formatTimeseries = (array: any[], options?: RequireOneObjParam<{ meta?: string; data?: string }>) => {
   const formattedArray: {}[] = [];
   for (const datapoint of array) {
-    const formattedData = {
-      timestamp: Math.floor(new Date(datapoint.timestamp).valueOf() / 1000),
-      ...datapoint.data,
-    };
+    var formattedData;
+    if (options?.data) {
+      formattedData = {
+        timestamp: Math.floor(new Date(datapoint.timestamp).valueOf() / 1000),
+        [options.data]: datapoint.data,
+      };
+    } else {
+      formattedData = {
+        timestamp: Math.floor(new Date(datapoint.timestamp).valueOf() / 1000),
+        ...datapoint.data,
+      };
+    }
     if (options?.meta) formattedData[options.meta] = datapoint.meta;
     formattedArray.push(formattedData);
   }
