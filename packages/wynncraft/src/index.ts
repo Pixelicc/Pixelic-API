@@ -140,14 +140,14 @@ export const getGuildList = async () => {
 
 export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
   try {
-    if (await checkCache("Wynncraft:Cache:serverList")) return await formatServerList(await getCache("Wynncraft:Cache:guildList"), { UUIDs });
+    if (await checkCache("Wynncraft:Cache:serverList")) return await formatServerList(await getCache("Wynncraft:Cache:serverList"), { UUIDs });
     return await Limiter.schedule(async () => {
       if (await checkCache("Wynncraft:Cache:serverList")) return await formatServerList(await getCache("Wynncraft:Cache:serverList", { raceCondition: true }), { UUIDs });
       return await WynncraftAPI.get("/v3/player")
         .then(async (res) => {
           log("Wynncraft", "Fetched Wynncraft Server List", "info");
           const formattedData = await formatServerList(res.data, { UUIDs: UUIDs });
-          if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 30, JSON.stringify(res.data));
+          if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:serverList", 55, JSON.stringify(res.data));
           if (config.wynncraft.persistData) {
             const persistableData = [];
             for (const server of Object.keys(formattedData.servers)) {
