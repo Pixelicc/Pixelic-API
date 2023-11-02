@@ -37,7 +37,7 @@ router.get("/v1/wynncraft/server/:server", async (req, res) => {
   }
 });
 
-router.get("/v1/wynncraft/server/:server/history", async (req, res) => {
+router.get("/v1/wynncraft/server/:server/history", ratelimit(), async (req, res) => {
   try {
     if (!/^[A-Z0-9]+$/.test(req.params.server)) return res.status(422).json({ success: false, cause: "Invalid Server" });
 
@@ -56,7 +56,7 @@ router.get("/v1/wynncraft/server/:server/history", async (req, res) => {
   }
 });
 
-router.get("/v1/wynncraft/server/:server/history/:timeframe", async (req, res) => {
+router.get("/v1/wynncraft/server/:server/history/:timeframe", ratelimit(), async (req, res) => {
   try {
     if (!["hour", "day", "week", "month", "year"].includes(req.params.timeframe)) return res.status(422).json({ success: false, cause: "Invalid Timeframe" });
     if (!/^[A-Z0-9]+$/.test(req.params.server)) return res.status(422).json({ success: false, cause: "Invalid Server" });
