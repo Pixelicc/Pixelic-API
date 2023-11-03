@@ -27,14 +27,16 @@ router.get("/v1/stats/code", async (req, res) => {
           };
           continue;
         }
-        languages[lang] = {
+        var formattedLang = lang;
+        if (lang === "Vuejs Component") formattedLang = "Vue.js";
+        languages[formattedLang] = {
           files: raw[lang].nFiles,
           lines: raw[lang].code,
           comments: raw[lang].comment,
         };
       }
-
       const parsed = { languages, ...total };
+
       await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
       return res.json({
         success: true,
