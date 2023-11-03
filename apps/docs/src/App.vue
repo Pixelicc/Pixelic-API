@@ -1,7 +1,7 @@
 <template>
   <v-app :theme="theme">
     <v-app-bar density="compact" scroll-behavior="hide elevate" elevation="1" href="/">
-      <v-app-bar-title><v-btn href="/" variant="plain" :ripple="false" style="font-size: medium; font: italic">Pixelic-API</v-btn></v-app-bar-title
+      <v-app-bar-title><v-btn href="/" variant="plain" :ripple="false" style="font-size: medium">Pixelic-API</v-btn></v-app-bar-title
       ><v-btn @click="toggleTheme" :icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"></v-btn
     ></v-app-bar>
     <v-main>
@@ -25,7 +25,7 @@ import { RouterView } from "vue-router";
 // @ts-ignore
 import { getTheme, setTheme } from "./stores/theme.js";
 
-const theme = ref("");
+const theme = ref();
 theme.value = getTheme();
 
 if (getTheme() === null) setTheme("light");
