@@ -30,7 +30,7 @@ router.get("/v1/wynncraft/server/:server", async (req, res) => {
     if (!data.servers[req.params.server]) return res.status(422).json({ success: false, cause: "Invalid Server" });
     res.set("Cache-Control", "public, max-age=60");
 
-    res.json({ success: true, ...data.servers[req.params.server] });
+    return res.json({ success: true, ...data.servers[req.params.server] });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
