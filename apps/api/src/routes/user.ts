@@ -31,7 +31,7 @@ router.get("/v1/user", ratelimit(), async (req, res) => {
 });
 
 router.get("/v1/user/usage", ratelimit(), async (req, res) => {
-  const key = (await redis.hgetall(`API:Users:Keys:${formatUUID(String(req.headers["x-api-key"]))}`)) as APIKeyRedis;
+  const key = (await redis.hgetall(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`)) as APIKeyRedis;
 
   return res.json({
     success: true,
