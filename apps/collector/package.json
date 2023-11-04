@@ -17,6 +17,7 @@
     "@pixelic/interceptors": "*",
     "@pixelic/utils": "*",
     "@pixelic/wynncraft": "*",
+    "@pixelic/constants": "*",
     "cron": "^3.0.0"
   }
 }

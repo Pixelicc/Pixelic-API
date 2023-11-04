@@ -1,9 +1,9 @@
 import express from "express";
 import * as Sentry from "@sentry/node";
 import redis from "@pixelic/redis";
-import { formatNumber, formatTimeseries, formatUUID, validateUUID } from "@pixelic/utils";
+import { formatNumber, formatTimeseries } from "@pixelic/utils";
 import { MinecraftServerPlayercountModel } from "@pixelic/mongo";
-import servers from "../../../../collector/dist/minecraft/servers.js";
+import { MinecraftServerList as servers } from "@pixelic/constants";
 
 const router = express.Router();
 

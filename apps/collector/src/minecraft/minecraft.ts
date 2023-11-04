@@ -3,13 +3,13 @@ import { MinecraftServerPlayercountModel } from "@pixelic/mongo";
 import redis from "@pixelic/redis";
 import { sendSLP } from "@pixelic/utils";
 
-import servers from "./servers.js";
+import { MinecraftServerList } from "@pixelic/constants";
 
 export default {
   collect: async () => {
     try {
       const persistableData = [];
-      for (const server of servers) {
+      for (const server of MinecraftServerList) {
         const SLPData = await sendSLP(server.host, 25565, { timeout: 3000 });
 
         if (SLPData !== null && SLPData?.latency) {
