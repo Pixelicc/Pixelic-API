@@ -22,6 +22,7 @@ router.get("/v1/user", ratelimit(), async (req, res) => {
     success: true,
     role: user.role,
     scopes: JSON.parse(user.scopes as string),
+    discordAccount: JSON.parse(user.discord as string),
     linkedAccounts: JSON.parse(user.linkedAccounts as string),
     totalRequests: Number(key.requests),
     usageHistory: objectStringToNumber((await redis.hgetall(`API:Users:Usage:${key.owner}`)) as APIUserUsage),
@@ -40,7 +41,7 @@ router.get("/v1/user/usage", ratelimit(), async (req, res) => {
   });
 });
 
-router.post("/v1/user", authorization({ role: "ADMIN", scope: "key:create" }), async (req, res) => {
+router.post("/v1/user", authorization({ role: "ADMIN", scope: "user:create" }), async (req, res) => {
   const { role, scopes, discord }: { role: APIAuthRole | undefined; scopes: APIAuthScope[] | undefined; discord: { ID: DiscordSnowflake; [key: string]: any } } = req.body;
   if (await redis.exists(`API:Users:${String(discord?.ID)}`)) return res.status(422).json({ success: false, cause: "This User already exists" });
 
@@ -85,19 +86,21 @@ router.post("/v1/user", authorization({ role: "ADMIN", scope: "key:create" }), a
   });
 });
 
-router.patch("/v1/user/key", ratelimit("keyRegeneration", "1h", 3), async (req, res) => {
-  const oldKey = hashSHA512(formatUUID(String(req.headers["x-api-key"])));
+router.patch("/v1/user/key", authorization({ role: "ADMIN", scope: "key:regenerate" }), async (req, res) => {
+  const { user }: { user: DiscordSnowflake } = req.body;
+  if (!(await redis.exists(`API:Users:${String(user)}`))) return res.status(422).json({ success: false, cause: "This User does not exist" });
+
   const key = formatUUID(generateUUID());
 
-  const owner = (await redis.hget(`API:Users:Keys:${oldKey}`, "owner")) as DiscordSnowflake;
-  await redis.rename(`API:Users:Keys:${oldKey}`, `API:Users:Keys:${hashSHA512(key)}`);
-  await redis.hset(`API:Users:Keys:${hashSHA512(key)}`, { keyHash: hashSHA512(key), lastKeyRegeneration: Math.floor(Date.now() / 1000) });
-  await redis.hincrby(`API:Users:${owner}`, "keyRegenerations", 1);
+  await redis.rename(`API:Users:Keys:${await redis.hget(`API:Users:${user}`, "keyHash")}`, `API:Users:Keys:${hashSHA512(key)}`);
+  await redis.hset(`API:Users:Keys:${hashSHA512(key)}`, { lastKeyRegeneration: Math.floor(Date.now() / 1000) });
+  await redis.hset(`API:Users:${user}`, { keyHash: hashSHA512(key) });
+  await redis.hincrby(`API:Users:${user}`, "keyRegenerations", 1);
 
   return res.status(200).json({ success: true, key: key });
 });
 
-router.patch("/v1/user", authorization({ role: "ADMIN", scope: "key:update" }), async (req, res) => {
+router.patch("/v1/user", authorization({ role: "ADMIN", scope: "user:update" }), async (req, res) => {
   const { user, role, scopes }: { user: DiscordSnowflake; role: APIAuthRole | undefined; scopes: APIAuthScope[] | undefined } = req.body;
   if (!(await redis.exists(`API:Users:${String(user)}`))) return res.status(422).json({ success: false, cause: "This User does not exist" });
 
