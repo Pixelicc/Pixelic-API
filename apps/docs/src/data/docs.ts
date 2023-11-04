@@ -346,5 +346,394 @@ export default {
         },
       },
     },
+    "/v1/stats/redis": {
+      get: {
+        tags: ["Status & Stats"],
+        summary: "Redis Stats",
+        operationId: "getRedisStats",
+        responses: {
+          "200": {
+            description: "Successfully retrieved Redis Stats.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    bytesStored: {
+                      type: "number",
+                      example: 346536888,
+                    },
+                    bytesStoredFormatted: {
+                      type: "string",
+                      example: "346.54MB",
+                    },
+                    keys: {
+                      type: "number",
+                      example: 99046,
+                    },
+                    keysFormatted: {
+                      type: "string",
+                      example: "99.05k",
+                    },
+                    averageKeySize: {
+                      type: "number",
+                      example: 3498.7469256709005,
+                    },
+                    averageKeySizeFormatted: {
+                      type: "string",
+                      example: "3.5KB",
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/v1/stats/mongo": {
+      get: {
+        tags: ["Status & Stats"],
+        summary: "Mongo Stats",
+        operationId: "getMongoStats",
+        responses: {
+          "200": {
+            description: "Successfully retrieved Mongo Stats.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    collections: {
+                      type: "number",
+                      example: 21,
+                    },
+                    documents: {
+                      type: "number",
+                      example: 106366,
+                    },
+                    documentsFormatted: {
+                      type: "string",
+                      example: "106.37k",
+                    },
+                    averageDocumentSize: {
+                      type: "number",
+                      example: 70115.59198132738,
+                    },
+                    averageDocumentSizeFormatted: {
+                      type: "string",
+                      example: "70.12KB",
+                    },
+                    bytesStored: {
+                      type: "number",
+                      example: 221626368,
+                    },
+                    bytesStoredFormatted: {
+                      type: "string",
+                      example: "221.63MB",
+                    },
+                    databases: {
+                      type: "object",
+                      properties: {
+                        "DB-NAME": {
+                          type: "object",
+                          properties: {
+                            collections: {
+                              type: "number",
+                              example: 21,
+                            },
+                            documents: {
+                              type: "number",
+                              example: 106366,
+                            },
+                            documentsFormatted: {
+                              type: "string",
+                              example: "106.37k",
+                            },
+                            averageDocumentSize: {
+                              type: "number",
+                              example: 70115.59198132738,
+                            },
+                            averageDocumentSizeFormatted: {
+                              type: "string",
+                              example: "70.12KB",
+                            },
+                            bytesStored: {
+                              type: "number",
+                              example: 221626368,
+                            },
+                            bytesStoredFormatted: {
+                              type: "string",
+                              example: "221.63MB",
+                            },
+                          },
+                        },
+                      },
+                      example: {
+                        API: {
+                          collections: 1,
+                          documents: 1,
+                          documentsFormatted: "1",
+                          averageDocumentSize: 45040,
+                          averageDocumentSizeFormatted: "45.04KB",
+                          bytesStored: 53248,
+                          bytesStoredFormatted: "53.25KB",
+                        },
+                        Hypixel: {
+                          collections: 11,
+                          documents: 69568,
+                          documentsFormatted: "69.57k",
+                          averageDocumentSize: 7312.638914443422,
+                          averageDocumentSizeFormatted: "7.31KB",
+                          bytesStored: 114593792,
+                          bytesStoredFormatted: "114.59MB",
+                        },
+                        Minecraft: {
+                          collections: 3,
+                          documents: 182,
+                          documentsFormatted: "182",
+                          averageDocumentSize: 10977.016483516483,
+                          averageDocumentSizeFormatted: "10.98KB",
+                          bytesStored: 651264,
+                          bytesStoredFormatted: "651.26KB",
+                        },
+                        Wynncraft: {
+                          collections: 6,
+                          documents: 36615,
+                          documentsFormatted: "36.62k",
+                          averageDocumentSize: 6785.936583367472,
+                          averageDocumentSizeFormatted: "6.79KB",
+                          bytesStored: 106328064,
+                          bytesStoredFormatted: "106.33MB",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/v1/user": {
+      get: {
+        tags: ["User & Usage"],
+        summary: "User",
+        description: "Retrieve all data we store about you.",
+        operationId: "getUser",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved User.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    role: {
+                      type: "string",
+                      enum: ["USER", "STAFF", "ADMIN"],
+                      example: "STAFF",
+                    },
+                    scopes: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "string",
+                      },
+                      example: ["hypixel:queryAuctions"],
+                    },
+                    discordAccount: {
+                      type: "object",
+                      properties: {
+                        ID: {
+                          type: "Snowflake",
+                          example: "619208257721860108",
+                        },
+                      },
+                    },
+                    linkedAccounts: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                      },
+                    },
+                    totalRequests: {
+                      type: "number",
+                      example: 416,
+                    },
+                    usageHistory: {
+                      type: "object",
+                      properties: {
+                        "YYYY-MM-DD": { type: "number" },
+                      },
+                      example: {
+                        "2023-10-20": 411,
+                        "2023-10-21": 4,
+                        "2023-11-04": 1,
+                      },
+                    },
+                    IPHistory: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "string",
+                      },
+                      example: ["1.1.1.1"],
+                    },
+                    requestHistory: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          "ID ": {
+                            type: "ULID",
+                            example: "01HD6XP00PS397G7V5AK57MYGC",
+                          },
+                          "URL ": {
+                            type: "string",
+                            example: "/v1/user",
+                          },
+                          "method ": {
+                            type: "string",
+                            example: "GET",
+                          },
+                          "userAgent ": {
+                            type: "string",
+                            example: "PostmanRuntime/7.33.0",
+                          },
+                          "IP ": {
+                            type: "string",
+                            example: "1.1.1.1",
+                          },
+                          "timestamp ": {
+                            type: "number",
+                            example: 1697818279,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/v1/user/usage": {
+      get: {
+        tags: ["User & Usage"],
+        summary: "Usage",
+        operationId: "getUsage",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Usage.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    totalRequests: {
+                      type: "number",
+                      example: 416,
+                    },
+                    usageHistory: {
+                      type: "object",
+                      properties: {
+                        "YYYY-MM-DD": { type: "number" },
+                      },
+                      example: {
+                        "2023-10-20": 411,
+                        "2023-10-21": 4,
+                        "2023-11-04": 1,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 };
