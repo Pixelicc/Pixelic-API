@@ -3,132 +3,60 @@ import { client } from "../../index.js";
 
 const APISettingsSchema = new Schema(
   {
-    onlineStatus: {
-      type: Boolean,
-    },
-    winstreaks: {
-      type: Boolean,
-    },
+    onlineStatus: Boolean,
+    winstreaks: Boolean,
   },
   { _id: false }
 );
 
 const rewardSchema = new Schema(
   {
-    streak: {
-      type: Number,
-    },
-    highestStreak: {
-      type: Number,
-    },
-    claimedTotal: {
-      type: Number,
-    },
-    claimedDaily: {
-      type: Number,
-    },
-    tokens: {
-      type: Number,
-    },
+    streak: Number,
+    highestStreak: Number,
+    claimedTotal: Number,
+    claimedDaily: Number,
+    tokens: Number,
   },
   { _id: false }
 );
 
 const socialMediaSchema = new Schema(
   {
-    HYPIXEL: {
-      type: String,
-    },
-    DISCORD: {
-      type: String,
-    },
-    YOUTUBE: {
-      type: String,
-    },
-    TWITCH: {
-      type: String,
-    },
-    TWITTER: {
-      type: String,
-    },
-    INSTAGRAM: {
-      type: String,
-    },
-    TIKTOK: {
-      type: String,
-    },
+    HYPIXEL: String,
+    DISCORD: String,
+    YOUTUBE: String,
+    TWITCH: String,
+    TWITTER: String,
+    INSTAGRAM: String,
+    TIKTOK: String,
   },
   { _id: false }
 );
 
 const statsSchema = new Schema(
   {
-    Bedwars: {
-      type: Object,
-    },
-    Skywars: {
-      type: Object,
-    },
-    Duels: {
-      type: Object,
-    },
-    Skyblock: {
-      type: Object,
-    },
-    Arcade: {
-      type: Object,
-    },
-    Arena: {
-      type: Object,
-    },
-    Warlords: {
-      type: Object,
-    },
-    BuildBattle: {
-      type: Object,
-    },
-    TKR: {
-      type: Object,
-    },
-    MurderMystery: {
-      type: Object,
-    },
-    Pit: {
-      type: Object,
-    },
-    TNT: {
-      type: Object,
-    },
-    Blitz: {
-      type: Object,
-    },
-    CvC: {
-      type: Object,
-    },
-    Paintball: {
-      type: Object,
-    },
-    Quake: {
-      type: Object,
-    },
-    SpeedUHC: {
-      type: Object,
-    },
-    Smash: {
-      type: Object,
-    },
-    Walls: {
-      type: Object,
-    },
-    MegaWalls: {
-      type: Object,
-    },
-    VampireZ: {
-      type: Object,
-    },
-    Woolwars: {
-      type: Object,
-    },
+    Bedwars: Object,
+    Skywars: Object,
+    Duels: Object,
+    Skyblock: Object,
+    Arcade: Object,
+    Arena: Object,
+    Warlords: Object,
+    BuildBattle: Object,
+    TKR: Object,
+    MurderMystery: Object,
+    Pit: Object,
+    TNT: Object,
+    Blitz: Object,
+    CvC: Object,
+    Paintball: Object,
+    Quake: Object,
+    SpeedUHC: Object,
+    Smash: Object,
+    Walls: Object,
+    MegaWalls: Object,
+    VampireZ: Object,
+    Woolwars: Object,
   },
   { _id: false, minimize: false }
 );
