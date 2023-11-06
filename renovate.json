@@ -1,8 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "schedule": [
-    "every weekend"
-  ],
+  "schedule": "daily",
   "extends": [
     "config:recommended"
   ],
@@ -10,12 +8,6 @@
     "dependencies"
   ],
   "packageRules": [
-    {
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ]
-    },
     {
       "matchPackagePatterns": [
         "@pixelic/",
