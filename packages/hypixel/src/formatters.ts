@@ -1643,7 +1643,7 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
     attributes: NBT?.tag?.ExtraAttributes,
   };
 
-  if (item?.attributes?.modifier) {
+  if (item?.attributes?.modifier && item.attributes.modifier.toUpperCase() !== "NONE") {
     item.reforge = item.attributes.modifier.toUpperCase();
   }
 
