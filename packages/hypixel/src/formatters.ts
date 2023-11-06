@@ -1499,6 +1499,12 @@ export const formatPlayer = async (player: any) => {
       INSTAGRAM: player?.socialMedia?.links?.INSTAGRAM || null,
       TIKTOK: player?.socialMedia?.links?.TIKTOK || null,
     },
+    tourney: {
+      tributes: player?.tourney?.total_tributes || 0,
+      /**
+       * TODO: Add individual tournament stats
+       */
+    },
     stats: {
       Bedwars: formatBedwars(player?.stats?.Bedwars),
       Skywars: formatSkywars(player?.stats?.SkyWars),
