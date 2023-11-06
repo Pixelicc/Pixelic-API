@@ -3,26 +3,26 @@ import { client } from "../../index.js";
 
 const rankSchema = new Schema(
   {
-    name: { type: String },
-    tag: { type: String },
-    default: { type: Boolean },
-    created: { type: Number },
-    priority: { type: Number },
+    name: { type: String, required: true },
+    tag: { type: String, required: true },
+    default: { type: Boolean, required: true },
+    created: { type: Number, required: true },
+    priority: { type: Number, required: true },
   },
-  { required: true, _id: false }
+  { _id: false }
 );
 
 const memberSchema = new Schema(
   {
-    UUID: { type: String },
-    rank: { type: String },
-    joined: { type: Number },
-    questParticipation: { type: Number },
-    weeklyEXP: { type: Number },
-    EXPHistory: { type: Object },
-    mutedTill: { type: Number },
+    UUID: { type: String, required: true },
+    rank: { type: String, required: true },
+    joined: { type: Number, required: true },
+    questParticipation: { type: Number, required: true },
+    weeklyEXP: { type: Number, required: true },
+    EXPHistory: { type: Object, required: true },
+    mutedTill: { type: Number, required: true },
   },
-  { required: true, _id: false }
+  { _id: false }
 );
 
 const achievementsSchema = new Schema(
@@ -92,12 +92,18 @@ const guildSchema = new Schema({
     type: Number,
     required: true,
   },
-  ranks: [rankSchema],
+  ranks: {
+    type: [rankSchema],
+    required: true,
+  },
   memberCount: {
     type: Number,
     required: true,
   },
-  members: [memberSchema],
+  members: {
+    type: [memberSchema],
+    required: true,
+  },
   preferredGames: {
     type: Array,
     required: true,
@@ -106,7 +112,10 @@ const guildSchema = new Schema({
     type: Object,
     required: true,
   },
-  achievements: achievementsSchema,
+  achievements: {
+    type: achievementsSchema,
+    required: true,
+  },
   timestamp: {
     type: Number,
     required: true,

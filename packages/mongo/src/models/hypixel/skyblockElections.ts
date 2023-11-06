@@ -3,20 +3,38 @@ import { client } from "../../index.js";
 
 const perkSchema = new Schema(
   {
-    name: { type: String },
-    description: { type: String },
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
   },
-  { required: true, _id: false }
+  { _id: false }
 );
 
 const candidateSchema = new Schema(
   {
-    key: { type: String },
-    name: { type: String },
-    perks: [perkSchema],
-    votes: { type: Number },
+    key: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    perks: {
+      type: [perkSchema],
+      required: true,
+    },
+    votes: {
+      type: Number,
+      required: true,
+    },
   },
-  { required: true, _id: false }
+  { _id: false }
 );
 
 const electionSchema = new Schema({
@@ -24,7 +42,10 @@ const electionSchema = new Schema({
     type: Number,
     required: true,
   },
-  candidates: [candidateSchema],
+  candidates: {
+    type: [candidateSchema],
+    required: true,
+  },
   timestamp: {
     type: Number,
     required: true,

@@ -162,9 +162,18 @@ const playerSchema = new Schema({
     required: true,
     index: true,
   },
-  global: globalSchema,
-  characters: [characterSchema],
-  guild: guildSchema,
+  global: {
+    type: globalSchema,
+    required: true,
+  },
+  characters: {
+    type: [characterSchema],
+    required: true,
+  },
+  guild: {
+    type: guildSchema,
+    required: true,
+  },
   publicProfile: {
     type: Boolean,
     required: true,

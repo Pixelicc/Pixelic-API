@@ -191,7 +191,10 @@ const playerSchema = new Schema({
     type: String,
     required: true,
   },
-  APISettings: APISettingsSchema,
+  APISettings: {
+    type: APISettingsSchema,
+    required: true,
+  },
   EXP: {
     type: Number,
     required: true,
@@ -258,9 +261,18 @@ const playerSchema = new Schema({
     type: Number,
     required: true,
   },
-  rewards: rewardSchema,
-  socialMedia: socialMediaSchema,
-  stats: statsSchema,
+  rewards: {
+    type: rewardSchema,
+    required: true,
+  },
+  socialMedia: {
+    type: socialMediaSchema,
+    required: true,
+  },
+  stats: {
+    type: statsSchema,
+    required: true,
+  },
   timestamp: {
     type: Number,
     required: true,

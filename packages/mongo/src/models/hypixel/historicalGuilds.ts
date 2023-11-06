@@ -3,15 +3,9 @@ import { client } from "../../index.js";
 
 const achievementsSchema = new Schema(
   {
-    experienceKings: {
-      type: Number,
-    },
-    winners: {
-      type: Number,
-    },
-    onlinePlayers: {
-      type: Number,
-    },
+    experienceKings: Number,
+    winners: Number,
+    onlinePlayers: Number,
   },
   { _id: false }
 );
@@ -24,7 +18,6 @@ const historicalGuildSchema = new Schema(
       index: true,
     },
     name: String,
-    description: String,
     tag: String,
     tagColor: String,
     EXP: Number,

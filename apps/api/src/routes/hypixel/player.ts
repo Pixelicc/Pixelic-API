@@ -1,16 +1,16 @@
 import express from "express";
 import * as Sentry from "@sentry/node";
 import { parseUUID } from "@pixelic/mojang";
-import { WynncraftHistoricalPlayerModel } from "@pixelic/mongo";
+import { HypixelHistoricalPlayerModel } from "@pixelic/mongo";
 import { ratelimit } from "@pixelic/middlewares";
 
 const router = express.Router();
 
-router.get("/v1/wynncraft/player/:player/history", ratelimit(), async (req, res) => {
+router.get("/v1/hypixel/player/:player/history", ratelimit(), async (req, res) => {
   const UUID = await parseUUID(req.params.player);
   if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
   try {
-    const data = await WynncraftHistoricalPlayerModel.find({ UUID }, ["-UUID", "-__v"]).lean();
+    const data = await HypixelHistoricalPlayerModel.find({ UUID }, ["-UUID", "-__v"]).lean();
     data.pop();
     if (data.length === 0) {
       res.set("Cache-Control", "public, max-age=300");

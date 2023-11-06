@@ -68,67 +68,27 @@ const historicalPlayerSchema = new Schema(
       required: true,
       index: true,
     },
-    username: {
-      type: String,
-    },
-    rank: {
-      type: String,
-    },
-    plusColor: {
-      type: String,
-    },
-    plusPlusColor: {
-      type: String,
-    },
+    username: String,
+    rank: String,
+    plusColor: String,
+    plusPlusColor: String,
     APISettings: APISettingsSchema,
-    EXP: {
-      type: Number,
-    },
-    level: {
-      type: Number,
-    },
-    karma: {
-      type: Number,
-    },
-    achievementPoints: {
-      type: Number,
-    },
-    questsCompleted: {
-      type: Number,
-    },
-    challengesCompleted: {
-      type: Number,
-    },
-    online: {
-      type: Boolean,
-    },
-    firstLogin: {
-      type: Number,
-    },
-    lastLogin: {
-      type: Number,
-    },
-    lastLogout: {
-      type: Number,
-    },
-    lastModePlayed: {
-      type: String,
-    },
-    language: {
-      type: String,
-    },
-    chatChannel: {
-      type: String,
-    },
-    giftsSent: {
-      type: Number,
-    },
-    giftsReceived: {
-      type: Number,
-    },
-    ranksGifted: {
-      type: Number,
-    },
+    EXP: Number,
+    level: Number,
+    karma: Number,
+    achievementPoints: Number,
+    questsCompleted: Number,
+    challengesCompleted: Number,
+    online: Boolean,
+    firstLogin: Number,
+    lastLogin: Number,
+    lastLogout: Number,
+    lastModePlayed: String,
+    language: String,
+    chatChannel: String,
+    giftsSent: Number,
+    giftsReceived: Number,
+    ranksGifted: Number,
     rewards: rewardSchema,
     socialMedia: socialMediaSchema,
     stats: statsSchema,

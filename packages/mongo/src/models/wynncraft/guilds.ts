@@ -1,6 +1,19 @@
 import { Schema } from "mongoose";
 import { client } from "../../index.js";
 
+const memberSchema = new Schema(
+  {
+    username: { type: String, required: true },
+    UUID: { type: String, required: true },
+    rank: { type: String, required: true },
+    online: { type: Boolean, required: true },
+    server: { type: String, required: true },
+    contributed: { type: Number, required: true },
+    joined: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
 const guildSchema = new Schema({
   _id: {
     type: String,
@@ -18,18 +31,10 @@ const guildSchema = new Schema({
     type: String,
     required: true,
   },
-  members: [
-    {
-      username: { type: String },
-      UUID: { type: String },
-      rank: { type: String },
-      online: { type: Boolean },
-      server: { type: String },
-      contributed: { type: Number },
-      joined: { type: Number },
-    },
-    { _id: false },
-  ],
+  members: {
+    type: [memberSchema],
+    required: true,
+  },
   level: {
     type: Number,
     required: true,

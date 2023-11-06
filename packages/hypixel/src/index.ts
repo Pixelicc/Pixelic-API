@@ -49,10 +49,12 @@ export const getPlayer = async (player: string) => {
               })
                 .sort({ _id: -1 })
                 .lean();
-              const difference = deepCompare(lastDataPoint, formattedData);
-              if (Object.keys(difference).length !== 0) {
-                await HypixelHistoricalPlayerModel.create(formattedData);
-                await HypixelHistoricalPlayerModel.replaceOne({ _id: lastDataPoint?._id }, { UUID: UUID, ...difference });
+              if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
+                const difference = deepCompare(lastDataPoint, formattedData);
+                if (Object.keys(difference).length !== 0) {
+                  await HypixelHistoricalPlayerModel.create(formattedData);
+                  await HypixelHistoricalPlayerModel.replaceOne({ _id: lastDataPoint?._id }, { UUID: UUID, ...difference });
+                }
               }
             }
           }
@@ -153,10 +155,12 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
         })
           .sort({ _id: -1 })
           .lean();
-        const difference = deepCompare(lastDataPoint, { ...formattedData, members });
-        if (Object.keys(difference).length !== 0) {
-          await HypixelHistoricalGuildModel.create({ ...formattedData, members });
-          await HypixelHistoricalGuildModel.replaceOne({ _id: lastDataPoint?._id }, { ID: formattedData.ID, ...difference });
+        if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
+          const difference = deepCompare(lastDataPoint, { ...formattedData, members });
+          if (Object.keys(difference).length !== 0) {
+            await HypixelHistoricalGuildModel.create({ ...formattedData, members });
+            await HypixelHistoricalGuildModel.replaceOne({ _id: lastDataPoint?._id }, { ID: formattedData.ID, ...difference });
+          }
         }
       }
     }
