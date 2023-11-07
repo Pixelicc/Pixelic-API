@@ -247,7 +247,6 @@ const playerSchema = new Schema({
   chatChannel: {
     type: String,
     required: true,
-    index: true,
   },
   giftsSent: {
     type: Number,
