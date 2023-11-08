@@ -20,6 +20,10 @@ const historicalPlayerSchema = new Schema(
     characters: Object,
     guild: Object,
     publicProfile: Boolean,
+    isFullData: {
+      type: Boolean,
+      index: { sparse: true },
+    },
   },
   { minimize: false }
 );

@@ -39,12 +39,14 @@ const historicalGuildSchema = new Schema(
      */
     thirdParty: {
       type: Boolean,
-      required: false,
       index: { sparse: true },
     },
     thirdPartySource: {
       type: String,
-      required: false,
+      index: { sparse: true },
+    },
+    isFullData: {
+      type: Boolean,
       index: { sparse: true },
     },
   },
