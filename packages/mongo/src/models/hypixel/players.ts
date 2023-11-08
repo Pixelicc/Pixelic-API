@@ -75,6 +75,13 @@ const socialMediaSchema = new Schema(
   { _id: false }
 );
 
+const tourneySchema = new Schema(
+  {
+    tributes: Number,
+  },
+  { _id: false }
+);
+
 const statsSchema = new Schema(
   {
     Bedwars: {
@@ -266,6 +273,10 @@ const playerSchema = new Schema({
   },
   socialMedia: {
     type: socialMediaSchema,
+    required: true,
+  },
+  tourney: {
+    type: tourneySchema,
     required: true,
   },
   stats: {

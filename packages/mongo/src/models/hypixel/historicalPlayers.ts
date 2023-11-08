@@ -33,6 +33,13 @@ const socialMediaSchema = new Schema(
   { _id: false }
 );
 
+const tourneySchema = new Schema(
+  {
+    tributes: Number,
+  },
+  { _id: false }
+);
+
 const statsSchema = new Schema(
   {
     Bedwars: Object,
@@ -91,18 +98,21 @@ const historicalPlayerSchema = new Schema(
     ranksGifted: Number,
     rewards: rewardSchema,
     socialMedia: socialMediaSchema,
+    tourney: tourneySchema,
     stats: statsSchema,
     /**
      * Shows wether the current data was ingested by the libary itself or a third-party source
      */
     thirdParty: {
       type: Boolean,
-      required: false,
       index: { sparse: true },
     },
     thirdPartySource: {
       type: String,
-      required: false,
+      index: { sparse: true },
+    },
+    isFullData: {
+      type: Boolean,
       index: { sparse: true },
     },
   },
