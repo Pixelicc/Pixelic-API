@@ -44,18 +44,18 @@ export const getPlayer = async (player: string) => {
           }
           if (config.wynncraft.persistHistoricalData) {
             if ((await WynncraftHistoricalPlayerModel.exists({ UUID: UUID })) === null) {
-              await WynncraftHistoricalPlayerModel.create(formattedData);
+              await WynncraftHistoricalPlayerModel.create({ ...formattedData, isFullData: true });
             } else {
               const lastDataPoint = await WynncraftHistoricalPlayerModel.findOne({
                 UUID: UUID,
-              })
-                .sort({ _id: -1 })
-                .lean();
+                isFullData: true,
+              }).lean();
               if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
                 const difference = deepCompare(lastDataPoint, { playtime: formattedData.playtime, global: formattedData.global, characters: formattedData.characters });
                 if (Object.keys(difference).length !== 0) {
-                  await WynncraftHistoricalPlayerModel.create({ UUID: UUID, playtime: formattedData.playtime, global: formattedData.global, characters: formattedData.characters });
-                  await WynncraftHistoricalPlayerModel.replaceOne({ _id: lastDataPoint?._id }, { UUID: UUID, ...difference });
+                  await WynncraftHistoricalPlayerModel.create({ UUID: UUID, ...difference, isFullData: undefined });
+                  await WynncraftHistoricalPlayerModel.create({ UUID: UUID, playtime: formattedData.playtime, global: formattedData.global, characters: formattedData.characters, isFullData: true });
+                  await WynncraftHistoricalPlayerModel.deleteOne({ _id: lastDataPoint?._id });
                 }
               }
             }
