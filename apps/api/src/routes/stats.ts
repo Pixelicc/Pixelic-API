@@ -9,7 +9,7 @@ import { formatBytes, formatNumber, objectStringToNumber } from "@pixelic/utils"
 const router = express.Router();
 
 router.get("/v1/stats/code", async (req, res) => {
-  res.set("Cache-Control", "public, max-age=300");
+  res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
   try {
     if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
     exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
