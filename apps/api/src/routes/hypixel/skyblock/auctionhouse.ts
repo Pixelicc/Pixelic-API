@@ -8,7 +8,7 @@ import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
 
 const router = express.Router();
 
-router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["STAFF", "ADMIN"], scope: "hypixel:queryAuctions" }), async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["STAFF", "ADMIN"], scope: "hypixel:queryAuctions" }), ratelimit("queryHypixelSkyblockAuctions", "1d", 1000), async (req, res) => {
   try {
     const { seller, sellerProfile, coop, category, bin, price, priceRange, name, lore, tier, itemID } = req.query as { [key: string]: string };
 
