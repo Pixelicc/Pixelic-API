@@ -1608,7 +1608,7 @@ export default {
         tags: ["Hypixel (Skyblock)"],
         summary: "Item Auction Price",
         description: "Returns the current price of the specified Skyblock Item.",
-        operationId: "getCurrentHypixelSkyblockItemPrice",
+        operationId: "getCurrentHypixelSkyblockAuctionhouseItemPrice",
         security: [
           {
             "API-Key": [],
@@ -1694,9 +1694,9 @@ export default {
     "/v1/hypixel/skyblock/auctionhouse/price/{ID}/history": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Auction Price History",
+        summary: "Item Auction Alltime Price History",
         description: "Returns alltime price history of the specified Skyblock Item.",
-        operationId: "getAllHypixelSkyblockItemPriceHistory",
+        operationId: "getHypixelSkyblockItemPriceHistory",
         security: [
           {
             "API-Key": [],
@@ -1715,7 +1715,745 @@ export default {
         ],
         responses: {
           "200": {
-            description: "Successfully retrieved Item Price.",
+            description: "Successfully retrieved Item Price History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          minPrice: {
+                            type: "number",
+                            example: 1690000000,
+                          },
+                          maxPrice: {
+                            type: "number",
+                            example: 1718999999,
+                          },
+                          averagePrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          medianPrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          timestamp: {
+                            type: "number",
+                            example: 1699645625,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/auctionhouse/price/{ID}/history/{TIMEFRAME}": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Item Auction Price History",
+        description: "Returns price history for the specified timeframe of the specified Skyblock Item.",
+        operationId: "getHypixelSkyblockItemAuctionhousePriceHistoryByTimeframe",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "ID",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Hypixel Skyblock Item ID",
+              example: "HYPERION",
+            },
+          },
+          {
+            name: "timeframe",
+            in: "path",
+            schema: {
+              type: "string",
+              enum: ["hour", "day", "week", "month", "year"],
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Item Price History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          minPrice: {
+                            type: "number",
+                            example: 1690000000,
+                          },
+                          maxPrice: {
+                            type: "number",
+                            example: 1718999999,
+                          },
+                          averagePrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          medianPrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          timestamp: {
+                            type: "number",
+                            example: 1699645625,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/bazaar": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Bazaar",
+        description: "Returns the full current Bazaar data plus additional info about the Products/Items.",
+        operationId: "getHypixelSkyblockBazaar",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Bazaar.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    products: {
+                      type: "object",
+                      properties: {
+                        PRODUCT: {
+                          type: "object",
+                          properties: {
+                            sellSummary: {
+                              uniqueItems: true,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  amount: {
+                                    type: "number",
+                                  },
+                                  pricePerUnit: {
+                                    type: "number",
+                                  },
+                                  orders: {
+                                    type: "number",
+                                  },
+                                },
+                              },
+                            },
+                            buySummary: {
+                              uniqueItems: true,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  amount: {
+                                    type: "number",
+                                  },
+                                  pricePerUnit: {
+                                    type: "number",
+                                  },
+                                  orders: {
+                                    type: "number",
+                                  },
+                                },
+                              },
+                            },
+                            quickStatus: {
+                              type: "object",
+                              properties: {
+                                sellPrice: {
+                                  type: "number",
+                                },
+                                sellVolume: {
+                                  type: "number",
+                                },
+                                sellMovingWeek: {
+                                  type: "number",
+                                },
+                                sellOrders: {
+                                  type: "number",
+                                },
+                                buyPrice: {
+                                  type: "number",
+                                },
+                                buyVolume: {
+                                  type: "number",
+                                },
+                                buyMovingWeek: {
+                                  type: "number",
+                                },
+                                buyOrders: {
+                                  type: "number",
+                                },
+                              },
+                            },
+                            item: {
+                              type: "object",
+                              properties: {
+                                name: {
+                                  type: "string",
+                                },
+                                material: {
+                                  type: "string",
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      example: {
+                        sellSummary: [
+                          {
+                            amount: 1,
+                            pricePerUnit: 7257325.4,
+                            orders: 1,
+                          },
+                          {
+                            amount: 11,
+                            pricePerUnit: 7257325.1,
+                            orders: 3,
+                          },
+                          {
+                            amount: 3,
+                            pricePerUnit: 7257324.6,
+                            orders: 1,
+                          },
+                          {
+                            amount: 12,
+                            pricePerUnit: 7200000.5,
+                            orders: 1,
+                          },
+                          {
+                            amount: 2,
+                            pricePerUnit: 7120804.2,
+                            orders: 1,
+                          },
+                        ],
+                        buySummary: [
+                          {
+                            amount: 1,
+                            pricePerUnit: 7346754.2,
+                            orders: 1,
+                          },
+                          {
+                            amount: 1,
+                            pricePerUnit: 7346754.3,
+                            orders: 1,
+                          },
+                          {
+                            amount: 4,
+                            pricePerUnit: 7356690.9,
+                            orders: 2,
+                          },
+                          {
+                            amount: 6,
+                            pricePerUnit: 7356691,
+                            orders: 1,
+                          },
+                          {
+                            amount: 1,
+                            pricePerUnit: 7356691.1,
+                            orders: 1,
+                          },
+                        ],
+                        quickStatus: {
+                          sellPrice: 6080239,
+                          sellVolume: 59918,
+                          sellMovingWeek: 39927,
+                          sellOrders: 2828,
+                          buyPrice: 7374871.3,
+                          buyVolume: 3539,
+                          buyMovingWeek: 55590,
+                          buyOrders: 417,
+                        },
+                        item: {
+                          material: "SKULL_ITEM",
+                          durability: 3,
+                          name: "Recombobulator 3000",
+                          tier: "LEGENDARY",
+                          dungeon_item: true,
+                          museum: true,
+                          texture: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/bazaar/{ID}": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Bazaar Product Price Alltime History",
+        description: "Returns current Bazaar data for the specified Item plus additional info about the Item.",
+        operationId: "getHypixelSkyblockBazaarProduct",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Bazaar Product.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            parameters: [
+              {
+                name: "ID",
+                in: "path",
+                schema: {
+                  type: "string",
+                  description: "Hypixel Skyblock Item ID",
+                  example: "HYPERION",
+                },
+              },
+            ],
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    sellSummary: {
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          amount: {
+                            type: "number",
+                          },
+                          pricePerUnit: {
+                            type: "number",
+                          },
+                          orders: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          amount: 1,
+                          pricePerUnit: 7257325.4,
+                          orders: 1,
+                        },
+                        {
+                          amount: 11,
+                          pricePerUnit: 7257325.1,
+                          orders: 3,
+                        },
+                        {
+                          amount: 3,
+                          pricePerUnit: 7257324.6,
+                          orders: 1,
+                        },
+                        {
+                          amount: 12,
+                          pricePerUnit: 7200000.5,
+                          orders: 1,
+                        },
+                        {
+                          amount: 2,
+                          pricePerUnit: 7120804.2,
+                          orders: 1,
+                        },
+                      ],
+                    },
+                    buySummary: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        properties: {
+                          amount: {
+                            type: "number",
+                          },
+                          pricePerUnit: {
+                            type: "number",
+                          },
+                          orders: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          amount: 1,
+                          pricePerUnit: 7346754.2,
+                          orders: 1,
+                        },
+                        {
+                          amount: 1,
+                          pricePerUnit: 7346754.3,
+                          orders: 1,
+                        },
+                        {
+                          amount: 4,
+                          pricePerUnit: 7356690.9,
+                          orders: 2,
+                        },
+                        {
+                          amount: 6,
+                          pricePerUnit: 7356691,
+                          orders: 1,
+                        },
+                        {
+                          amount: 1,
+                          pricePerUnit: 7356691.1,
+                          orders: 1,
+                        },
+                      ],
+                    },
+                    quickStatus: {
+                      type: "object",
+                      properties: {
+                        sellPrice: {
+                          type: "number",
+                        },
+                        sellVolume: {
+                          type: "number",
+                        },
+                        sellMovingWeek: {
+                          type: "number",
+                        },
+                        sellOrders: {
+                          type: "number",
+                        },
+                        buyPrice: {
+                          type: "number",
+                        },
+                        buyVolume: {
+                          type: "number",
+                        },
+                        buyMovingWeek: {
+                          type: "number",
+                        },
+                        buyOrders: {
+                          type: "number",
+                        },
+                      },
+                      example: {
+                        sellPrice: 6080239,
+                        sellVolume: 59918,
+                        sellMovingWeek: 39927,
+                        sellOrders: 2828,
+                        buyPrice: 7374871.3,
+                        buyVolume: 3539,
+                        buyMovingWeek: 55590,
+                        buyOrders: 417,
+                      },
+                    },
+                    item: {
+                      type: "object",
+                      properties: {
+                        name: {
+                          type: "string",
+                        },
+                        material: {
+                          type: "string",
+                        },
+                      },
+                      example: {
+                        material: "SKULL_ITEM",
+                        durability: 3,
+                        name: "Recombobulator 3000",
+                        tier: "LEGENDARY",
+                        dungeon_item: true,
+                        museum: true,
+                        texture: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/bazaar/{ID}/history": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Item Bazaar Alltime Price History",
+        description: "Returns alltime price history of the specified Product.",
+        operationId: "getHypixelSkyblockBazaarItemPriceHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "ID",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Hypixel Skyblock Item ID",
+              example: "RECOMBOBULATOR_3000",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Item Price History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          minPrice: {
+                            type: "number",
+                            example: 1690000000,
+                          },
+                          maxPrice: {
+                            type: "number",
+                            example: 1718999999,
+                          },
+                          averagePrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          medianPrice: {
+                            type: "number",
+                            example: 1704499999,
+                          },
+                          timestamp: {
+                            type: "number",
+                            example: 1699645625,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/bazaar/{ID}/history/{TIMEFRAME}": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Item Auction Price History",
+        description: "Returns price history for the specified timeframe of the specified product.",
+        operationId: "getHypixelSkyblockBazaarItemPriceHistoryByTimeframe",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "ID",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Hypixel Skyblock Item ID",
+              example: "RECOMBOBULATOR_3000",
+            },
+          },
+          {
+            name: "timeframe",
+            in: "path",
+            schema: {
+              type: "string",
+              enum: ["hour", "day", "week", "month", "year"],
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Item Price History.",
             headers: {
               "X-Server-ID": {
                 $ref: "#/components/headers/X-Server-ID",
