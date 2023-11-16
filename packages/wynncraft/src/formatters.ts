@@ -57,7 +57,7 @@ export const formatPlayer = (player: any) => {
     lastLogin: player?.lastJoin ? Math.floor(new Date(player?.lastJoin).valueOf() / 1000) : null,
     online: player?.online || false,
     server: player?.server || null,
-    rank: player?.rank?.toUpperCase() || "PLAYER",
+    rank: player?.rank === "Administrator" ? "ADMIN" : player?.rank?.toUpperCase() || "PLAYER",
     purchasedRank: player?.supportRank === "vipplus" ? "VIP_PLUS" : player?.supportRank?.toUpperCase() || null,
     global: {
       wars: player?.globalData?.wars || 0,

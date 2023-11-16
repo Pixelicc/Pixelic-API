@@ -32,7 +32,7 @@ const characterSchema = new Schema(
     level: { type: Number, required: true },
     totalLevels: { type: Number, required: true },
     EXP: { type: Number, required: true },
-    EXPPercent: { type: Number, required: true },
+    levelPercent: { type: Number, required: true },
     wars: { type: Number, required: true },
     mobsKilled: { type: Number, required: true },
     chestsFound: { type: Number, required: true },
@@ -53,51 +53,51 @@ const characterSchema = new Schema(
     professions: {
       fishing: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       woodcutting: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       mining: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       farming: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       scribing: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       jeweling: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       alchemism: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       cooking: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       weaponsmithing: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       tailoring: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       woodworking: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
       armouring: {
         level: { type: Number, required: true },
-        EXPPercent: { type: Number, required: true },
+        levelPercent: { type: Number, required: true },
       },
     },
     dungeons: {
