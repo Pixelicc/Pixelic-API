@@ -731,7 +731,7 @@ export default {
                       items: {
                         type: "string",
                       },
-                      example: ["hypixel:queryAuctions"],
+                      example: ["hypixel:querySkyblockAuctions"],
                     },
                     discordAccount: {
                       type: "object",
@@ -887,6 +887,432 @@ export default {
         },
       },
     },
+    "/v1/hypixel/player/{PLAYER}": {
+      get: {
+        tags: ["Hypixel"],
+        summary: "Player",
+        description: "Returns the latest player data.\n\n**MAY NOT BE UP TO DATE**",
+        operationId: "getHypixelPlayer",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            $ref: "#/components/parameters/player",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Player.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    UUID: {
+                      type: "UUID",
+                      example: "14727faefbdc4aff848cd2713eb9939e",
+                    },
+                    username: {
+                      type: "string",
+                      example: "Pixelic",
+                    },
+                    APISettings: {
+                      type: "object",
+                      properties: {
+                        onlineStatus: {
+                          type: "boolean",
+                        },
+                        winstreaks: {
+                          type: "boolean",
+                        },
+                      },
+                    },
+                    EXP: {
+                      type: "number",
+                      example: 46016605,
+                    },
+                    achievementPoints: {
+                      type: "number",
+                      example: 7145,
+                    },
+                    challengesCompleted: {
+                      type: "number",
+                      example: 2171,
+                    },
+                    chatChannel: {
+                      type: "string",
+                      enum: ["ALL", "PARTY", "GUILD", "OFFICER", "SKYBLOCK_COOP", "PM"],
+                    },
+                    firstLogin: {
+                      type: "number",
+                      example: 1496234626,
+                    },
+                    giftsReceived: {
+                      type: "number",
+                      example: 11,
+                    },
+                    giftsSent: {
+                      type: "number",
+                      example: 15,
+                    },
+                    karma: {
+                      type: "number",
+                      example: 37403863,
+                    },
+                    language: {
+                      type: "string",
+                      enum: ["ENGLISH", "SERBIAN_CYRILLIC", "FRENCH", "POLISH", "PIRATE", "GERMAN", "ITALIAN", "SPANISH", "CHINESE_SIMPLIFIED", "CHINESE_TRADITIONAL", "PORTUGUESE_PT", "RUSSIAN", "UKRAINIAN", "KOREAN", "PORTUGUESE_BR", "DUTCH", "TURKISH", "FINNISH", "JAPANESE", "CZECH", "NORWEGIAN", "HUNGARIAN", "SWEDISH", "ROMANIAN", "DANISH", "GREEK"],
+                    },
+                    lastLogin: {
+                      type: "number",
+                      example: 1699446906,
+                    },
+                    lastLogout: {
+                      type: "number",
+                      example: 1699373578,
+                    },
+                    lastModePlayed: {
+                      oneOf: [
+                        {
+                          type: "string",
+                        },
+                        { type: "null" },
+                      ],
+                      example: "BEDWARS",
+                    },
+                    level: {
+                      type: "number",
+                      example: 189.39980198009582,
+                    },
+                    online: {
+                      type: "boolean",
+                    },
+                    plusColor: {
+                      oneOf: [
+                        {
+                          type: "string",
+                          enum: ["RED", "GOLD", "GREEN", "YELLOW", "LIGHT_PURPLE", "WHITE", "BLUE", "DARK_GREEN", "DARK_RED", "DARK_AQUA", "DARK_PURPLE", "DARK_GRAY", "BLACK", "DARK_BLUE"],
+                        },
+                        { type: "null" },
+                      ],
+                      example: "LIGHT_PURPLE",
+                    },
+                    plusPlusColor: {
+                      oneOf: [
+                        {
+                          type: "string",
+                          enum: ["GOLD", "AQUA"],
+                        },
+                        { type: "null" },
+                      ],
+                      example: "AQUA",
+                    },
+                    questsCompleted: {
+                      type: "number",
+                      example: 1329,
+                    },
+                    rank: {
+                      oneOf: [
+                        {
+                          type: "string",
+                          enum: ["VIP", "VIP_PLUS", "MVP", "MVP_PLUS", "MVP_PLUS_PLUS", "PIG_PLUS_PLUS_PLUS", "YOUTUBER", "GAME_MASTER", "ADMIN", "OWNER"],
+                        },
+                        { type: "null" },
+                      ],
+                      example: "MVP_PLUS_PLUS",
+                    },
+                    ranksGifted: {
+                      type: "number",
+                      example: 21,
+                    },
+                    rewards: {
+                      type: "object",
+                      properties: {
+                        streak: {
+                          type: "number",
+                          example: 2,
+                        },
+                        highestStreak: {
+                          type: "number",
+                          example: 71,
+                        },
+                        claimedTotal: {
+                          type: "number",
+                          example: 492,
+                        },
+                        claimedDaily: {
+                          type: "number",
+                          example: 430,
+                        },
+                        tokens: {
+                          type: "number",
+                          example: 0,
+                        },
+                      },
+                    },
+                    socialMedia: {
+                      type: "object",
+                      properties: {
+                        HYPIXEL: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                        DISCORD: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: "Pixelic",
+                        },
+                        YOUTUBE: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                        TWITCH: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                        TWITTER: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                        INSTAGRAM: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                        TIKTOK: {
+                          oneOf: [{ type: "string" }, { type: "null" }],
+                          example: null,
+                        },
+                      },
+                    },
+                    tourney: {
+                      type: "object",
+                      properties: {
+                        tributes: {
+                          type: "number",
+                          example: 100,
+                        },
+                      },
+                    },
+                    stats: {
+                      type: "object",
+                      properties: {
+                        Bedwars: {
+                          type: "object",
+                        },
+                        Skywars: {
+                          type: "object",
+                        },
+                        Duels: {
+                          type: "object",
+                        },
+                        Skyblock: {
+                          type: "object",
+                        },
+                        Arcade: {
+                          type: "object",
+                        },
+                        Arena: {
+                          type: "object",
+                        },
+                        Warlords: {
+                          type: "object",
+                        },
+                        BuildBattle: {
+                          type: "object",
+                        },
+                        TKR: {
+                          type: "object",
+                        },
+                        MurderMystery: {
+                          type: "object",
+                        },
+                        Pit: {
+                          type: "object",
+                        },
+                        TNT: {
+                          type: "object",
+                        },
+                        Blitz: {
+                          type: "object",
+                        },
+                        CvC: {
+                          type: "object",
+                        },
+                        Paintball: {
+                          type: "object",
+                        },
+                        Quake: {
+                          type: "object",
+                        },
+                        SpeedUHC: {
+                          type: "object",
+                        },
+                        Smash: {
+                          type: "object",
+                        },
+                        Walls: {
+                          type: "object",
+                        },
+                        MegaWalls: {
+                          type: "object",
+                        },
+                        VampireZ: {
+                          type: "object",
+                        },
+                        Woolwars: {
+                          type: "object",
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/player/{PLAYER}/history": {
+      get: {
+        tags: ["Hypixel"],
+        summary: "Player History",
+        description: "Returns alltime history of the specified Player. The returned data only shows object keys which have changed between the datapoints.",
+        operationId: "getHypixelPlayerHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            $ref: "#/components/parameters/player",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Player History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      example: [
+                        {
+                          stats: {
+                            Bedwars: {
+                              practice: {
+                                fireballJumping: {
+                                  successes: 464,
+                                  fails: 420,
+                                  SFR: 1.1047619047619048,
+                                },
+                              },
+                            },
+                          },
+                          timestamp: 1699453062,
+                        },
+                        {
+                          EXP: 46016125,
+                          level: 189.3988014553504,
+                          karma: 37401363,
+                          stats: {
+                            Blitz: {
+                              coins: 286872,
+                            },
+                          },
+                          timestamp: 1699453185,
+                        },
+                        {
+                          EXP: 46016605,
+                          level: 189.39980198009582,
+                          karma: 37403863,
+                          stats: {
+                            Warlords: {
+                              coins: 367397,
+                            },
+                            CvC: {
+                              coins: 194880,
+                            },
+                            Smash: {
+                              coins: 135716,
+                            },
+                          },
+                          timestamp: 1699453373,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
     "/v1/hypixel/skyblock/auctionhouse/query": {
       get: {
         tags: ["Hypixel (Skyblock)"],
@@ -981,7 +1407,7 @@ export default {
         ],
         responses: {
           "200": {
-            description: "Successfully queried Hypixel Skyblock Auctions",
+            description: "Successfully queried Hypixel Skyblock Auctions.",
             headers: {
               "X-Server-ID": {
                 $ref: "#/components/headers/X-Server-ID",
@@ -1456,7 +1882,7 @@ export default {
     "/v1/hypixel/skyblock/auctionhouse/item/{UUID}": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Auction History",
+        summary: "Auction Item History",
         description: "Returns all past Auctions about the same exact unique Skyblock Item.",
         operationId: "getHypixelSkyblockItemHistory",
         security: [
@@ -1606,7 +2032,7 @@ export default {
     "/v1/hypixel/skyblock/auctionhouse/price/{ID}": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Auction Price",
+        summary: "Auction Item Price",
         description: "Returns the current price of the specified Skyblock Item.",
         operationId: "getCurrentHypixelSkyblockAuctionhouseItemPrice",
         security: [
@@ -1694,7 +2120,7 @@ export default {
     "/v1/hypixel/skyblock/auctionhouse/price/{ID}/history": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Auction Alltime Price History",
+        summary: "Auction Item Alltime Price History",
         description: "Returns alltime price history of the specified Skyblock Item.",
         operationId: "getHypixelSkyblockItemPriceHistory",
         security: [
@@ -2017,78 +2443,80 @@ export default {
                         },
                       },
                       example: {
-                        sellSummary: [
-                          {
-                            amount: 1,
-                            pricePerUnit: 7257325.4,
-                            orders: 1,
+                        RECOMBOBULATOR_3000: {
+                          sellSummary: [
+                            {
+                              amount: 1,
+                              pricePerUnit: 7257325.4,
+                              orders: 1,
+                            },
+                            {
+                              amount: 11,
+                              pricePerUnit: 7257325.1,
+                              orders: 3,
+                            },
+                            {
+                              amount: 3,
+                              pricePerUnit: 7257324.6,
+                              orders: 1,
+                            },
+                            {
+                              amount: 12,
+                              pricePerUnit: 7200000.5,
+                              orders: 1,
+                            },
+                            {
+                              amount: 2,
+                              pricePerUnit: 7120804.2,
+                              orders: 1,
+                            },
+                          ],
+                          buySummary: [
+                            {
+                              amount: 1,
+                              pricePerUnit: 7346754.2,
+                              orders: 1,
+                            },
+                            {
+                              amount: 1,
+                              pricePerUnit: 7346754.3,
+                              orders: 1,
+                            },
+                            {
+                              amount: 4,
+                              pricePerUnit: 7356690.9,
+                              orders: 2,
+                            },
+                            {
+                              amount: 6,
+                              pricePerUnit: 7356691,
+                              orders: 1,
+                            },
+                            {
+                              amount: 1,
+                              pricePerUnit: 7356691.1,
+                              orders: 1,
+                            },
+                          ],
+                          quickStatus: {
+                            sellPrice: 6080239,
+                            sellVolume: 59918,
+                            sellMovingWeek: 39927,
+                            sellOrders: 2828,
+                            buyPrice: 7374871.3,
+                            buyVolume: 3539,
+                            buyMovingWeek: 55590,
+                            buyOrders: 417,
                           },
-                          {
-                            amount: 11,
-                            pricePerUnit: 7257325.1,
-                            orders: 3,
+                          item: {
+                            material: "SKULL_ITEM",
+                            durability: 3,
+                            name: "Recombobulator 3000",
+                            tier: "LEGENDARY",
+                            dungeon_item: true,
+                            museum: true,
+                            texture: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
                           },
-                          {
-                            amount: 3,
-                            pricePerUnit: 7257324.6,
-                            orders: 1,
-                          },
-                          {
-                            amount: 12,
-                            pricePerUnit: 7200000.5,
-                            orders: 1,
-                          },
-                          {
-                            amount: 2,
-                            pricePerUnit: 7120804.2,
-                            orders: 1,
-                          },
-                        ],
-                        buySummary: [
-                          {
-                            amount: 1,
-                            pricePerUnit: 7346754.2,
-                            orders: 1,
-                          },
-                          {
-                            amount: 1,
-                            pricePerUnit: 7346754.3,
-                            orders: 1,
-                          },
-                          {
-                            amount: 4,
-                            pricePerUnit: 7356690.9,
-                            orders: 2,
-                          },
-                          {
-                            amount: 6,
-                            pricePerUnit: 7356691,
-                            orders: 1,
-                          },
-                          {
-                            amount: 1,
-                            pricePerUnit: 7356691.1,
-                            orders: 1,
-                          },
-                        ],
-                        quickStatus: {
-                          sellPrice: 6080239,
-                          sellVolume: 59918,
-                          sellMovingWeek: 39927,
-                          sellOrders: 2828,
-                          buyPrice: 7374871.3,
-                          buyVolume: 3539,
-                          buyMovingWeek: 55590,
-                          buyOrders: 417,
-                        },
-                        item: {
-                          material: "SKULL_ITEM",
-                          durability: 3,
-                          name: "Recombobulator 3000",
-                          tier: "LEGENDARY",
-                          dungeon_item: true,
-                          museum: true,
-                          texture: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
                         },
                       },
                     },
@@ -2112,7 +2540,7 @@ export default {
     "/v1/hypixel/skyblock/bazaar/{ID}": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Bazaar Product Price Alltime History",
+        summary: "Bazaar Product",
         description: "Returns current Bazaar data for the specified Item plus additional info about the Item.",
         operationId: "getHypixelSkyblockBazaarProduct",
         security: [
@@ -2327,7 +2755,7 @@ export default {
     "/v1/hypixel/skyblock/bazaar/{ID}/history": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Bazaar Alltime Price History",
+        summary: "Bazaar Product Alltime Price History",
         description: "Returns alltime price history of the specified Product.",
         operationId: "getHypixelSkyblockBazaarItemPriceHistory",
         security: [
@@ -2424,7 +2852,7 @@ export default {
     "/v1/hypixel/skyblock/bazaar/{ID}/history/{TIMEFRAME}": {
       get: {
         tags: ["Hypixel (Skyblock)"],
-        summary: "Item Auction Price History",
+        summary: "Bazaar Product Price History",
         description: "Returns price history for the specified timeframe of the specified product.",
         operationId: "getHypixelSkyblockBazaarItemPriceHistoryByTimeframe",
         security: [
@@ -2508,6 +2936,701 @@ export default {
                           },
                         },
                       },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/player/{PLAYER}": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Player",
+        description: "Returns the latest player data.\n\n**MAY NOT BE UP TO DATE**",
+        operationId: "getWynncraftPlayer",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            $ref: "#/components/parameters/player",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Player.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    UUID: {
+                      type: "UUID",
+                      example: "14727faefbdc4aff848cd2713eb9939e",
+                    },
+                    username: {
+                      type: "string",
+                      example: "Pixelic",
+                    },
+                    characters: {
+                      type: "object",
+                      properties: {
+                        CHARACTER: {
+                          type: "object",
+                          properties: {
+                            class: {
+                              type: "string",
+                              enum: ["ARCHER", "WARRIOR", "MAGE", "ASSASSIN", "SHAMAN"],
+                            },
+                            nick: {
+                              oneOf: [
+                                {
+                                  type: "string",
+                                },
+                                {
+                                  type: "null",
+                                },
+                              ],
+                            },
+                            level: {
+                              type: "number",
+                            },
+                            totalLevels: {
+                              type: "number",
+                            },
+                            EXP: {
+                              type: "number",
+                            },
+                            levelPercent: {
+                              type: "number",
+                            },
+                            wars: {
+                              type: "number",
+                            },
+                            mobsKilled: {
+                              type: "number",
+                            },
+                            chestsFound: {
+                              type: "number",
+                            },
+                            blocksWalked: {
+                              type: "number",
+                            },
+                            playtime: {
+                              type: "number",
+                            },
+                            logins: {
+                              type: "number",
+                            },
+                            deaths: {
+                              type: "number",
+                            },
+                            discoveries: {
+                              type: "number",
+                            },
+                            pvp: {
+                              type: "object",
+                              properties: {
+                                kills: {
+                                  type: "number",
+                                },
+                                deaths: {
+                                  type: "number",
+                                },
+                              },
+                            },
+                            gamemodes: {
+                              type: "array",
+                              uniqueItems: true,
+                              items: {
+                                type: "string",
+                                enum: ["IRONMAN", "ULTIMATE_IRONMAN", "CRAFTSMAN", "HUNTED", "HARDCORE"],
+                              },
+                            },
+                            skillPoints: {
+                              type: "object",
+                              properties: {
+                                strength: {
+                                  type: "number",
+                                },
+                                intelligence: {
+                                  type: "number",
+                                },
+                              },
+                            },
+                            professions: {
+                              type: "object",
+                              properties: {
+                                fishing: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                woodcutting: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                mining: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                farming: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                scribing: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                jeweling: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                alchemism: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                cooking: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                weaponsmithing: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                tailoring: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                woodworking: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                                armouring: {
+                                  type: "object",
+                                  properties: {
+                                    level: {
+                                      type: "number",
+                                    },
+                                    levelPercent: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                            dungeons: {
+                              type: "object",
+                              properties: {
+                                total: {
+                                  type: "number",
+                                },
+                                list: {
+                                  type: "object",
+                                  properties: {
+                                    DUNGEON: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                            raids: {
+                              type: "object",
+                              properties: {
+                                total: {
+                                  type: "number",
+                                },
+                                list: {
+                                  type: "object",
+                                  properties: {
+                                    DUNGEON: {
+                                      type: "number",
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                            questsCompleted: {
+                              type: "number",
+                            },
+                            quests: {
+                              type: "array",
+                              uniqueItems: true,
+                              items: {
+                                type: "string",
+                              },
+                            },
+                          },
+                        },
+                      },
+                      example: {
+                        class: "MAGE",
+                        nick: null,
+                        level: 7,
+                        totalLevels: 0,
+                        EXP: 311,
+                        levelPercent: 29,
+                        wars: 0,
+                        mobsKilled: 380,
+                        chestsFound: 4,
+                        blocksWalked: 26083,
+                        playtime: 1,
+                        logins: 2,
+                        deaths: 2,
+                        discoveries: 7,
+                        pvp: {
+                          kills: 0,
+                          deaths: 0,
+                        },
+                        gamemodes: [],
+                        skillPoints: {
+                          strength: 2,
+                          intelligence: 2,
+                        },
+                        professions: {
+                          fishing: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          woodcutting: {
+                            level: 4,
+                            levelPercent: 58,
+                          },
+                          mining: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          farming: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          scribing: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          jeweling: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          alchemism: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          cooking: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          weaponsmithing: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          tailoring: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          woodworking: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                          armouring: {
+                            level: 1,
+                            levelPercent: 0,
+                          },
+                        },
+                        dungeons: {
+                          total: 0,
+                          list: {},
+                        },
+                        raids: {
+                          total: 0,
+                          list: {},
+                        },
+                        questsCompleted: 1,
+                        quests: ["King's Recruit"],
+                      },
+                    },
+                    firstLogin: {
+                      type: "number",
+                      example: 1699106087,
+                    },
+                    global: {
+                      type: "object",
+                      properties: {
+                        wars: {
+                          type: "number",
+                          example: 0,
+                        },
+                        totalLevels: {
+                          type: "number",
+                          example: 10,
+                        },
+                        mobsKilled: {
+                          type: "number",
+                          example: 380,
+                        },
+                        chestsFound: {
+                          type: "number",
+                          example: 4,
+                        },
+                        dungeons: {
+                          type: "object",
+                          properties: {
+                            total: {
+                              type: "number",
+                              example: 0,
+                            },
+                            list: {
+                              type: "object",
+                              properties: {
+                                DUNGEON: {
+                                  type: "number",
+                                  example: 0,
+                                },
+                              },
+                            },
+                          },
+                        },
+                        raids: {
+                          type: "object",
+                          properties: {
+                            total: {
+                              type: "number",
+                              example: 0,
+                            },
+                            list: {
+                              type: "object",
+                              properties: {
+                                DUNGEON: {
+                                  type: "number",
+                                  exampple: 0,
+                                },
+                              },
+                            },
+                          },
+                        },
+                        questsCompleted: {
+                          type: "number",
+                          example: 0,
+                        },
+                      },
+                    },
+                    guild: {
+                      oneOf: [
+                        {
+                          type: "object",
+                          properties: {
+                            name: {
+                              type: "string",
+                            },
+                            prefix: {
+                              type: "string",
+                            },
+                            rank: {
+                              type: "string",
+                            },
+                          },
+                        },
+                        {
+                          type: "null",
+                        },
+                      ],
+                      example: null,
+                    },
+                    lastLogin: {
+                      type: "number",
+                      example: 1699118622,
+                    },
+                    online: {
+                      type: "boolean",
+                      example: false,
+                    },
+                    playtime: {
+                      type: "number",
+                      description: "Playtime in Hours",
+                      example: 1,
+                    },
+                    publicProfile: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    purchasedRank: {
+                      oneOf: [
+                        {
+                          type: "string",
+                          enum: ["VIP", "VIP_PLUS", "HERO", "CHAMPION"],
+                        },
+                        {
+                          type: "null",
+                        },
+                      ],
+                      example: null,
+                    },
+                    rank: {
+                      oneOf: [
+                        {
+                          type: "string",
+                          enum: ["MEDIA", "MODERATOR", "ADMIN"],
+                        },
+                        {
+                          type: "null",
+                        },
+                      ],
+                      example: null,
+                    },
+                    server: {
+                      oneOf: [
+                        {
+                          type: "string",
+                        },
+                        {
+                          type: "null",
+                        },
+                      ],
+                      example: null,
+                    },
+                    timestamp: {
+                      type: "number",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/player/{PLAYER}/history": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Player History",
+        description: "Returns alltime history of the specified Player. The returned data only shows object keys which have changed between the datapoints.",
+        operationId: "getWynncraftPlayerHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            $ref: "#/components/parameters/player",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Player History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      example: [
+                        {
+                          playtime: 9394,
+                          global: {
+                            wars: 8362,
+                            totalLevels: 20264,
+                            mobsKilled: 1990982,
+                            chestsFound: 134769,
+                          },
+                          characters: {
+                            b1b27f0ad7844e83829af23beca1f103: {
+                              logins: 5703,
+                            },
+                          },
+                          timestamp: 1699639115,
+                        },
+                        {
+                          playtime: 9400,
+                          global: {
+                            wars: 8377,
+                            totalLevels: 20266,
+                            mobsKilled: 1991982,
+                            chestsFound: 134772,
+                          },
+                          characters: {
+                            "9a5cac7a4254442ca056558a1ff675e3": {
+                              wars: 838,
+                              mobsKilled: 20887,
+                              blocksWalked: -1882465464,
+                              playtime: 398,
+                              logins: 5047,
+                            },
+                          },
+                          timestamp: 1699707076,
+                        },
+                        {
+                          playtime: 9457,
+                          global: {
+                            wars: 8496,
+                            totalLevels: 20267,
+                            mobsKilled: 2004825,
+                            chestsFound: 134788,
+                            raids: {
+                              total: 588,
+                              list: {
+                                "The Canyon Colossus": 351,
+                                "The Nameless Anomaly": 111,
+                              },
+                            },
+                            questsCompleted: 1978,
+                          },
+                          characters: {
+                            "9a5cac7a4254442ca056558a1ff675e3": {
+                              wars: 907,
+                              mobsKilled: 21348,
+                              chestsFound: 1056,
+                              blocksWalked: -1849210290,
+                              playtime: 407,
+                              logins: 5196,
+                            },
+                          },
+                          timestamp: 1700137445,
+                        },
+                      ],
                     },
                   },
                 },
