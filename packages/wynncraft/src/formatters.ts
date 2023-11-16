@@ -9,7 +9,7 @@ export const formatPlayer = (player: any) => {
       for (const profession of professions) {
         formattedProfessions[profession] = {
           level: character?.professions?.[profession]?.level || 0,
-          EXPPercent: character?.professions?.[profession]?.xpPercent || 0,
+          levelPercent: character?.professions?.[profession]?.xpPercent || 0,
         };
       }
       return formattedProfessions;
@@ -21,7 +21,7 @@ export const formatPlayer = (player: any) => {
       level: character?.level || 0,
       totalLevels: character?.totalLevels || 0,
       EXP: character?.xp || 0,
-      EXPPercent: character?.xpPercent || 0,
+      levelPercent: character?.xpPercent || 0,
       wars: character?.wars || 0,
       mobsKilled: character?.mobsKilled || 0,
       chestsFound: character?.chestsFound || 0,
@@ -112,7 +112,7 @@ export const formatGuild = (guild: any) => {
     prefix: guild?.prefix || null,
     onlineMembers: guild?.online || 0,
     members: members,
-    EXPPercent: guild?.xpPercent || 0,
+    levelPercent: guild?.xpPercent || 0,
     level: guild?.level || 0,
     created: guild?.created ? Math.floor(new Date(guild?.created).valueOf() / 1000) : null,
     territories: guild?.territories || 0,
