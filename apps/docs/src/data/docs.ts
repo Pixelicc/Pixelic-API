@@ -894,7 +894,7 @@ export default {
         operationId: "queryHypixelSkyblockAuctions",
         security: [
           {
-            "API-Key": ["hypixel:queryAuctions"],
+            "API-Key": ["hypixel:querySkyblockAuctions"],
           },
         ],
         parameters: [
