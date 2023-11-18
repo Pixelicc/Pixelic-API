@@ -887,6 +887,89 @@ export default {
         },
       },
     },
+    "/v1/minecraft/uuids": {
+      get: {
+        tags: ["Minecraft"],
+        summary: "UUID List",
+        description: "Returns up to **100,000** UUIDs (**~ 3.34MB**) per page. The most recent/last page is cached for around **15min**, all others are cached as long as possible!",
+        operationId: "getMinecraftUUIDList",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            required: false,
+            schema: {
+              type: "integer",
+              default: 0,
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved UUID List Page.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    totalPages: {
+                      type: "number",
+                      example: 1,
+                    },
+                    currentPage: {
+                      type: "number",
+                      example: 1,
+                    },
+                    UUIDs: {
+                      type: "array",
+                      minItems: 1,
+                      maxItems: 100000,
+                      uniqueItems: true,
+                      items: {
+                        type: "UUID",
+                      },
+                      example: ["14727faefbdc4aff848cd2713eb9939e", "6dd9f4bdffbc4e5f9634c5278782bc11"],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
     "/v1/minecraft/server/list": {
       get: {
         tags: ["Minecraft"],
