@@ -887,6 +887,446 @@ export default {
         },
       },
     },
+    "/v1/minecraft/server/list": {
+      get: {
+        tags: ["Minecraft"],
+        summary: "Server List",
+        description: "Returns a list of all current online Servers and its Players.",
+        operationId: "getMinecraftServerList",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server List.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    servers: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          ID: {
+                            type: "string",
+                          },
+                          name: {
+                            type: "string",
+                          },
+                          host: {
+                            type: "string",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          ID: "HYPIXEL",
+                          host: "mc.hypixel.net",
+                          name: "Hypixel",
+                        },
+                        {
+                          ID: "WYNNCRAFT",
+                          host: "play.wynncraft.com",
+                          name: "Wynncraft",
+                        },
+                        {
+                          ID: "GOMMEHD",
+                          host: "play.gommehd.net",
+                          name: "GommeHD",
+                        },
+                        {
+                          ID: "CUBECRAFT",
+                          host: "play.cubecraft.net",
+                          name: "CubeCraft",
+                        },
+                        {
+                          ID: "MINEHUT",
+                          host: "minehut.gg",
+                          name: "Minehut",
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/minecraft/server/{SERVER}": {
+      get: {
+        tags: ["Minecraft"],
+        summary: "Server",
+        description: "Returns the specified Server and its Players.",
+        operationId: "getMinecraftServer",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Minecraft Server ID",
+              example: "HYPIXEL",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    latency: {
+                      type: "number",
+                      example: 104,
+                    },
+                    latencyFormatted: {
+                      type: "string",
+                      example: "104ms",
+                    },
+                    maxPlayercount: {
+                      type: "number",
+                      example: 200000,
+                    },
+                    maxPlayercountFormatted: {
+                      type: "number",
+                      example: "200k",
+                    },
+                    playercount: {
+                      type: "number",
+                      example: 35243,
+                    },
+                    playercountFormatted: {
+                      type: "string",
+                      example: "35.24k",
+                    },
+                    MOTD: {
+                      oneOf: [
+                        {
+                          type: "string",
+                        },
+                        {
+                          type: "object",
+                        },
+                      ],
+                      example: "                §aHypixel Network §c[1.8-1.20]\n  §6§lSKYBLOCK 0.19.7 §e§lPESTS §7- §b§lHOUSING UPDATE",
+                    },
+                    icon: {
+                      type: "string",
+                      example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaX (...15.6 KB)",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/minecraft/server/{SERVER}/history": {
+      get: {
+        tags: ["Minecraft"],
+        summary: "Server History",
+        description: "Returns the Server's alltime playercount and latency history.",
+        operationId: "getMinecraftServerHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Minecraft Server ID",
+              example: "HYPIXEL",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          playercount: {
+                            type: "number",
+                          },
+                          latency: {
+                            type: "number",
+                          },
+                          timestamp: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          playercount: 36477,
+                          latency: 104,
+                          timestamp: 1699301070,
+                        },
+                        {
+                          playercount: 24416,
+                          latency: 104,
+                          timestamp: 1699362947,
+                        },
+                        {
+                          playercount: 27971,
+                          latency: 119,
+                          timestamp: 1699366590,
+                        },
+                        {
+                          playercount: 30909,
+                          latency: 113,
+                          timestamp: 1699370190,
+                        },
+                        {
+                          playercount: 21947,
+                          latency: 105,
+                          timestamp: 1699446870,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/minecraft/server/{SERVER}/history/{TIMEFRAME}": {
+      get: {
+        tags: ["Minecraft"],
+        summary: "Server Alltime History",
+        description: "Returns the Server's playercount and latency history for the specified timeframe.",
+        operationId: "getMinecraftServerHistoryByTimeframe",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Minecraft Server ID",
+              example: "HYPIXEL",
+            },
+          },
+          {
+            name: "timeframe",
+            in: "path",
+            schema: {
+              type: "string",
+              enum: ["hour", "day", "week", "month", "year"],
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          playercount: {
+                            type: "number",
+                          },
+                          latency: {
+                            type: "number",
+                          },
+                          timestamp: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          playercount: 36477,
+                          latency: 104,
+                          timestamp: 1699301070,
+                        },
+                        {
+                          playercount: 24416,
+                          latency: 104,
+                          timestamp: 1699362947,
+                        },
+                        {
+                          playercount: 27971,
+                          latency: 119,
+                          timestamp: 1699366590,
+                        },
+                        {
+                          playercount: 30909,
+                          latency: 113,
+                          timestamp: 1699370190,
+                        },
+                        {
+                          playercount: 21947,
+                          latency: 105,
+                          timestamp: 1699446870,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
     "/v1/hypixel/player/{PLAYER}": {
       get: {
         tags: ["Hypixel"],
@@ -2528,9 +2968,7 @@ export default {
           "403": {
             $ref: "#/components/responses/accessForbidden",
           },
-          "422": {
-            $ref: "#/components/responses/invalidData",
-          },
+
           "429": {
             $ref: "#/components/responses/ratelimited",
           },
@@ -3567,6 +4005,9 @@ export default {
                     },
                     data: {
                       type: "array",
+                      items: {
+                        type: "object",
+                      },
                       example: [
                         {
                           playtime: 9394,
@@ -3629,6 +4070,459 @@ export default {
                             },
                           },
                           timestamp: 1700137445,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/server/list": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Server List",
+        description: "Returns a list of all current online Servers and its Players.",
+        operationId: "getWynncraftServerList",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server List.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    servers: {
+                      type: "object",
+                      properties: {
+                        SERVER: {
+                          type: "object",
+                          properties: {
+                            playercount: {
+                              type: "number",
+                            },
+                            players: {
+                              type: "array",
+                              uniqueItems: true,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  UUID: {
+                                    oneOf: [
+                                      {
+                                        type: "UUID",
+                                      },
+                                      {
+                                        type: "null",
+                                        description: "Null gets returned when the UUID translation failed",
+                                      },
+                                    ],
+                                  },
+                                  username: {
+                                    type: "string",
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      example: {
+                        WC1: {
+                          playercount: 5,
+                          players: [
+                            {
+                              UUID: "761ed6b8c16f46c5a5c354a66b673c7b",
+                              username: "AlchabenKaker",
+                            },
+                            {
+                              UUID: "1bcf9d80901a4d5bb603f2538d4bf454",
+                              username: "AtaksDalo",
+                            },
+                            {
+                              UUID: "05f912041c5a464b880603a82d0b9c18",
+                              username: "Bluwu",
+                            },
+                            {
+                              UUID: "2ba59e4767a34912b4d76693accd5275",
+                              username: "CowPink",
+                            },
+                            {
+                              UUID: "61ffb95837a34bc69caf607e63ec993b",
+                              username: "eatbread",
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/server/{SERVER}": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Server",
+        description: "Returns the specified Server and its Players.",
+        operationId: "getWynncraftServer",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Wynncraft Server ID",
+              example: "WC1",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+
+                    playercount: {
+                      type: "number",
+                      example: 5,
+                    },
+                    players: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          UUID: {
+                            oneOf: [
+                              {
+                                type: "UUID",
+                              },
+                              {
+                                type: "null",
+                                description: "Null gets returned when the UUID translation failed",
+                              },
+                            ],
+                          },
+                          username: {
+                            type: "string",
+                          },
+                        },
+                        example: [
+                          {
+                            UUID: "761ed6b8c16f46c5a5c354a66b673c7b",
+                            username: "AlchabenKaker",
+                          },
+                          {
+                            UUID: "1bcf9d80901a4d5bb603f2538d4bf454",
+                            username: "AtaksDalo",
+                          },
+                          {
+                            UUID: "05f912041c5a464b880603a82d0b9c18",
+                            username: "Bluwu",
+                          },
+                          {
+                            UUID: "2ba59e4767a34912b4d76693accd5275",
+                            username: "CowPink",
+                          },
+                          {
+                            UUID: "61ffb95837a34bc69caf607e63ec993b",
+                            username: "eatbread",
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/server/{SERVER}/history": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Server History",
+        description: "Returns the Server's alltime playercount history.",
+        operationId: "getWynncraftServerHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Wynncraft Server ID",
+              example: "WC1",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          playercount: {
+                            type: "number",
+                          },
+                          timestamp: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          playercount: 31,
+                          timestamp: 1699638779,
+                        },
+                        {
+                          playercount: 34,
+                          timestamp: 1699642400,
+                        },
+                        {
+                          playercount: 21,
+                          timestamp: 1699646115,
+                        },
+                        {
+                          playercount: 26,
+                          timestamp: 1699649770,
+                        },
+                        {
+                          playercount: 27,
+                          timestamp: 1699702390,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/wynncraft/server/{SERVER}/history/{TIMEFRAME}": {
+      get: {
+        tags: ["Wynncraft"],
+        summary: "Server Alltime History",
+        description: "Returns the Server's playercount history for the specified timeframe.",
+        operationId: "getWynncraftServerHistoryByTimeframe",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "Server",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Wynncraft Server ID",
+              example: "WC1",
+            },
+          },
+          {
+            name: "timeframe",
+            in: "path",
+            schema: {
+              type: "string",
+              enum: ["hour", "day", "week", "month", "year"],
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Server History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          playercount: {
+                            type: "number",
+                          },
+                          timestamp: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          playercount: 31,
+                          timestamp: 1699638779,
+                        },
+                        {
+                          playercount: 34,
+                          timestamp: 1699642400,
+                        },
+                        {
+                          playercount: 21,
+                          timestamp: 1699646115,
+                        },
+                        {
+                          playercount: 26,
+                          timestamp: 1699649770,
+                        },
+                        {
+                          playercount: 27,
+                          timestamp: 1699702390,
                         },
                       ],
                     },
