@@ -1836,6 +1836,674 @@ export default {
         },
       },
     },
+    "/v1/hypixel/skyblock/election": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Election",
+        operationId: "getHypixelSkyblockElection",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Hypixel Skyblock Election data.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    currentMayor: {
+                      type: "object",
+                      properties: {
+                        key: {
+                          type: "string",
+                          example: "MINING",
+                        },
+                        name: {
+                          type: "string",
+                          example: "Cole",
+                        },
+                        perks: {
+                          type: "array",
+                          uniqueItems: true,
+                          items: {
+                            type: "object",
+                            properties: {
+                              name: {
+                                type: "string",
+                              },
+                              description: {
+                                type: "string",
+                              },
+                            },
+                          },
+                          example: [
+                            {
+                              name: "Prospection",
+                              description: "Mining minions work §a25% §7faster.",
+                            },
+                            {
+                              name: "Mining XP Buff",
+                              description: "Get §3+60☯ Mining Wisdom §7on public islands.",
+                            },
+                            {
+                              name: "Mining Fiesta",
+                              description: "§7Schedules two Mining Fiesta events during the year!",
+                            },
+                          ],
+                        },
+                        votes: {
+                          type: "number",
+                          example: 555507,
+                        },
+                      },
+                    },
+                    nextMayor: {
+                      oneOf: [
+                        {
+                          type: "object",
+                          properties: {
+                            key: {
+                              type: "string",
+                              example: "FARMING",
+                            },
+                            name: {
+                              type: "string",
+                              example: "Finnegan",
+                            },
+                            perks: {
+                              type: "array",
+                              uniqueItems: true,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  name: {
+                                    type: "string",
+                                  },
+                                  description: {
+                                    type: "string",
+                                  },
+                                },
+                              },
+                              example: [
+                                {
+                                  name: "Farming Simulator",
+                                  description: "There is a §a25% §7chance for Mathematical Hoes and the §9Cultivating Enchantment §7to count twice.",
+                                },
+                                {
+                                  name: "GOATed",
+                                  description: "§eJacob's Farming Contest §7brackets include §a10% §7more players each.",
+                                },
+                                {
+                                  name: "Pelt-pocalypse",
+                                  description: "Obtain §a1.5x §7more §5pelts §7from §aTrevor §7in the §eMushroom Desert§7, hunt a new trapper mob, and purchase items from a new trapper shop.",
+                                },
+                              ],
+                            },
+                            votes: {
+                              type: "number",
+                              example: 339771,
+                            },
+                          },
+                        },
+                        {
+                          type: "null",
+                          description: "Null gets returned if no Election is currently taking place",
+                        },
+                      ],
+                    },
+                    currentElection: {
+                      oneOf: [
+                        {
+                          type: "object",
+                          properties: {
+                            year: {
+                              type: "number",
+                              example: 314,
+                            },
+                            candidates: {
+                              type: "array",
+                              uniqueItems: true,
+                              items: {
+                                type: "object",
+                                properties: {
+                                  key: {
+                                    type: "string",
+                                  },
+                                  name: {
+                                    type: "string",
+                                  },
+                                  perks: {
+                                    type: "array",
+                                    uniqueItems: true,
+                                    items: {
+                                      type: "object",
+                                      properties: {
+                                        name: {
+                                          type: "string",
+                                        },
+                                        description: {
+                                          type: "string",
+                                        },
+                                      },
+                                    },
+                                  },
+                                  votes: {
+                                    type: "number",
+                                  },
+                                },
+                              },
+                              example: [
+                                {
+                                  key: "FARMING",
+                                  name: "Finnegan",
+                                  perks: [
+                                    {
+                                      name: "Farming Simulator",
+                                      description: "There is a §a25% §7chance for Mathematical Hoes and the §9Cultivating Enchantment §7to count twice.",
+                                    },
+                                    {
+                                      name: "GOATed",
+                                      description: "§eJacob's Farming Contest §7brackets include §a10% §7more players each.",
+                                    },
+                                    {
+                                      name: "Pelt-pocalypse",
+                                      description: "Obtain §a1.5x §7more §5pelts §7from §aTrevor §7in the §eMushroom Desert§7, hunt a new trapper mob, and purchase items from a new trapper shop.",
+                                    },
+                                  ],
+                                  votes: 339771,
+                                },
+                                {
+                                  key: "DUNGEONS",
+                                  name: "Paul",
+                                  perks: [
+                                    {
+                                      name: "Marauder",
+                                      description: "Dungeon reward chests are §e20% §7cheaper.",
+                                    },
+                                    {
+                                      name: "Benediction",
+                                      description: "Blessings are §d25% §7stronger.",
+                                    },
+                                  ],
+                                  votes: 80565,
+                                },
+                                {
+                                  key: "EVENTS",
+                                  name: "Foxy",
+                                  perks: [
+                                    {
+                                      name: "Benevolence",
+                                      description: "Gain §c2.5x §7gifts from the attack event on Jerry's Workshop.",
+                                    },
+                                    {
+                                      name: "Sweet Tooth",
+                                      description: "Grants §a+20% §7chance to get Candy from mobs during the §6Spooky Festival§7.",
+                                    },
+                                    {
+                                      name: "Extra Event",
+                                      description: "Schedules an extra §bFishing Festival §7event during the year.",
+                                    },
+                                  ],
+                                  votes: 22609,
+                                },
+                                {
+                                  key: "ECONOMIST",
+                                  name: "Diaz",
+                                  perks: [
+                                    {
+                                      name: "Barrier Street",
+                                      description: "Gain §625% §7more bank interest.",
+                                    },
+                                    {
+                                      name: "Shopping Spree",
+                                      description: "Increase daily NPC buy limits by §e10x§7.",
+                                    },
+                                  ],
+                                  votes: 15651,
+                                },
+                                {
+                                  key: "PETS",
+                                  name: "Diana",
+                                  perks: [
+                                    {
+                                      name: "Lucky!",
+                                      description: "Gain §d+25♣ Pet Luck§7.",
+                                    },
+                                  ],
+                                  votes: 13745,
+                                },
+                              ],
+                            },
+                          },
+                        },
+                        {
+                          type: "null",
+                          description: "Null gets returned if no Election is currently taking place",
+                        },
+                      ],
+                    },
+                    lastElection: {
+                      type: "object",
+                      properties: {
+                        year: {
+                          type: "number",
+                          example: 313,
+                        },
+                        candidates: {
+                          type: "array",
+                          uniqueItems: true,
+                          items: {
+                            type: "object",
+                            properties: {
+                              key: {
+                                type: "string",
+                              },
+                              name: {
+                                type: "string",
+                              },
+                              perks: {
+                                type: "array",
+                                uniqueItems: true,
+                                items: {
+                                  type: "object",
+                                  properties: {
+                                    name: {
+                                      type: "string",
+                                    },
+                                    description: {
+                                      type: "string",
+                                    },
+                                  },
+                                },
+                              },
+                              votes: {
+                                type: "number",
+                              },
+                            },
+                          },
+                          example: [
+                            {
+                              key: "MINING",
+                              name: "Cole",
+                              perks: [
+                                {
+                                  name: "Prospection",
+                                  description: "Mining minions work §a25% §7faster.",
+                                },
+                                {
+                                  name: "Mining XP Buff",
+                                  description: "Get §3+60☯ Mining Wisdom §7on public islands.",
+                                },
+                                {
+                                  name: "Mining Fiesta",
+                                  description: "§7Schedules two Mining Fiesta events during the year!",
+                                },
+                              ],
+                              votes: 555507,
+                            },
+                            {
+                              key: "FISHING",
+                              name: "Marina",
+                              perks: [
+                                {
+                                  name: "Fishing XP Buff",
+                                  description: "Gain §3+50☯ Fishing Wisdom §7on public islands.",
+                                },
+                                {
+                                  name: "Luck of the Sea 2.0",
+                                  description: "Gain §315α Sea Creature Chance§7.",
+                                },
+                                {
+                                  name: "Fishing Festival",
+                                  description: "Start a special fishing event the first §b3 §7days of each month!",
+                                },
+                              ],
+                              votes: 165602,
+                            },
+                            {
+                              key: "DUNGEONS",
+                              name: "Paul",
+                              perks: [
+                                {
+                                  name: "Marauder",
+                                  description: "Dungeon reward chests are §e20% §7cheaper.",
+                                },
+                                {
+                                  name: "Benediction",
+                                  description: "Blessings are §d25% §7stronger.",
+                                },
+                              ],
+                              votes: 100401,
+                            },
+                            {
+                              key: "SLAYER",
+                              name: "Aatrox",
+                              perks: [
+                                {
+                                  name: "Slayer XP Buff",
+                                  description: "Earn §d25% §7more Slayer XP.",
+                                },
+                              ],
+                              votes: 34919,
+                            },
+                            {
+                              key: "EVENTS",
+                              name: "Foxy",
+                              perks: [
+                                {
+                                  name: "Benevolence",
+                                  description: "Gain §c2.5x §7gifts from the attack event on Jerry's Workshop.",
+                                },
+                                {
+                                  name: "Extra Event",
+                                  description: "Schedules an extra §6Spooky Festival §7event during the year.",
+                                },
+                              ],
+                              votes: 6273,
+                            },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/election/history": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Election History",
+        operationId: "getHypixelSkyblockElectionHistory",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Hypixel Skyblock Election History.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "array",
+                      uniqueItems: true,
+                      items: {
+                        type: "object",
+                        properties: {
+                          year: {
+                            type: "number",
+                          },
+                          candidates: {
+                            type: "array",
+                            uniqueItems: true,
+                            items: {
+                              type: "object",
+                              properties: {
+                                key: {
+                                  type: "string",
+                                },
+                                name: {
+                                  type: "string",
+                                },
+                                perks: {
+                                  type: "array",
+                                  uniqueItems: true,
+                                  items: {
+                                    type: "object",
+                                    properties: {
+                                      name: {
+                                        type: "string",
+                                      },
+                                      description: {
+                                        type: "string",
+                                      },
+                                    },
+                                  },
+                                },
+                                votes: {
+                                  type: "number",
+                                },
+                              },
+                            },
+                          },
+                          timestamp: {
+                            type: "number",
+                          },
+                        },
+                      },
+                      example: [
+                        {
+                          year: 311,
+                          candidates: [
+                            {
+                              key: "SLAYER",
+                              name: "Aatrox",
+                              perks: [
+                                {
+                                  name: "SLASHED Pricing",
+                                  description: "Starting slayer quests is §ehalf price§7.",
+                                },
+                                {
+                                  name: "Slayer XP Buff",
+                                  description: "Earn §d25% §7more Slayer XP.",
+                                },
+                              ],
+                              votes: 617402,
+                            },
+                            {
+                              key: "FARMING",
+                              name: "Finnegan",
+                              perks: [
+                                {
+                                  name: "Farming Simulator",
+                                  description: "There is a §a25% §7chance for Mathematical Hoes and the §9Cultivating Enchantment §7to count twice.",
+                                },
+                                {
+                                  name: "GOATed",
+                                  description: "§eJacob's Farming Contest §7brackets include §a10% §7more players each.",
+                                },
+                                {
+                                  name: "Pelt-pocalypse",
+                                  description: "Obtain §a1.5x §7more §5pelts §7from §aTrevor §7in the §eMushroom Desert§7, hunt a new trapper mob, and purchase items from a new trapper shop.",
+                                },
+                              ],
+                              votes: 127341,
+                            },
+                            {
+                              key: "FISHING",
+                              name: "Marina",
+                              perks: [
+                                {
+                                  name: "Fishing XP Buff",
+                                  description: "Gain §3+50☯ Fishing Wisdom §7on public islands.",
+                                },
+                                {
+                                  name: "Fishing Festival",
+                                  description: "Start a special fishing event the first §b3 §7days of each month!",
+                                },
+                              ],
+                              votes: 93922,
+                            },
+                            {
+                              key: "DUNGEONS",
+                              name: "Paul",
+                              perks: [
+                                {
+                                  name: "Marauder",
+                                  description: "Dungeon reward chests are §e20% §7cheaper.",
+                                },
+                              ],
+                              votes: 33858,
+                            },
+                            {
+                              key: "EVENTS",
+                              name: "Foxy",
+                              perks: [
+                                {
+                                  name: "Extra Event",
+                                  description: "Schedules an extra §6Mining Fiesta §7event during the year.",
+                                },
+                              ],
+                              votes: 15098,
+                            },
+                          ],
+                          timestamp: 1699282805,
+                        },
+                        {
+                          year: 312,
+                          candidates: [
+                            {
+                              key: "SHADY",
+                              name: "Scorpius",
+                              perks: [
+                                {
+                                  name: "Bribe",
+                                  description: "If Scorpius wins and you voted for him, Mayor Scorpius will offer you coins as a token of gratitude.",
+                                },
+                                {
+                                  name: "Darker Auctions",
+                                  description: "Scorpius will intrude in Dark Auctions, increasing the amount of rounds to 7 and offering special items.",
+                                },
+                              ],
+                              votes: 1149243,
+                            },
+                            {
+                              key: "MINING",
+                              name: "Cole",
+                              perks: [
+                                {
+                                  name: "Prospection",
+                                  description: "Mining minions work §a25% §7faster.",
+                                },
+                                {
+                                  name: "Mining Fiesta",
+                                  description: "§7Schedules two Mining Fiesta events during the year!",
+                                },
+                              ],
+                              votes: 9327,
+                            },
+                            {
+                              key: "FARMING",
+                              name: "Finnegan",
+                              perks: [
+                                {
+                                  name: "Farming Simulator",
+                                  description: "There is a §a25% §7chance for Mathematical Hoes and the §9Cultivating Enchantment §7to count twice.",
+                                },
+                                {
+                                  name: "GOATed",
+                                  description: "§eJacob's Farming Contest §7brackets include §a10% §7more players each.",
+                                },
+                                {
+                                  name: "Pelt-pocalypse",
+                                  description: "Obtain §a1.5x §7more §5pelts §7from §aTrevor §7in the §eMushroom Desert§7, hunt a new trapper mob, and purchase items from a new trapper shop.",
+                                },
+                              ],
+                              votes: 8621,
+                            },
+                            {
+                              key: "PETS",
+                              name: "Diana",
+                              perks: [
+                                {
+                                  name: "Lucky!",
+                                  description: "Gain §d+25♣ Pet Luck§7.",
+                                },
+                              ],
+                              votes: 2695,
+                            },
+                            {
+                              key: "ECONOMIST",
+                              name: "Diaz",
+                              perks: [
+                                {
+                                  name: "Barrier Street",
+                                  description: "Gain §625% §7more bank interest.",
+                                },
+                                {
+                                  name: "Shopping Spree",
+                                  description: "Increase daily NPC buy limits by §e10x§7.",
+                                },
+                              ],
+                              votes: 2041,
+                            },
+                          ],
+                          timestamp: 1699704005,
+                        },
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
     "/v1/hypixel/skyblock/auctionhouse/query": {
       get: {
         tags: ["Hypixel (Skyblock)"],
