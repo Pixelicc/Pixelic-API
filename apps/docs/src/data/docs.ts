@@ -964,6 +964,9 @@ export default {
           "403": {
             $ref: "#/components/responses/accessForbidden",
           },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
           "429": {
             $ref: "#/components/responses/ratelimited",
           },
@@ -2504,6 +2507,197 @@ export default {
         },
       },
     },
+    "/v1/hypixel/skyblock/items": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Items",
+        operationId: "getHypixelSkyblockItems",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Hypixel Skyblock Items.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    items: {
+                      type: "object",
+                      properties: {
+                        RECOMBOBULATOR_3000: {
+                          type: "object",
+                          properties: {
+                            material: {
+                              type: "string",
+                              example: "SKULL_ITEM",
+                            },
+                            durability: {
+                              type: "number",
+                              example: 3,
+                            },
+                            name: {
+                              type: "string",
+                              example: "Recombobulator 3000",
+                            },
+                            tier: {
+                              type: "string",
+                              enum: ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "DIVINE", "SPECIAL", "VERY_SPECIAL"],
+                              example: "LEGENDARY",
+                            },
+                            dungeon_item: {
+                              type: "boolean",
+                              example: true,
+                            },
+                            museum: {
+                              type: "boolean",
+                              example: true,
+                            },
+                            texture: {
+                              type: "string",
+                              description: "Shortened Link to the Item's texture only containing the Skin's SHA-256 Hash: eg. http://textures.minecraft.net/texture/{HASH}",
+                              example: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
+    "/v1/hypixel/skyblock/items/{ID}": {
+      get: {
+        tags: ["Hypixel (Skyblock)"],
+        summary: "Item",
+        operationId: "getHypixelSkyblockItem",
+        security: [
+          {
+            "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "ID",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Hypixel Skyblock Item ID",
+              example: "RECOMBOBULATOR_3000",
+            },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Successfully retrieved Hypixel Skyblock Item.",
+            headers: {
+              "X-Server-ID": {
+                $ref: "#/components/headers/X-Server-ID",
+              },
+              "X-Request-ID": {
+                $ref: "#/components/headers/X-Request-ID",
+              },
+              "X-RateLimit-Limit": {
+                $ref: "#/components/headers/X-RateLimit-Limit",
+              },
+              "X-RateLimit-Remaining": {
+                $ref: "#/components/headers/X-RateLimit-Remaining",
+              },
+              "X-RateLimit-Reset": {
+                $ref: "#/components/headers/X-RateLimit-Reset",
+              },
+            },
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    material: {
+                      type: "string",
+                      example: "SKULL_ITEM",
+                    },
+                    durability: {
+                      type: "number",
+                      example: 3,
+                    },
+                    name: {
+                      type: "string",
+                      example: "Recombobulator 3000",
+                    },
+                    tier: {
+                      type: "string",
+                      enum: ["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "DIVINE", "SPECIAL", "VERY_SPECIAL"],
+                      example: "LEGENDARY",
+                    },
+                    dungeon_item: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    museum: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    texture: {
+                      type: "string",
+                      description: "Shortened Link to the Item's texture only containing the Skin's SHA-256 Hash: eg. http://textures.minecraft.net/texture/{HASH}",
+                      example: "57ccd36dc8f72adcb1f8c8e61ee82cd96ead140cf2a16a1366be9b5a8e3cc3fc",
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "403": {
+            $ref: "#/components/responses/accessForbidden",
+          },
+          "422": {
+            $ref: "#/components/responses/invalidData",
+          },
+          "429": {
+            $ref: "#/components/responses/ratelimited",
+          },
+        },
+      },
+    },
     "/v1/hypixel/skyblock/auctionhouse/query": {
       get: {
         tags: ["Hypixel (Skyblock)"],
@@ -3735,6 +3929,17 @@ export default {
         security: [
           {
             "API-Key": [],
+          },
+        ],
+        parameters: [
+          {
+            name: "ID",
+            in: "path",
+            schema: {
+              type: "string",
+              description: "Hypixel Skyblock Item ID",
+              example: "RECOMBOBULATOR_3000",
+            },
           },
         ],
         responses: {
