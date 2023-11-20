@@ -12,37 +12,51 @@ router.get("/v1/stats/code", async (req, res) => {
   res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=60");
   try {
     if (await redis.exists("API:Cache:Code-Stats")) return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
-    exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
-      if (error || stderr) return res.status(500).json({ success: false });
-      const raw = JSON.parse(stdout);
-      delete raw.header;
-      const languages: any = {};
-      var total;
-      for (const lang in raw) {
-        if (lang === "SUM") {
-          total = {
+    if (await redis.exists(`API:Locks:Code-Scanning`)) {
+      const checkRecursive = async (): Promise<any> => {
+        return setTimeout(async () => {
+          if (await redis.exists(`API:Locks:Code-Scanning`)) {
+            return await checkRecursive();
+          }
+          return res.json({ success: true, ...JSON.parse((await redis.get("API:Cache:Code-Stats")) as string) });
+        }, 500);
+      };
+      return checkRecursive();
+    } else {
+      await redis.set(`API:Locks:Code-Scanning`, "");
+      exec("pnpm exec cloc --json --docstring-as-code --exclude-ext=json,yaml,md --exclude-dir=dist,logs,node_modules ../../", async (error, stdout, stderr) => {
+        if (error || stderr) return res.status(500).json({ success: false });
+        const raw = JSON.parse(stdout);
+        delete raw.header;
+        const languages: any = {};
+        var total;
+        for (const lang in raw) {
+          if (lang === "SUM") {
+            total = {
+              files: raw[lang].nFiles,
+              lines: raw[lang].code,
+              comments: raw[lang].comment,
+            };
+            continue;
+          }
+          var formattedLang = lang;
+          if (lang === "Vuejs Component") formattedLang = "Vue.js";
+          languages[formattedLang] = {
             files: raw[lang].nFiles,
             lines: raw[lang].code,
             comments: raw[lang].comment,
           };
-          continue;
         }
-        var formattedLang = lang;
-        if (lang === "Vuejs Component") formattedLang = "Vue.js";
-        languages[formattedLang] = {
-          files: raw[lang].nFiles,
-          lines: raw[lang].code,
-          comments: raw[lang].comment,
-        };
-      }
-      const parsed = { languages, ...total };
+        const parsed = { languages, ...total };
 
-      await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
-      return res.json({
-        success: true,
-        ...parsed,
+        await redis.setex("API:Cache:Code-Stats", 3600 * 3, JSON.stringify(parsed));
+        await redis.del("API:Locks:Code-Scanning");
+        return res.json({
+          success: true,
+          ...parsed,
+        });
       });
-    });
+    }
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
