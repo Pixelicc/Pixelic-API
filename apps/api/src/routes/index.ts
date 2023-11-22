@@ -5,8 +5,10 @@ import wynncraft from "./wynncraft/index.js";
 import user from "./user.js";
 import stats from "./stats.js";
 
+import OAuth2 from "./OAuth2.js";
+
 const router = express.Router();
 
-router.use(minecraft, hypixel, wynncraft, user, stats);
+router.use(minecraft, hypixel, wynncraft, user, stats, OAuth2);
 
 export default router;

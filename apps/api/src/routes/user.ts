@@ -41,65 +41,6 @@ router.get("/v1/user/usage", ratelimit(), async (req, res) => {
   });
 });
 
-router.post("/v1/user", authorization({ role: "ADMIN", scope: "user:create" }), async (req, res) => {
-  const { role, scopes, discord }: { role: APIAuthRole | undefined; scopes: APIAuthScope[] | undefined; discord: { ID: DiscordSnowflake; [key: string]: any } } = req.body;
-  if (await redis.exists(`API:Users:${String(discord?.ID)}`)) return res.status(422).json({ success: false, cause: "This User already exists" });
-
-  if (typeof discord?.ID !== "string") return res.status(422).json({ success: false, cause: "Invalid Body" });
-  if (!["string", "undefined"].includes(typeof role)) return res.status(422).json({ success: false, cause: "Invalid Body" });
-  if (!["object", "undefined"].includes(typeof scopes) || (typeof scopes === "object" && !Array.isArray(scopes))) return res.status(422).json({ success: false, cause: "Invalid Body" });
-
-  const key = formatUUID(generateUUID());
-
-  await redis.hset(`API:Users:${discord.ID}`, {
-    timestamp: Math.floor(Date.now() / 1000),
-    discord: JSON.stringify(discord),
-    role: role || "USER",
-    scopes: JSON.stringify(scopes || []),
-    linkedAccounts: JSON.stringify([]),
-    keyHash: hashSHA512(key),
-  });
-  await redis.hset(`API:Users:Keys:${hashSHA512(key)}`, {
-    timestamp: Math.floor(Date.now() / 1000),
-    owner: discord.ID,
-    role: role || "",
-    scopes: JSON.stringify(scopes || []),
-  });
-
-  return res.status(201).json({
-    success: true,
-    user: {
-      timestamp: Math.floor(Date.now() / 1000),
-      discord,
-      role: role || "USER",
-      scopes: scopes || [],
-      linkedAccounts: [],
-      key: key,
-      keyHash: hashSHA512(key),
-    },
-    key: {
-      timestamp: Math.floor(Date.now() / 1000),
-      owner: discord.ID,
-      role: role || "USER",
-      scopes: scopes || [],
-    },
-  });
-});
-
-router.patch("/v1/user/key", authorization({ role: "ADMIN", scope: "key:regenerate" }), async (req, res) => {
-  const { user }: { user: DiscordSnowflake } = req.body;
-  if (!(await redis.exists(`API:Users:${String(user)}`))) return res.status(422).json({ success: false, cause: "This User does not exist" });
-
-  const key = formatUUID(generateUUID());
-
-  await redis.rename(`API:Users:Keys:${await redis.hget(`API:Users:${user}`, "keyHash")}`, `API:Users:Keys:${hashSHA512(key)}`);
-  await redis.hset(`API:Users:Keys:${hashSHA512(key)}`, { lastKeyRegeneration: Math.floor(Date.now() / 1000) });
-  await redis.hset(`API:Users:${user}`, { keyHash: hashSHA512(key) });
-  await redis.hincrby(`API:Users:${user}`, "keyRegenerations", 1);
-
-  return res.status(200).json({ success: true, key: key });
-});
-
 router.patch("/v1/user", authorization({ role: "ADMIN", scope: "user:update" }), async (req, res) => {
   const { user, role, scopes }: { user: DiscordSnowflake; role: APIAuthRole | undefined; scopes: APIAuthScope[] | undefined } = req.body;
   if (!(await redis.exists(`API:Users:${String(user)}`))) return res.status(422).json({ success: false, cause: "This User does not exist" });

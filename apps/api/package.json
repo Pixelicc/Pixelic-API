@@ -18,6 +18,7 @@
     "@pixelic/wynncraft": "*",
     "@pixelic/hypixel": "*",
     "@pixelic/constants": "*",
+    "@pixelic/interceptors": "*",
     "axios": "^1.4.0",
     "cloc": "1.98.0-cloc",
     "cors": "^2.8.5",

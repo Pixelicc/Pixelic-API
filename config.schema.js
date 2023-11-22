@@ -20,6 +20,19 @@ export default {
      * Port the API is running on
      */
     port: 3000,
+    OAuth2: {
+      /**
+       * Discord OAuth2 requires the creation of an Application: https://discord.com/developers/applications
+       */
+      discord: {
+        clientID: "",
+        clientSecret: "",
+        redirectURLs: {
+          userCreate: "",
+          userKeyRegenerate: "",
+        },
+      },
+    },
   },
   collector: {
     minecraft: {
