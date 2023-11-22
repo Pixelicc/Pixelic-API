@@ -126,8 +126,8 @@ router.post("/v1/user", authorization({ role: "ADMIN", scope: "user:create" }), 
 router.patch("/v1/user/key", authorization({ role: "ADMIN", scope: "key:regenerate" }), (req, res) => {
   if (!req.query.discordID) return res.status(422).json({ success: false, cause: "No Discord ID provided" });
   regenerateUserKey(String(req.query.discordID))
-    .then((createdUser) => {
-      return res.json({ success: true, ...createdUser });
+    .then((regeneratedKey) => {
+      return res.json({ success: true, ...regeneratedKey });
     })
     .catch((error) => {
       return res.status(422).json({ success: false, cause: error });
