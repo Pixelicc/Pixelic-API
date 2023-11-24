@@ -65,7 +65,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
     res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
-      data: formatTimeseries(
+      auctions: formatTimeseries(
         await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { meta: UUID } : { "data.buyer": UUID }, ["-_id", "-__v"])
           .sort({ timestamp: -1 })
           .limit(100)
@@ -89,7 +89,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
     res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
-      data: formatTimeseries(
+      auctions: formatTimeseries(
         await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { meta: UUID } : { "data.buyer": UUID }, ["-_id", "-__v"])
           .skip(req?.query?.page ? Number(req.query.page) * 100 : 0)
           .limit(100)
@@ -110,7 +110,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", ratelimit(), async (r
     res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
-      data: formatTimeseries(await HypixelSkyblockAuctionModel.find({ "data.item.attributes.UUID": formatUUID(req.params.item) }, ["-_id", "-__v"]).lean(), { meta: "seller" }),
+      auctions: formatTimeseries(await HypixelSkyblockAuctionModel.find({ "data.item.attributes.UUID": formatUUID(req.params.item) }, ["-_id", "-__v"]).lean(), { meta: "seller" }),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -125,7 +125,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (re
     res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
-      ...formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).sort({ timestamp: -1 }).limit(1).lean())[0],
+      item: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).sort({ timestamp: -1 }).limit(1).lean())[0],
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -144,7 +144,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", ratelimit(), a
 
     return res.json({
       success: true,
-      data: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -168,7 +168,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history/:timeframe", rat
     if (req.params.timeframe === "year") startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     return res.json({
       success: true,
-      data: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);

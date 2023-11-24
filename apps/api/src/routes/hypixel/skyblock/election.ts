@@ -30,7 +30,7 @@ router.get("/v1/hypixel/skyblock/election/history", ratelimit(), async (req, res
       formattedData.push({ year: election._id, candidates: election.candidates, timestamp: election.timestamp });
     }
 
-    return res.json({ success: true, data: formattedData });
+    return res.json({ success: true, history: formattedData });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

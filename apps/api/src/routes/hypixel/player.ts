@@ -8,9 +8,9 @@ import { getPlayer } from "@pixelic/hypixel";
 const router = express.Router();
 
 /**
- * Exposes the internal libary for other self-developed projects
+ * Exposes the internal library for other self-developed projects
  *
- * MAKING PROXY ENDPOINTS PUBLICLY ACCESSABLE IS NOT ALLOWED
+ * MAKING PROXY ENDPOINTS PUBLICLY ACCESSIBLE IS NOT ALLOWED
  * https://developer.hypixel.net/policies
  */
 router.get("/v1/hypixel/proxy/player/:player", authorization({ role: "ADMIN", scope: "hypixel:proxy" }), async (req, res) => {
@@ -32,7 +32,7 @@ router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
     const data = await HypixelPlayerModel.findOne({ _id: UUID }, ["-_id", "-__v"]).lean();
     if (Object.keys(data as object).length === 0) return res.status(404).json({ success: false, cause: "No Data Available" });
 
-    return res.json({ success: true, UUID, ...data });
+    return res.json({ success: true, player: { UUID, ...data } });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -59,7 +59,7 @@ router.get("/v1/hypixel/player/:player/history", ratelimit(), async (req, res) =
     }
 
     res.set("Cache-Control", "public, max-age=3600");
-    return res.json({ success: true, data: formattedData });
+    return res.json({ success: true, history: formattedData });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

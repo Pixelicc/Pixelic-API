@@ -21,7 +21,7 @@ router.get("/v1/wynncraft/player/:player", ratelimit(), async (req, res) => {
       characters[characterUUID] = character;
     }
 
-    return res.json({ success: true, UUID, ...data, characters });
+    return res.json({ success: true, player: { UUID, ...data, characters } });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -48,7 +48,7 @@ router.get("/v1/wynncraft/player/:player/history", ratelimit(), async (req, res)
     }
 
     res.set("Cache-Control", "public, max-age=3600");
-    return res.json({ success: true, data: formattedData });
+    return res.json({ success: true, history: formattedData });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

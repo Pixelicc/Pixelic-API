@@ -30,7 +30,7 @@ router.get("/v1/wynncraft/server/:server", async (req, res) => {
     if (!data.servers[req.params.server]) return res.status(422).json({ success: false, cause: "Invalid Server" });
     res.set("Cache-Control", "public, max-age=60");
 
-    return res.json({ success: true, ...data.servers[req.params.server] });
+    return res.json({ success: true, server: data.servers[req.params.server] });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -48,7 +48,7 @@ router.get("/v1/wynncraft/server/:server/history", ratelimit(), async (req, res)
 
     return res.json({
       success: true,
-      data: formatTimeseries(await WynncraftServerPlayercountModel.longTerm.find({ meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
+      history: formatTimeseries(await WynncraftServerPlayercountModel.longTerm.find({ meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -68,7 +68,7 @@ router.get("/v1/wynncraft/server/:server/history/:timeframe", ratelimit(), async
       res.set("Expires", date.toUTCString());
       return res.json({
         success: true,
-        data: formatTimeseries(await WynncraftServerPlayercountModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
+        history: formatTimeseries(await WynncraftServerPlayercountModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
       });
     }
 
@@ -83,7 +83,7 @@ router.get("/v1/wynncraft/server/:server/history/:timeframe", ratelimit(), async
     if (req.params.timeframe === "year") startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     return res.json({
       success: true,
-      data: formatTimeseries(await WynncraftServerPlayercountModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
+      history: formatTimeseries(await WynncraftServerPlayercountModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean(), { data: "playercount" }),
     });
   } catch (e) {
     Sentry.captureException(e);

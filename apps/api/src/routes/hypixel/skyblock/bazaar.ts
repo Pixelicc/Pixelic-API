@@ -30,7 +30,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
     if (!data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
     res.set("Cache-Control", "public, max-age=60");
 
-    return res.json({ success: true, ...data[req.params.product] });
+    return res.json({ success: true, product: data[req.params.product] });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -48,7 +48,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history", ratelimit(), async (req, r
 
     return res.json({
       success: true,
-      data: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -68,7 +68,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history/:timeframe", ratelimit(), as
       res.set("Expires", date.toUTCString());
       return res.json({
         success: true,
-        data: formatTimeseries(await HypixelSkyblockBazaarModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
+        history: formatTimeseries(await HypixelSkyblockBazaarModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
       });
     }
 
@@ -83,7 +83,7 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history/:timeframe", ratelimit(), as
     if (req.params.timeframe === "year") startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     return res.json({
       success: true,
-      data: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);

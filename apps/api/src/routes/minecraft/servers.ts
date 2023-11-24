@@ -29,14 +29,16 @@ router.get("/v1/minecraft/server/:server", async (req, res) => {
 
     return res.json({
       success: true,
-      latency: SLPData.latency,
-      latencyFormatted: `${SLPData.latency}ms`,
-      maxPlayercount: SLPData.players.max,
-      maxPlayercountFormatted: formatNumber(SLPData.players.max, 2),
-      playercount: SLPData.players.online,
-      playercountFormatted: formatNumber(SLPData.players.online, 2),
-      MOTD: SLPData.description,
-      icon: SLPData.favicon,
+      server: {
+        latency: SLPData.latency,
+        latencyFormatted: `${SLPData.latency}ms`,
+        maxPlayercount: SLPData.players.max,
+        maxPlayercountFormatted: formatNumber(SLPData.players.max, 2),
+        playercount: SLPData.players.online,
+        playercountFormatted: formatNumber(SLPData.players.online, 2),
+        MOTD: SLPData.description,
+        icon: SLPData.favicon,
+      },
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -55,7 +57,7 @@ router.get("/v1/minecraft/server/:server/history", async (req, res) => {
 
     return res.json({
       success: true,
-      data: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -75,7 +77,7 @@ router.get("/v1/minecraft/server/:server/history/:timeframe", async (req, res) =
       res.set("Expires", date.toUTCString());
       return res.json({
         success: true,
-        data: formatTimeseries(await MinecraftServerPlayercountModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
+        history: formatTimeseries(await MinecraftServerPlayercountModel.shortTerm.find({ timestamp: { $gte: new Date(Date.now() - 60 * 60 * 1000), $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
       });
     }
 
@@ -89,7 +91,7 @@ router.get("/v1/minecraft/server/:server/history/:timeframe", async (req, res) =
     if (req.params.timeframe === "year") startDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
     return res.json({
       success: true,
-      data: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
+      history: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ timestamp: { $gte: startDate, $lt: new Date() }, meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),
     });
   } catch (e) {
     Sentry.captureException(e);
