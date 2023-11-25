@@ -20,7 +20,7 @@ export default {
         type: "apiKey",
         in: "header",
         name: "X-API-Key",
-        description: "To generate an API-Key click here: [CREATE](https://api.pixelic.de/oauth/discord?action=user.create)\n\nTo regenerate your API-Key click here: [REGENERATE](https://api.pixelic.de/oauth/discord?action=user.user.regenerate)",
+        description: "To generate an API-Key click here: [CREATE](https://api.pixelic.de/oauth/discord?action=user.create)\n\nTo regenerate your API-Key click here: [REGENERATE](https://api.pixelic.de/oauth/discord?action=user.key.regenerate)",
       },
     },
     headers: {
