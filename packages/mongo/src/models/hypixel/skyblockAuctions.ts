@@ -1,66 +1,63 @@
 import { Schema } from "mongoose";
 import { client } from "../../index.js";
 
-const attributeSchema = new Schema(
+const itemSchema = new Schema(
   {
+    count: Number,
+    name: String,
+    tier: String,
     ID: {
       type: String,
       required: true,
     },
     UUID: {
       type: String,
-      required: false,
-      index: true,
+      index: {
+        sparse: true,
+      },
     },
-    timestamp: {
-      type: Number,
-      required: false,
-    },
+    timestamp: Number,
+    attributes: Object,
   },
-  { strict: false, _id: false }
+  { _id: false }
 );
 
-const itemSchema = new Schema(
-  {
-    count: {
-      type: Number,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    reforge: {
-      type: String,
-    },
-    tier: {
-      type: String,
-    },
-    attributes: attributeSchema,
+const auctionSchema = new Schema({
+  _id: {
+    type: String,
+    required: true,
   },
-  { strict: true, _id: false }
-);
-
-const retentionSchema = new Schema(
-  {
-    timestamp: { type: Date, required: true },
-    meta: { type: String, required: true },
-    data: {
-      UUID: { type: String, required: true, index: true },
-      sellerProfile: { type: String, required: true, index: true },
-      buyer: { type: String, required: true, index: true },
-      price: { type: Number, required: true },
-      bin: { type: Boolean, required: true },
-      item: { type: itemSchema, required: true },
-    },
+  timestamp: {
+    type: Number,
+    required: true,
   },
-  {
-    timeseries: {
-      timeField: "timestamp",
-      metaField: "meta",
-      granularity: "hours",
-    },
-  }
-);
+  seller: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  sellerProfile: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  buyer: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  bin: {
+    type: Boolean,
+    required: true,
+  },
+  item: {
+    type: itemSchema,
+    required: true,
+  },
+});
 
-export const HypixelSkyblockAuctionModel = client.useDb("Hypixel").model("skyblockAuctions", retentionSchema);
+export const HypixelSkyblockAuctionModel = client.useDb("Hypixel").model("skyblockAuctions", auctionSchema);
