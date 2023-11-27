@@ -575,7 +575,7 @@ export default {
                     },
                     indexes: {
                       type: "number",
-                      example: 10,
+                      example: 46,
                     },
                     documents: {
                       type: "number",
@@ -613,7 +613,7 @@ export default {
                             },
                             indexes: {
                               type: "number",
-                              example: 10,
+                              example: 46,
                             },
                             documents: {
                               type: "number",
@@ -645,6 +645,7 @@ export default {
                       example: {
                         API: {
                           collections: 1,
+                          indexes: 3,
                           documents: 1,
                           documentsFormatted: "1",
                           averageDocumentSize: 45040,
@@ -654,6 +655,7 @@ export default {
                         },
                         Hypixel: {
                           collections: 11,
+                          indexes: 30,
                           documents: 69568,
                           documentsFormatted: "69.57k",
                           averageDocumentSize: 7312.638914443422,
@@ -663,6 +665,7 @@ export default {
                         },
                         Minecraft: {
                           collections: 3,
+                          indexes: 3,
                           documents: 182,
                           documentsFormatted: "182",
                           averageDocumentSize: 10977.016483516483,
@@ -672,6 +675,7 @@ export default {
                         },
                         Wynncraft: {
                           collections: 6,
+                          indexes: 10,
                           documents: 36615,
                           documentsFormatted: "36.62k",
                           averageDocumentSize: 6785.936583367472,
