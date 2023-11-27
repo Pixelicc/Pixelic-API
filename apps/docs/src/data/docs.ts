@@ -3026,7 +3026,7 @@ export default {
                             UUID: "e813edbeb3be4946936a402899d5e818",
                             timestamp: 1611916680,
                             attributes: {
-                              modifier: "ancient",
+                              modifier: "Ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3070,7 +3070,7 @@ export default {
                             UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
                             timestamp: 1633113060,
                             attributes: {
-                              modifier: "ancient",
+                              modifier: "Ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3193,7 +3193,7 @@ export default {
                             UUID: "e813edbeb3be4946936a402899d5e818",
                             timestamp: 1611916680,
                             attributes: {
-                              modifier: "ancient",
+                              modifier: "Ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3237,7 +3237,7 @@ export default {
                             UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
                             timestamp: 1633113060,
                             attributes: {
-                              modifier: "ancient",
+                              modifier: "Ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3347,7 +3347,7 @@ export default {
                             ID: "SORROW_HELMET",
                             UUID: "12b48efea327492a9d1e56dd15c74573",
                             attributes: {
-                              modifier: "wise",
+                              modifier: "Wise",
                               hot_potato_count: 10,
                               gems: {
                                 JADE_0: "FINE",
@@ -3384,7 +3384,7 @@ export default {
                             ID: "SORROW_HELMET",
                             UUID: "12b48efea327492a9d1e56dd15c74573",
                             attributes: {
-                              modifier: "wise",
+                              modifier: "Wise",
                               hot_potato_count: 10,
                               gems: {
                                 JADE_0: "FINE",
