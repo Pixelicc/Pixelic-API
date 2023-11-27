@@ -2905,11 +2905,9 @@ export default {
                             name: "§cKat Flower",
                             lore: ["§7Give this to §bKat §7the §aPet", "§aSitter §7in order to skip §91", "§9day §7of wait time while", "§7upgrading your pet!", "§7", "§7§eRight-click on Kat to use", "", "§c§lSPECIAL"],
                             tier: "SPECIAL",
-                            attributes: {
-                              timestamp: 1699349580,
-                              ID: "KAT_FLOWER",
-                              UUID: "992e352e898d4d05b2ac1516fad5832a",
-                            },
+                            timestamp: 1699349580,
+                            ID: "KAT_FLOWER",
+                            UUID: "992e352e898d4d05b2ac1516fad5832a",
                           },
                         },
                         {
@@ -2929,11 +2927,11 @@ export default {
                             name: "§5Greater Backpack",
                             lore: ["§7A bag with §a36§7 slots which", "§7can be placed in your Storage", "§7Menu to store additional items.", "", "§5§lEPIC"],
                             tier: "EPIC",
+                            timestamp: 1699349640,
+                            ID: "GREATER_BACKPACK",
+                            UUID: "f29c94df5a9940449092f67b6fcf43a8",
                             attributes: {
                               backpack_color: "DEFAULT",
-                              timestamp: 1699349640,
-                              ID: "GREATER_BACKPACK",
-                              UUID: "f29c94df5a9940449092f67b6fcf43a8",
                             },
                           },
                         },
@@ -3023,12 +3021,12 @@ export default {
                           item: {
                             count: 1,
                             name: "§dAncient Maxor's Boots §6✪§6✪§6✪§6✪§6✪",
-                            reforge: "ANCIENT",
                             tier: "MYTHIC",
+                            ID: "SPEED_WITHER_BOOTS",
+                            UUID: "e813edbeb3be4946936a402899d5e818",
+                            timestamp: 1611916680,
                             attributes: {
-                              ID: "SPEED_WITHER_BOOTS",
-                              UUID: "e813edbeb3be4946936a402899d5e818",
-                              timestamp: 1611916680,
+                              modifier: "ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3067,12 +3065,12 @@ export default {
                           item: {
                             count: 1,
                             name: "§dAncient Necron's Leggings §6✪§6✪§6✪§6✪§6✪§c➊",
-                            reforge: "ANCIENT",
                             tier: "MYTHIC",
+                            ID: "POWER_WITHER_LEGGINGS",
+                            UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
+                            timestamp: 1633113060,
                             attributes: {
-                              ID: "POWER_WITHER_LEGGINGS",
-                              UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
-                              timestamp: 1633113060,
+                              modifier: "ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3190,12 +3188,12 @@ export default {
                           item: {
                             count: 1,
                             name: "§dAncient Maxor's Boots §6✪§6✪§6✪§6✪§6✪",
-                            reforge: "ANCIENT",
                             tier: "MYTHIC",
+                            ID: "SPEED_WITHER_BOOTS",
+                            UUID: "e813edbeb3be4946936a402899d5e818",
+                            timestamp: 1611916680,
                             attributes: {
-                              ID: "SPEED_WITHER_BOOTS",
-                              UUID: "e813edbeb3be4946936a402899d5e818",
-                              timestamp: 1611916680,
+                              modifier: "ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3234,12 +3232,12 @@ export default {
                           item: {
                             count: 1,
                             name: "§dAncient Necron's Leggings §6✪§6✪§6✪§6✪§6✪§c➊",
-                            reforge: "ANCIENT",
                             tier: "MYTHIC",
+                            ID: "POWER_WITHER_LEGGINGS",
+                            UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
+                            timestamp: 1633113060,
                             attributes: {
-                              ID: "POWER_WITHER_LEGGINGS",
-                              UUID: "8b9a99cb858c4644b1cb3666c1fe5fe2",
-                              timestamp: 1633113060,
+                              modifier: "ancient",
                               rarity_upgrades: 1,
                               hot_potato_count: 15,
                               gems: {
@@ -3345,7 +3343,11 @@ export default {
                             count: 1,
                             name: "§6Wise Sorrow Helmet",
                             tier: "LEGENDARY",
+                            timestamp: 1657288620,
+                            ID: "SORROW_HELMET",
+                            UUID: "12b48efea327492a9d1e56dd15c74573",
                             attributes: {
+                              modifier: "wise",
                               hot_potato_count: 10,
                               gems: {
                                 JADE_0: "FINE",
@@ -3363,11 +3365,7 @@ export default {
                                 respiration: 3,
                                 aqua_affinity: 1,
                               },
-                              timestamp: 1657288620,
-                              ID: "SORROW_HELMET",
-                              UUID: "12b48efea327492a9d1e56dd15c74573",
                             },
-                            reforge: "Wise",
                           },
                           price: 12400000,
                           seller: "307a8f0021d14443983a5612c84aa3b4",
@@ -3382,7 +3380,11 @@ export default {
                             count: 1,
                             name: "§6Wise Sorrow Helmet",
                             tier: "LEGENDARY",
+                            timestamp: 1657288620,
+                            ID: "SORROW_HELMET",
+                            UUID: "12b48efea327492a9d1e56dd15c74573",
                             attributes: {
+                              modifier: "wise",
                               hot_potato_count: 10,
                               gems: {
                                 JADE_0: "FINE",
@@ -3400,11 +3402,7 @@ export default {
                                 respiration: 3,
                                 aqua_affinity: 1,
                               },
-                              timestamp: 1657288620,
-                              ID: "SORROW_HELMET",
-                              UUID: "12b48efea327492a9d1e56dd15c74573",
                             },
-                            reforge: "Wise",
                           },
                           price: 12599000,
                           seller: "0c508a91b27748509d1341f18ec342c6",
