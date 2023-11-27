@@ -573,6 +573,10 @@ export default {
                       type: "number",
                       example: 21,
                     },
+                    indexes: {
+                      type: "number",
+                      example: 10,
+                    },
                     documents: {
                       type: "number",
                       example: 106366,
@@ -606,6 +610,10 @@ export default {
                             collections: {
                               type: "number",
                               example: 21,
+                            },
+                            indexes: {
+                              type: "number",
+                              example: 10,
                             },
                             documents: {
                               type: "number",

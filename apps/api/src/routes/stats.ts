@@ -134,6 +134,7 @@ router.get("/v1/stats/mongo", async (req, res) => {
     const DBs = await mongo.db.admin().listDatabases();
     const total = {
       collections: 0,
+      indexes: 0,
       documents: 0,
       documentsFormatted: "",
       averageDocumentSize: 0,
@@ -147,6 +148,7 @@ router.get("/v1/stats/mongo", async (req, res) => {
       const data = await mongo.useDb(db.name).db.stats();
       parsedDBs[db.name] = {
         collections: data.collections,
+        indexes: data.indexes,
         documents: data.objects,
         documentsFormatted: formatNumber(data.objects, 2),
         averageDocumentSize: data.avgObjSize,
@@ -155,6 +157,7 @@ router.get("/v1/stats/mongo", async (req, res) => {
         bytesStoredFormatted: formatBytes(data.storageSize, 2),
       };
       total.collections += data.collections;
+      total.indexes += data.indexes;
       total.documents += data.objects;
       total.averageDocumentSize += data.avgObjSize;
       total.bytesStored += data.storageSize;
