@@ -5,6 +5,10 @@
 An API focused on Minecraft related data
 
 </div>
+<div align="center">
+    <a href="https://discord.com/invite/2vAuyVvdwj"><img src="https://img.shields.io/discord/926873163411910746?color=7289DA&label=Discord" alt="Discord"></a>
+    <a><img src="https://wakatime.com/badge/user/fdd9682f-df58-46bb-9b10-374601d7f52d/project/838fd6e7-9cf0-4d5d-8986-aa7535ca3ec5.svg" alt="wakatime"></a>
+</div>
 
 ## 📗 Usage
 
