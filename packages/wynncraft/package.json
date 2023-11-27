@@ -14,7 +14,7 @@
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",
     "@pixelic/mojang": "*",
-    "axios-retry": "^3.7.0",
+    "axios-retry": "^4.0.0",
     "bottleneck": "^2.19.5"
   }
 }

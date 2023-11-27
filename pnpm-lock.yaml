@@ -167,8 +167,8 @@ importers:
         specifier: '*'
         version: link:../utils
       axios-retry:
-        specifier: ^3.7.0
-        version: 3.8.1
+        specifier: ^4.0.0
+        version: 4.0.0(axios@1.6.0)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -235,8 +235,8 @@ importers:
         specifier: ^1.4.0
         version: 1.6.0
       axios-retry:
-        specifier: ^3.7.0
-        version: 3.8.1
+        specifier: ^4.0.0
+        version: 4.0.0(axios@1.6.0)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -311,8 +311,8 @@ importers:
         specifier: '*'
         version: link:../utils
       axios-retry:
-        specifier: ^3.7.0
-        version: 3.8.1
+        specifier: ^4.0.0
+        version: 4.0.0(axios@1.6.0)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -349,13 +349,6 @@ packages:
     hasBin: true
     dependencies:
       '@babel/types': 7.23.0
-
-  /@babel/runtime@7.23.2:
-    resolution: {integrity: sha512-mM8eg4yl5D6i3lu2QKPuPH4FArvJ8KhTofbE7jwMUv9KX5mBvwPAqnV3MlyBNqdp9RyRKP6Yck8TrfYrPvX3bg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      regenerator-runtime: 0.14.0
-    dev: false
 
   /@babel/types@7.23.0:
     resolution: {integrity: sha512-0oIyUfKoI3mSqMvsxBdclDwxXKXAUA8v/apZbc+iSyARYou1o8ZGDxbUYyLFoW2arqS2jDGqJuZvv1d/io1axg==}
@@ -1416,10 +1409,12 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  /axios-retry@3.8.1:
-    resolution: {integrity: sha512-4XseuArB4CEbfLRtMpUods2q8MLBvD4r8ifKgK4SP2FRgzQIPUDpzZ+cjQ/19eu3w2UpKgkJA+myEh2BYDSjqQ==}
+  /axios-retry@4.0.0(axios@1.6.0):
+    resolution: {integrity: sha512-F6P4HVGITD/v4z9Lw2mIA24IabTajvpDZmKa6zq/gGwn57wN5j1P3uWrAV0+diqnW6kTM2fTqmWNfgYWGmMuiA==}
+    peerDependencies:
+      axios: 0.x || 1.x
     dependencies:
-      '@babel/runtime': 7.23.2
+      axios: 1.6.0
       is-retry-allowed: 2.2.0
     dev: false
 
@@ -3496,10 +3491,6 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
-    dev: false
-
-  /regenerator-runtime@0.14.0:
-    resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
     dev: false
 
   /require-in-the-middle@5.2.0:
