@@ -97,7 +97,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
     res.set("Cache-Control", "public, max-age=300");
     const auctions: any[] = [];
     (
-      await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-_id", "-__v"])
+      await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-__v"])
         .sort({ timestamp: -1 })
         .skip(req?.query?.page ? Number(req.query.page) * 100 : 0)
         .limit(100)
