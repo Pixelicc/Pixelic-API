@@ -63,15 +63,23 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
     if (!req?.query?.data && !["sell", "buy"].includes(String(req.query.data))) return res.status(422).json({ success: false, cause: "Invalid Data Type" });
 
     res.set("Cache-Control", "public, max-age=300");
+    const auctions: any[] = [];
+    (
+      await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-__v"])
+        .sort({ timestamp: -1 })
+        .limit(100)
+        .lean()
+    )
+      .reverse()
+      .forEach((auction: any) => {
+        const auctionUUID = auction._id;
+        delete auction._id;
+        auctions.push({ UUID: auctionUUID, ...auction });
+      });
+
     return res.json({
       success: true,
-      auctions: formatTimeseries(
-        await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { meta: UUID } : { "data.buyer": UUID }, ["-_id", "-__v"])
-          .sort({ timestamp: -1 })
-          .limit(100)
-          .lean(),
-        { meta: "seller" }
-      ),
+      auctions,
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -87,15 +95,22 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
     if (req?.query?.page && isNaN(Number(req.query.page))) return res.status(422).json({ success: false, cause: "Invalid Page" });
 
     res.set("Cache-Control", "public, max-age=300");
+    const auctions: any[] = [];
+    (
+      await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-_id", "-__v"])
+        .sort({ timestamp: -1 })
+        .skip(req?.query?.page ? Number(req.query.page) * 100 : 0)
+        .limit(100)
+        .lean()
+    ).forEach((auction: any) => {
+      const auctionUUID = auction._id;
+      delete auction._id;
+      auctions.push({ UUID: auctionUUID, ...auction });
+    });
+
     return res.json({
       success: true,
-      auctions: formatTimeseries(
-        await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { meta: UUID } : { "data.buyer": UUID }, ["-_id", "-__v"])
-          .skip(req?.query?.page ? Number(req.query.page) * 100 : 0)
-          .limit(100)
-          .lean(),
-        { meta: "seller" }
-      ),
+      auctions,
     });
   } catch (e) {
     Sentry.captureException(e);
