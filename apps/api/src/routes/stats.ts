@@ -151,18 +151,18 @@ router.get("/v1/stats/mongo", async (req, res) => {
         indexes: data.indexes,
         documents: data.objects,
         documentsFormatted: formatNumber(data.objects, 2),
-        averageDocumentSize: data.avgObjSize,
-        averageDocumentSizeFormatted: formatBytes(data.avgObjSize, 2),
+        averageDocumentSize: data.objects !== 0 ? data.storageSize / data.objects : 0,
+        averageDocumentSizeFormatted: formatBytes(data.objects !== 0 ? data.storageSize / data.objects : 0, 2),
         bytesStored: data.storageSize,
         bytesStoredFormatted: formatBytes(data.storageSize, 2),
       };
       total.collections += data.collections;
       total.indexes += data.indexes;
       total.documents += data.objects;
-      total.averageDocumentSize += data.avgObjSize;
       total.bytesStored += data.storageSize;
     }
     total.documentsFormatted = formatNumber(total.documents, 2);
+    total.averageDocumentSize = total.documents !== 0 ? total.bytesStored / total.documents : 0;
     total.averageDocumentSizeFormatted = formatBytes(total.averageDocumentSize, 2);
     total.bytesStoredFormatted = formatBytes(total.bytesStored, 2);
     return res.json({ success: true, ...total, databases: parsedDBs });
