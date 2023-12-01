@@ -10,10 +10,11 @@
   "dependencies": {
     "@pixelic/interceptors": "*",
     "@pixelic/logger": "*",
+    "@pixelic/mojang": "*",
     "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",
-    "@pixelic/mojang": "*",
+    "axios": "^1.4.0",
     "axios-retry": "^4.0.0",
     "bottleneck": "^2.19.5"
   }
