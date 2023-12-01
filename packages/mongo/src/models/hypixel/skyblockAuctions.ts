@@ -5,6 +5,7 @@ const itemSchema = new Schema(
   {
     count: Number,
     name: String,
+    color: Number,
     tier: String,
     ID: {
       type: String,

@@ -179,15 +179,15 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
 export const getSkyblockActiveAuctions = async (): Promise<void> => {
   try {
     const UUIDs: string[] = [];
-    const UUIDsBefore = await redis.smembers("Hypixel:Auctions:UUIDs");
+    const UUIDsBefore = await redis.smembers("Hypixel:Skyblock:Auctions:UUIDs");
 
     const firstPage = (await HypixelAPI.get("https://api.hypixel.net/v2/skyblock/auctions")).data;
     log("Hypixel", `Fetching Skyblock Auctions (1/${firstPage.totalPages})`, "info");
     const pipeline = redis.pipeline();
     for (const auction of firstPage.auctions) {
       const formattedData = await formatSkyblockActiveAuction(auction);
-      pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
-      pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
+      pipeline.sadd("Hypixel:Skyblock:Auctions:UUIDs", formattedData.UUID);
+      pipeline.call("JSON.SET", `Hypixel:Skyblock:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
       UUIDs.push(formattedData.UUID);
     }
     pipeline.exec();
@@ -198,8 +198,8 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
       const pipeline = redis.pipeline();
       for (const auction of page.auctions) {
         const formattedData = await formatSkyblockActiveAuction(auction);
-        pipeline.sadd("Hypixel:Auctions:UUIDs", formattedData.UUID);
-        pipeline.call("JSON.SET", `Hypixel:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
+        pipeline.sadd("Hypixel:Skyblock:Auctions:UUIDs", formattedData.UUID);
+        pipeline.call("JSON.SET", `Hypixel:Skyblock:Auctions:${formattedData.UUID}`, "$", JSON.stringify(formattedData));
         UUIDs.push(formattedData.UUID);
       }
       pipeline.exec();
@@ -208,8 +208,8 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
 
     const removeInvalid = redis.pipeline();
     for (const UUID of UUIDsBefore.filter((UUID) => !UUIDs.includes(UUID))) {
-      removeInvalid.srem("Hypixel:Auctions:UUIDs", UUID);
-      removeInvalid.del(`Hypixel:Auctions:${UUID}`);
+      removeInvalid.srem("Hypixel:Skyblock:Auctions:UUIDs", UUID);
+      removeInvalid.del(`Hypixel:Skyblock:Auctions:${UUID}`);
     }
 
     removeInvalid.exec();
@@ -244,23 +244,39 @@ export const getSkyblockEndedAuctions = async () => {
     const auctions: any[] = [];
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/skyblock/auctions_ended")).data.auctions;
     log("Hypixel", "Fetched Skyblock Ended Auctions", "info");
+    const isNewData = (await redis.get("Hypixel:Cache:skyblockEndedAuctionsLastState")) !== JSON.stringify(data);
     for (const auction of data) {
       const formattedData = await formatSkyblockEndedAuction(auction);
       auctions.push(formattedData);
-      if (config.hypixel.persistHistoricalData && (await redis.get("Hypixel:Cache:skyblockEndedAuctionsLastState")) !== JSON.stringify(data)) {
-        await HypixelSkyblockAuctionModel.create({ timestamp: new Date(), meta: formattedData.seller, data: formattedData });
-        await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.attributes.ID, timestamp: new Date(formattedData.timestamp * 1000) });
+      if (config.hypixel.persistHistoricalData && isNewData) {
+        await HypixelSkyblockAuctionModel.create({ _id: formattedData.UUID, ...formattedData, timestamp: Math.floor(Date.now() / 1000) });
+        await HypixelSkyblockAuctionTrackingModel.create({ _id: formattedData.UUID, price: formattedData.price, bin: formattedData.bin, itemID: formattedData.item.ID, timestamp: new Date(formattedData.timestamp * 1000) });
 
-        // Checks wether the last ingestion was over an hour ago
-        if (!(await redis.exists("Hypixel:lastSkyblockAuctionhouseIngestion"))) {
-          await calculateSkyblockAuctionPrices();
-        }
+        const pipeline = redis.pipeline();
+        pipeline.zincrby("Hypixel:Stats:Skyblock:AuctionsSoldByItem", 1, formattedData.item.ID);
+        pipeline.zincrby("Hypixel:Stats:Skyblock:AuctionVolumeByItem", formattedData?.item?.count || 1, formattedData.item.ID);
+        pipeline.zincrby("Hypixel:Stats:Skyblock:AuctionsSoldByTier", 1, formattedData.item.tier);
+        pipeline.hincrby(`Hypixel:Stats:Skyblock:AuctionsSoldByItemHistory:${formattedData.item.ID}`, new Date().toISOString().slice(0, 10), 1);
+        pipeline.hincrby(`Hypixel:Stats:Skyblock:AuctionVolumeByItemHistory:${formattedData.item.ID}`, new Date().toISOString().slice(0, 10), formattedData?.item?.count || 1);
+        pipeline.hincrby(`Hypixel:Stats:Skyblock:AuctionsSoldByTierHistory:${formattedData.item.tier}`, new Date().toISOString().slice(0, 10), 1);
+        pipeline.hincrby("Hypixel:Stats:Skyblock:Auctions", "sold", 1);
+        pipeline.hincrby("Hypixel:Stats:Skyblock:Auctions", "coinsMoved", formattedData.price);
+        pipeline.hincrby("Hypixel:Stats:Skyblock:AuctionsSoldHistory", new Date().toISOString().slice(0, 10), 1);
+        pipeline.hincrby("Hypixel:Stats:Skyblock:AuctionsCoinsMovedHistory", new Date().toISOString().slice(0, 10), formattedData.price);
+        pipeline.exec();
+      }
+    }
+    if (config.hypixel.persistHistoricalData) {
+      // Checks wether the last ingestion was over an hour ago
+      if (!(await redis.exists("Hypixel:lastSkyblockAuctionhouseIngestion"))) {
+        await calculateSkyblockAuctionPrices();
       }
     }
     await redis.set("Hypixel:Cache:skyblockEndedAuctionsLastState", JSON.stringify(data));
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return auctions;
   } catch (e) {
+    console.log(e);
     Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Skyblock Ended Auctions", "warn");
     return null;

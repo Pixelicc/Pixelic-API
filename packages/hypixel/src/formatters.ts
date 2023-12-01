@@ -1681,67 +1681,49 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
   const item: any = {
     count: NBT?.Count,
     name: NBT?.tag.display.Name,
+    cleanName: NBT?.tag.display.Name.replace(/§./g, ""),
     lore: NBT?.tag?.display.Lore,
+    cleanLore: [],
     color: NBT?.tag?.display.color,
     tier: tier ? tier : null,
     attributes: NBT?.tag?.ExtraAttributes,
   };
 
-  if (item?.attributes?.modifier && item.attributes.modifier.toUpperCase() !== "NONE") {
-    item.reforge = item.attributes.modifier.toUpperCase();
-  }
+  item.lore.forEach((line: string) => {
+    item.cleanLore.push(line.replace(/§./g, ""));
+  });
 
   if (NBT?.tag?.ExtraAttributes?.id === "PET") {
-    const petData = JSON.parse(NBT.tag.ExtraAttributes.petInfo);
-    item.attributes.ID = `PET_${petData.type}`;
-    item.attributes.EXP = petData.exp;
-    if (petData?.candyUsed) item.attributes.candyUsed = petData.candyUsed;
-    if (petData?.heldItem) item.attributes.heldItem = petData.heldItem;
-    if (petData?.skin) item.attributes.skin = petData.skin;
-
-    delete item.attributes.petInfo;
+    item.attributes.petInfo = JSON.parse(item.attributes.petInfo);
+    item.ID = `PET_${item.attributes.petInfo.type.toUpperCase()}`;
+    item.UUID = formatUUID(item?.attributes?.uuid || item.attributes.petInfo.uuid);
   } else if (NBT?.tag?.ExtraAttributes?.id === "POTION") {
-    item.attributes.ID = `POTION_${String(NBT.tag.ExtraAttributes.potion).toUpperCase()}`;
-    item.attributes.duration = NBT?.tag?.ExtraAttributes?.effects?.[0]?.duration_ticks || 0;
-    item.attributes.splash = Boolean(item.attributes.splash);
-
-    delete item.attributes.potion_level;
-    delete item.attributes.potion;
-    delete item.attributes.effects;
-    delete item.attributes.potion_type;
+    item.ID = `POTION_${String(item.attributes.potion).toUpperCase()}`;
   } else if (NBT?.tag?.ExtraAttributes?.id === "RUNE") {
-    item.attributes.ID = `RUNE_${String(Object.keys(NBT.tag.ExtraAttributes.runes)[0]).toUpperCase()}`;
-    item.attributes.runeTier = NBT.tag.ExtraAttributes.runes[Object.keys(NBT.tag.ExtraAttributes.runes)[0]];
-    delete item.attributes.runes;
+    item.ID = `RUNE_${String(Object.keys(NBT.tag.ExtraAttributes.runes)[0]).toUpperCase()}`;
   } else {
-    item.attributes = {
-      ...NBT.tag.ExtraAttributes,
-      ID: NBT.tag.ExtraAttributes.id,
-      UUID: NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : undefined,
-    };
+    item.ID = NBT?.tag?.ExtraAttributes?.id || undefined;
+    item.UUID = NBT?.tag?.ExtraAttributes?.uuid ? formatUUID(NBT.tag.ExtraAttributes.uuid) : undefined;
   }
 
   delete item.attributes.id;
   delete item.attributes.uuid;
-  delete item.attributes.color;
-  delete item.attributes.originTag;
-  delete item.attributes.modifier;
 
   if (item?.attributes?.timestamp) {
     /**
-     * Regex needed for old invalid formatted timestamp strings eg. "15/04/20 18:19"
+     * Regex needed for older invalid formatted timestamp strings eg. "15/04/20 18:19"
      */
     if (/^(\d{2})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})$/.test(item.attributes.timestamp)) {
       const [date, time] = item.attributes.timestamp.split(" ");
       const [day, month, year] = date.split("/");
       const [hours, minutes] = time.split(":");
-      item.attributes.timestamp = Math.floor(new Date(Number(`20${year}`), month - 1, day, hours, minutes).valueOf() / 1000);
+      item.timestamp = Math.floor(new Date(Number(`20${year}`), month - 1, day, hours, minutes).valueOf() / 1000);
     } else {
-      item.attributes.timestamp = item.attributes.timestamp ? Math.floor(new Date(item.attributes.timestamp).valueOf() / 1000) : undefined;
-      if (isNaN(item.attributes.timestamp)) item.attributes.timestamp = undefined;
+      item.timestamp = item.attributes.timestamp ? Math.floor(new Date(item.attributes.timestamp).valueOf() / 1000) : undefined;
+      if (isNaN(item.timestamp)) item.timestamp = undefined;
     }
+    delete item.attributes.timestamp;
   }
-
   return item;
 };
 
