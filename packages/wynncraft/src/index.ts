@@ -30,7 +30,7 @@ export const getPlayer = async (player: string) => {
     if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return await getCache(`Wynncraft:Cache:Players:${UUID}`);
     return await Limiter.schedule(async () => {
       if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return await getCache(`Wynncraft:Cache:Players:${UUID}`, { raceCondition: true });
-      return await WynncraftAPI.get(`/v3/player/${dashUUID(UUID)}`, { params: { fullResult: true } })
+      return await WynncraftAPI.get(`/v3/player/${dashUUID(UUID)}`, { params: { fullResult: "True" } })
         .then(async (res) => {
           log("Wynncraft", `Fetched Player (${UUID})`, "info");
           const formattedData = formatPlayer(res.data);
