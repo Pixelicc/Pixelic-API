@@ -19,45 +19,55 @@ const guildSchema = new Schema({
     type: String,
     required: true,
   },
-  name: {
-    type: String,
-    required: true,
-  },
-  prefix: {
-    type: String,
-    required: true,
-  },
-  onlineMembers: {
-    type: String,
-    required: true,
-  },
-  members: {
-    type: [memberSchema],
-    required: true,
-  },
-  level: {
-    type: Number,
-    required: true,
-  },
-  EXPPercent: {
-    type: Number,
-    required: true,
-  },
-  created: {
-    type: Number,
-    required: true,
-  },
-  territories: {
-    type: Number,
-    required: true,
-  },
-  banner: {
-    type: Object,
-    required: true,
+  guild: {
+    name: {
+      type: String,
+      required: true,
+    },
+    prefix: {
+      type: String,
+      required: true,
+    },
+    onlineMembers: {
+      type: String,
+      required: true,
+    },
+    members: {
+      type: [memberSchema],
+      required: true,
+    },
+    level: {
+      type: Number,
+      required: true,
+    },
+    levelPercent: {
+      type: Number,
+      required: true,
+    },
+    created: {
+      type: Number,
+      required: true,
+    },
+    territories: {
+      type: Number,
+      required: true,
+    },
+    banner: {
+      type: Object,
+      required: true,
+    },
   },
   timestamp: {
     type: Number,
     required: true,
+  },
+  lastUpdated: {
+    type: Number,
+    required: true,
+  },
+  updates: {
+    type: Number,
+    default: 0,
   },
 });
 

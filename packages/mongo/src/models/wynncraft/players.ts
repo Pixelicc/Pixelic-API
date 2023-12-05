@@ -128,59 +128,73 @@ const playerSchema = new Schema({
     type: String,
     required: true,
   },
-  username: {
-    type: String,
-    required: true,
-  },
-  playtime: {
-    type: Number,
-    required: true,
-  },
-  firstLogin: {
-    type: Number,
-    required: true,
-  },
-  lastLogin: {
-    type: Number,
-    required: true,
-  },
-  online: {
-    type: Boolean,
-    required: true,
-  },
-  server: {
-    type: String,
-    required: true,
-  },
-  rank: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  purchasedRank: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  global: {
-    type: globalSchema,
-    required: true,
-  },
-  characters: {
-    type: [characterSchema],
-    required: true,
-  },
-  guild: {
-    type: guildSchema,
-    required: true,
-  },
-  publicProfile: {
-    type: Boolean,
-    required: true,
+  player: {
+    UUID: {
+      type: String,
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    playtime: {
+      type: Number,
+      required: true,
+    },
+    firstLogin: {
+      type: Number,
+      required: true,
+    },
+    lastLogin: {
+      type: Number,
+      required: true,
+    },
+    online: {
+      type: Boolean,
+      required: true,
+    },
+    server: {
+      type: String,
+      required: true,
+    },
+    rank: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    purchasedRank: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    global: {
+      type: globalSchema,
+      required: true,
+    },
+    characters: {
+      type: [characterSchema],
+      required: true,
+    },
+    guild: {
+      type: guildSchema,
+      required: true,
+    },
+    publicProfile: {
+      type: Boolean,
+      required: true,
+    },
   },
   timestamp: {
     type: Number,
     required: true,
+  },
+  lastUpdated: {
+    type: Number,
+    required: true,
+  },
+  updates: {
+    type: Number,
+    default: 0,
   },
 });
 

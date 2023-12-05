@@ -40,21 +40,25 @@ export const getPlayer = async (player: string) => {
             Object.entries(formattedData.characters as { [key: string]: any }).forEach(([UUID, character]) => {
               characters.push({ UUID, ...character });
             });
-            await WynncraftPlayerModel.updateOne({ _id: UUID }, { ...formattedData, characters, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+            const operation = await WynncraftPlayerModel.updateOne({ _id: UUID }, { $set: { player: { ...formattedData, characters }, lastUpdated: Math.floor(Date.now() / 1000) } }, { upsert: true });
+            if (operation.acknowledged && operation.upsertedId !== null) {
+              await WynncraftPlayerModel.updateOne({ _id: UUID }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
+            }
           }
-          if (config.wynncraft.persistHistoricalData) {
-            if ((await WynncraftHistoricalPlayerModel.exists({ UUID: UUID })) === null) {
-              await WynncraftHistoricalPlayerModel.create({ ...formattedData, isFullData: true });
+          if (config.hypixel.persistHistoricalData) {
+            const lastDataPoint = await WynncraftHistoricalPlayerModel.findOne({
+              UUID,
+              isFullData: true,
+            }).lean();
+
+            if (lastDataPoint === null) {
+              await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
             } else {
-              const lastDataPoint = await WynncraftHistoricalPlayerModel.findOne({
-                UUID: UUID,
-                isFullData: true,
-              }).lean();
               if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
-                const difference = deepCompare(lastDataPoint, { playtime: formattedData.playtime, global: formattedData.global, characters: formattedData.characters });
+                const difference = deepCompare(lastDataPoint.data, formattedData);
                 if (Object.keys(difference).length !== 0) {
-                  await WynncraftHistoricalPlayerModel.create({ UUID: UUID, ...difference, isFullData: undefined });
-                  await WynncraftHistoricalPlayerModel.create({ UUID: UUID, playtime: formattedData.playtime, global: formattedData.global, characters: formattedData.characters, isFullData: true });
+                  await WynncraftHistoricalPlayerModel.create({ UUID, data: difference, timestamp: Math.floor(Date.now() / 1000), isFullData: undefined });
+                  await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
                   await WynncraftHistoricalPlayerModel.deleteOne({ _id: lastDataPoint?._id });
                 }
               }
@@ -110,7 +114,10 @@ export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: str
       await redis.setex(`Wynncraft:Cache:Guilds:${formattedData.name.toLowerCase()}`, 600, JSON.stringify(formattedData));
     }
     if (config.wynncraft.persistData) {
-      await WynncraftGuildModel.updateOne({ _id: formattedData.name.toLowerCase() }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+      const operation = await WynncraftGuildModel.updateOne({ _id: formattedData.name.toUpperCase() }, { $set: { guild: formattedData, lastUpdated: Math.floor(Date.now() / 1000) }, $inc: { updates: 1 } }, { upsert: true });
+      if (operation.acknowledged && operation.upsertedId !== null) {
+        await WynncraftGuildModel.updateOne({ _id: formattedData.name.toUpperCase() }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
+      }
     }
     return formattedData;
   } catch (e) {
