@@ -149,4 +149,39 @@ export const MinecraftServerList = [
     host: "earthmc.net",
     name: "EarthMC",
   },
+  {
+    ID: "CASTCRAFTER",
+    host: "server.castcrafter.de",
+    name: "Castcrafter Community Server",
+  },
+  {
+    ID: "LETSHUGO",
+    host: "letshugo.de",
+    name: "LetsHugoTV Community Server",
+  },
+  {
+    ID: "MC_COMPLEX",
+    host: "hub.mc-complex.com",
+    name: "Complex Gaming Network",
+  },
+  {
+    ID: "TOGETHERCRAFT",
+    host: "play.togethercraft.online",
+    name: "TogetherCraft",
+  },
+  {
+    ID: "MINEBENCH",
+    host: "s.minebench.de",
+    name: "Minebench",
+  },
+  {
+    ID: "MINECRAFTONLINE",
+    host: "minecraftonline.com",
+    name: "MinecraftOnline",
+  },
+  {
+    ID: "SIPHONMC",
+    host: "play.siphonmc.net",
+    name: "SiphonMC SMP",
+  },
 ];
