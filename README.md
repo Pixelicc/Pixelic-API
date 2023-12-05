@@ -9,6 +9,10 @@ An API focused on Minecraft related data
     <a href="https://discord.com/invite/2vAuyVvdwj"><img src="https://img.shields.io/discord/926873163411910746?color=7289DA&label=Discord" alt="Discord"></a>
     <a><img src="https://wakatime.com/badge/user/fdd9682f-df58-46bb-9b10-374601d7f52d/project/838fd6e7-9cf0-4d5d-8986-aa7535ca3ec5.svg" alt="wakatime"></a>
 </div>
+<div align="center">
+    <a><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.pixelic.de%2Fv1%2Fstats%2Fmongo&query=%24.documentsFormatted&logo=MongoDB&label=Datapoints" alt="Dynamic JSON Badge"></a>
+    <a><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.pixelic.de%2Fv1%2Fstats%2Fmongo&query=%24.bytesStoredFormatted&logo=MongoDB&label=Data stored" alt="Dynamic JSON Badge"></a>
+</div>div
 
 ## 📗 Usage
 
