@@ -4,7 +4,7 @@ import { APIKeyMongo } from "@pixelic/types";
 
 const requestSchema = new Schema(
   {
-    ID: { type: String, index: true },
+    ID: { type: String, index: { unique: true } },
     URL: { type: String },
     method: { type: String, enum: ["GET", "POST", "PUT", "PATCH", "DELETE"] },
     userAgent: { type: String },
@@ -17,9 +17,9 @@ const keySchema = new Schema<APIKeyMongo>({
   owner: {
     type: String,
     required: true,
-    index: true,
+    index: { unique: true },
   },
   requestHistory: [requestSchema],
 });
 
-export const APIKeyModel = client.useDb("API").model<APIKeyMongo>("API-Key", keySchema);
+export const APIKeyModel = client.useDb("API").model<APIKeyMongo>("API-Keys", keySchema);
