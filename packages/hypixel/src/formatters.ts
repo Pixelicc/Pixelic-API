@@ -275,17 +275,23 @@ const formatBedwars = (bedwars: any) => {
       protectThePresident: bedwars?.bw_challenge_protect_the_president || 0,
       cantTouchThis: bedwars?.bw_challenge_cant_touch_this || 0,
     },
+    slumber: {
+      bag: bedwars?.slumber?.bag_type || null,
+      unlockedHotel: bedwars?.slumber?.tickets_requirement_met || false,
+      tickets: bedwars?.slumber?.tickets || 0,
+      ticketsEarned: bedwars?.slumber?.total_tickets_earned || 0,
+    },
   };
 
   if (bedwars?.["favourites_2"]) {
-    formattedBedwars["quickbuy"] = bedwars["favourites_2"].toLowerCase().split(",");
+    formattedBedwars["quickbuy"] = bedwars["favourites_2"].toUpperCase().split(",");
     for (const slot in formattedBedwars["quickbuy"]) {
       if (formattedBedwars["quickbuy"][slot] === "null") formattedBedwars["quickbuy"][slot] = null;
     }
   }
 
   if (bedwars?.["favorite_slots"]) {
-    formattedBedwars["preferedSlots"] = bedwars["favorite_slots"].toLowerCase().split(",");
+    formattedBedwars["preferedSlots"] = bedwars["favorite_slots"].toUpperCase().split(",");
     for (const slot in formattedBedwars["preferedSlots"]) {
       if (formattedBedwars["preferedSlots"][slot] === "null") formattedBedwars["preferedSlots"][slot] = null;
     }
@@ -1501,7 +1507,7 @@ export const formatPlayer = async (player: any) => {
     rank: rank,
     plusColor: parsePlusColor(player.rankPlusColor, rank),
     plusPlusColor: parsePlusPlusColor(player.monthlyRankColor, rank),
-    EXP: player?.networkExp || 0,
+    EXP: (player?.networkExp || 0) >= 0 ? player?.networkExp || 0 : 0,
     level: (Math.sqrt((player?.networkExp || 0) + 15312.5) - 125 / Math.sqrt(2)) / (25 * Math.sqrt(2)),
     karma: player?.karma || 0,
     achievementPoints: player?.achievementPoints || 0,
