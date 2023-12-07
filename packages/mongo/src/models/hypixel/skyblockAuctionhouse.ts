@@ -21,4 +21,4 @@ const retentionSchema = new Schema(
   }
 );
 
-export const HypixelSkyblockAuctionhouseModel = client.useDb("Hypixel").model("skyblockAuctionhouse", retentionSchema);
+export const HypixelSkyblockAuctionhouseModel = client.useDb("Hypixel").model("skyblockAuctionhouseItems", retentionSchema);

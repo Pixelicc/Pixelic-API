@@ -51,6 +51,6 @@ const longTermRetentionSchema = new Schema(
 );
 
 export const HypixelSkyblockBazaarModel = {
-  shortTerm: client.useDb("Hypixel").model("skyblockBazaarShortTerm", shortTermRetentionSchema),
-  longTerm: client.useDb("Hypixel").model("skyblockBazaarLongTerm", longTermRetentionSchema),
+  shortTerm: client.useDb("Hypixel").model("skyblockBazaarProductsShortTerm", shortTermRetentionSchema),
+  longTerm: client.useDb("Hypixel").model("skyblockBazaarProductsLongTerm", longTermRetentionSchema),
 };
