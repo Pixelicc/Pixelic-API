@@ -8,7 +8,7 @@ import { getPlayer } from "@pixelic/hypixel";
 const router = express.Router();
 
 /**
- * Exposes the internal library for other self-developed projects
+ * Exposes the internal library for other self-developed projects to share the same backend
  *
  * MAKING PROXY ENDPOINTS PUBLICLY ACCESSIBLE IS NOT ALLOWED
  * https://developer.hypixel.net/policies
@@ -43,7 +43,7 @@ router.get("/v1/hypixel/player/:player/history", ratelimit(), async (req, res) =
   const UUID = await parseUUID(req.params.player);
   if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
   try {
-    const data = await HypixelHistoricalPlayerModel.find({ UUID }, ["-UUID", "-__v"]).lean();
+    const data = await HypixelHistoricalPlayerModel.find({ UUID }, ["-UUID", "-__v"]).sort({ _id: 1 }).lean();
     data.pop();
     if (data.length === 0) {
       res.set("Cache-Control", "public, max-age=300");
@@ -52,7 +52,7 @@ router.get("/v1/hypixel/player/:player/history", ratelimit(), async (req, res) =
 
     const formattedData = [];
     for (const day of data) {
-      const currentDay = { ...day, timestamp: Math.floor(day._id.getTimestamp().valueOf() / 1000) };
+      const currentDay = { ...day.data, timestamp: Math.floor(day._id.getTimestamp().valueOf() / 1000) };
       // @ts-ignore
       delete currentDay._id;
       formattedData.push(currentDay);

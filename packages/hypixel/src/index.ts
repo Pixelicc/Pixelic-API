@@ -38,21 +38,25 @@ export const getPlayer = async (player: string) => {
           const formattedData = await formatPlayer(res.data.player);
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Players:${UUID}`, 600, JSON.stringify(formattedData));
           if (config.hypixel.persistData) {
-            await HypixelPlayerModel.updateOne({ _id: UUID }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+            const operation = await HypixelPlayerModel.updateOne({ _id: UUID }, { $set: { player: formattedData, lastUpdated: Math.floor(Date.now() / 1000) }, $inc: { updates: 1 } }, { upsert: true });
+            if (operation.acknowledged && operation.upsertedId !== null) {
+              await HypixelPlayerModel.updateOne({ _id: UUID }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
+            }
           }
           if (config.hypixel.persistHistoricalData) {
-            if ((await HypixelHistoricalPlayerModel.exists({ UUID: UUID })) === null) {
-              await HypixelHistoricalPlayerModel.create({ ...formattedData, isFullData: true });
+            const lastDataPoint = await HypixelHistoricalPlayerModel.findOne({
+              UUID,
+              isFullData: true,
+            }).lean();
+
+            if (lastDataPoint === null) {
+              await HypixelHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
             } else {
-              const lastDataPoint = await HypixelHistoricalPlayerModel.findOne({
-                UUID: UUID,
-                isFullData: true,
-              }).lean();
               if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
-                const difference = deepCompare(lastDataPoint, formattedData);
+                const difference = deepCompare(lastDataPoint.data, formattedData);
                 if (Object.keys(difference).length !== 0) {
-                  await HypixelHistoricalPlayerModel.create({ UUID: UUID, ...difference, isFullData: undefined });
-                  await HypixelHistoricalPlayerModel.create({ ...formattedData, isFullData: true });
+                  await HypixelHistoricalPlayerModel.create({ UUID, data: difference, timestamp: Math.floor(Date.now() / 1000), isFullData: undefined });
+                  await HypixelHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
                   await HypixelHistoricalPlayerModel.deleteOne({ _id: lastDataPoint?._id });
                 }
               }
@@ -138,8 +142,12 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       pipeline.setex(`Hypixel:Cache:Guilds:${formattedData.ID}`, 600, JSON.stringify(formattedData));
       pipeline.exec();
     }
+
     if (config.hypixel.persistData) {
-      await HypixelGuildModel.updateOne({ _id: formattedData.ID }, { ...formattedData, timestamp: Math.floor(Date.now() / 1000) }, { upsert: true });
+      const operation = await HypixelGuildModel.updateOne({ _id: formattedData.ID }, { $set: { guild: formattedData, lastUpdated: Math.floor(Date.now() / 1000) }, $inc: { updates: 1 } }, { upsert: true });
+      if (operation.acknowledged && operation.upsertedId !== null) {
+        await HypixelGuildModel.updateOne({ _id: formattedData.ID }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
+      }
     }
     if (config.hypixel.persistHistoricalData) {
       const members: any = {};
@@ -147,17 +155,19 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
         const { UUID, ...rest } = member;
         members[UUID] = rest;
       });
-      if ((await HypixelHistoricalGuildModel.exists({ ID: formattedData.ID })) === null) {
-        await HypixelHistoricalGuildModel.create({ ...formattedData, members, isFullData: true });
+
+      const lastDataPoint = await HypixelHistoricalGuildModel.findOne({
+        isFullData: true,
+      }).lean();
+
+      if (lastDataPoint === null) {
+        await HypixelHistoricalGuildModel.create({ ID: formattedData.ID, data: { ...formattedData, members }, isFullData: true });
       } else {
-        const lastDataPoint = await HypixelHistoricalGuildModel.findOne({
-          isFullData: true,
-        }).lean();
         if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
           const difference = deepCompare(lastDataPoint, { ...formattedData, members });
           if (Object.keys(difference).length !== 0) {
-            await HypixelHistoricalGuildModel.create({ ID: formattedData.ID, ...difference, isFullData: undefined });
-            await HypixelHistoricalGuildModel.create({ ...formattedData, members, isFullData: true });
+            await HypixelHistoricalGuildModel.create({ ID: formattedData.ID, data: difference, isFullData: undefined });
+            await HypixelHistoricalGuildModel.create({ ID: formattedData.ID, data: { ...formattedData, members }, isFullData: true });
             await HypixelHistoricalGuildModel.deleteOne({ _id: lastDataPoint?._id });
           }
         }
@@ -165,7 +175,6 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
     }
     return formattedData;
   } catch (e) {
-    console.log(e);
     Sentry.captureException(e);
     return null;
   }
