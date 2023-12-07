@@ -40,7 +40,7 @@ export const getPlayer = async (player: string) => {
             Object.entries(formattedData.characters as { [key: string]: any }).forEach(([UUID, character]) => {
               characters.push({ UUID, ...character });
             });
-            const operation = await WynncraftPlayerModel.updateOne({ _id: UUID }, { $set: { player: { ...formattedData, characters }, lastUpdated: Math.floor(Date.now() / 1000) } }, { upsert: true });
+            const operation = await WynncraftPlayerModel.updateOne({ _id: UUID }, { $set: { player: { ...formattedData, characters }, lastUpdated: Math.floor(Date.now() / 1000) }, $inc: { updates: 1 } }, { upsert: true });
             if (operation.acknowledged && operation.upsertedId !== null) {
               await WynncraftPlayerModel.updateOne({ _id: UUID }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
             }
