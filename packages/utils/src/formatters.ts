@@ -11,6 +11,8 @@ export const formatNumber = (number: number, digits: number) => {
     { value: 1e6, symbol: "m" },
     { value: 1e9, symbol: "b" },
     { value: 1e12, symbol: "t" },
+    { value: 1e15, symbol: "qa" },
+    { value: 1e18, symbol: "qi" },
   ];
   const rx = /.0+$|(.[0-9]*[1-9])0+$/;
   var item = lookup
