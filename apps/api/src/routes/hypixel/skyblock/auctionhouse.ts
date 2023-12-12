@@ -1,12 +1,52 @@
 import express from "express";
 import * as Sentry from "@sentry/node";
 import { parseUUID } from "@pixelic/mojang";
-import { formatTimeseries, formatUUID, validateSkyblockItemID, validateUUID, validateUsername } from "@pixelic/utils";
+import { formatNumber, formatTimeseries, formatUUID, objectStringToNumber, validateSkyblockItemID, validateUUID, validateUsername } from "@pixelic/utils";
 import { HypixelSkyblockAuctionModel, HypixelSkyblockAuctionhouseModel } from "@pixelic/mongo";
 import { authorization, ratelimit } from "@pixelic/middlewares";
 import { querySkyblockActiveAuctions } from "@pixelic/hypixel";
+import redis from "@pixelic/redis";
 
 const router = express.Router();
+
+router.get("/v1/hypixel/skyblock/auctionhouse/stats", async (req, res) => {
+  try {
+    const tierStats: { [key: string]: number } = {};
+    const tierStatsRaw = await redis.zrevrange("Hypixel:Stats:Skyblock:AuctionsSoldByTier", 0, 100000, "WITHSCORES");
+    for (var i = 0; i < tierStatsRaw.length; i += 2) {
+      tierStats[tierStatsRaw[i]] = Number(tierStatsRaw[i + 1]);
+    }
+
+    const itemStats: { [key: string]: number } = {};
+    const itemStatsRaw = await redis.zrevrange("Hypixel:Stats:Skyblock:AuctionsSoldByItem", 0, 100000, "WITHSCORES");
+    for (var i = 0; i < itemStatsRaw.length; i += 2) {
+      itemStats[itemStatsRaw[i]] = Number(itemStatsRaw[i + 1]);
+    }
+
+    const volumeStats: { [key: string]: number } = {};
+    const volumeStatsRaw = await redis.zrevrange("Hypixel:Stats:Skyblock:AuctionVolumeByItem", 0, 100000, "WITHSCORES");
+    for (var i = 0; i < volumeStatsRaw.length; i += 2) {
+      volumeStats[volumeStatsRaw[i]] = Number(volumeStatsRaw[i + 1]);
+    }
+
+    res.set("Cache-Control", "public, max-age=300");
+
+    return res.json({
+      success: true,
+      auctionsSold: Number(await redis.hget("Hypixel:Stats:Skyblock:Auctions", "sold")),
+      auctionsSoldFormatted: formatNumber(Number(await redis.hget("Hypixel:Stats:Skyblock:Auctions", "sold")), 2),
+      coinsMoved: Number(await redis.hget("Hypixel:Stats:Skyblock:Auctions", "coinsMoved")),
+      coinsMovedFormatted: formatNumber(Number(await redis.hget("Hypixel:Stats:Skyblock:Auctions", "coinsMoved")), 2),
+      auctionsSoldByTier: tierStats,
+      auctionsSoldByItem: itemStats,
+      auctionVolumeByItem: volumeStats,
+      volumeStatsRaw,
+    });
+  } catch (e) {
+    Sentry.captureException(e);
+    return res.status(500).json({ success: false });
+  }
+});
 
 router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["STAFF", "ADMIN"], scope: "hypixel:querySkyblockAuctions" }), ratelimit("queryHypixelSkyblockAuctions", "1d", 1000), async (req, res) => {
   try {
@@ -26,7 +66,9 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     if (name) query.push(`@itemName:${sanitize(decodeURI(name))}`);
     if (lore) query.push(`@itemLore:${sanitize(decodeURI(lore))}`);
     if (["COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC", "DIVINE", "SPECIAL", "VERY_SPECIAL"].includes(tier)) query.push(`@itemTier:{${tier}}`);
-    if (validateUUID(itemID)) query.push(`@itemID:{${formatUUID(itemID)}}`);
+    if (validateSkyblockItemID(itemID)) query.push(`@itemID:{${itemID}}`);
+
+    res.set("Cache-Control", "public, max-age=300");
 
     return res.json({
       success: true,
@@ -133,7 +175,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/item/:item", ratelimit(), async (r
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/:id/price", ratelimit(), async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
@@ -148,7 +190,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/price/:id", ratelimit(), async (re
   }
 });
 
-router.get("/v1/hypixel/skyblock/auctionhouse/price/:id/history", ratelimit(), async (req, res) => {
+router.get("/v1/hypixel/skyblock/auctionhouse/:id/price/history", ratelimit(), async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.id)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
