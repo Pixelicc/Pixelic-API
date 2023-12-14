@@ -8,12 +8,12 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
-    "@pixelic/utils": "*",
     "@pixelic/logger": "*",
+    "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
-    "@pixelic/mongo": "*"
+    "@pixelic/utils": "*"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17"
+    "@types/express": "^4.17.21"
   }
 }

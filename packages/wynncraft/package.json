@@ -14,7 +14,7 @@
     "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",
-    "axios": "^1.4.0",
+    "axios": "^1.6.2",
     "axios-retry": "^4.0.0",
     "bottleneck": "^2.19.5"
   }

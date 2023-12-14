@@ -9,15 +9,14 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/constants": "*",
     "@pixelic/hypixel": "*",
     "@pixelic/logger": "*",
     "@pixelic/mojang": "*",
     "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
-    "@pixelic/interceptors": "*",
     "@pixelic/utils": "*",
     "@pixelic/wynncraft": "*",
-    "@pixelic/constants": "*",
-    "cron": "^3.0.0"
+    "cron": "^3.1.6"
   }
 }

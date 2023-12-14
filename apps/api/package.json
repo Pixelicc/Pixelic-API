@@ -9,6 +9,9 @@
     "build": "swc src --config-file ../../.swcrc --out-dir dist"
   },
   "dependencies": {
+    "@pixelic/constants": "*",
+    "@pixelic/hypixel": "*",
+    "@pixelic/interceptors": "*",
     "@pixelic/logger": "*",
     "@pixelic/middlewares": "*",
     "@pixelic/mojang": "*",
@@ -16,17 +19,14 @@
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",
     "@pixelic/wynncraft": "*",
-    "@pixelic/hypixel": "*",
-    "@pixelic/constants": "*",
-    "@pixelic/interceptors": "*",
-    "axios": "^1.4.0",
+    "axios": "^1.6.2",
     "cloc": "1.98.0-cloc",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-mongo-sanitize": "^2.2.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.13",
-    "@types/express": "^4.17.17"
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21"
   }
 }
