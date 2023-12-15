@@ -184,4 +184,9 @@ export const MinecraftServerList = [
     host: "play.siphonmc.net",
     name: "SiphonMC SMP",
   },
+  {
+    ID: "PLAYLEGEND",
+    host: "playlegend.net",
+    name: "PlayLegend"
+  }
 ];
