@@ -2,13 +2,11 @@
   "apps": [
     {
       "name": "API",
-      "script": "apps/api/dist/index.js",
-      "exec_mode": "cluster",
-      "instances": 4
+      "script": "pnpm api start"
     },
     {
       "name": "Collector",
-      "script": "apps/collector/dist/index.js"
+      "script": "pnpm collector start"
     }
   ]
 }
