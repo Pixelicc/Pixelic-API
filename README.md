@@ -2,7 +2,7 @@
 
 # Pixelic-API
 
-An API focused on Minecraft related data
+An API focused on Minecraft related data and powering other related Pixelic-Services
 
 </div>
 <div align="center">
