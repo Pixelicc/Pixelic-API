@@ -286,14 +286,14 @@ const formatBedwars = (bedwars: any) => {
   if (bedwars?.["favourites_2"]) {
     formattedBedwars["quickbuy"] = bedwars["favourites_2"].toUpperCase().split(",");
     for (const slot in formattedBedwars["quickbuy"]) {
-      if (formattedBedwars["quickbuy"][slot] === "null") formattedBedwars["quickbuy"][slot] = null;
+      if (formattedBedwars["quickbuy"][slot] === "NULL") formattedBedwars["quickbuy"][slot] = null;
     }
   }
 
   if (bedwars?.["favorite_slots"]) {
     formattedBedwars["preferedSlots"] = bedwars["favorite_slots"].toUpperCase().split(",");
     for (const slot in formattedBedwars["preferedSlots"]) {
-      if (formattedBedwars["preferedSlots"][slot] === "null") formattedBedwars["preferedSlots"][slot] = null;
+      if (formattedBedwars["preferedSlots"][slot] === "NULL") formattedBedwars["preferedSlots"][slot] = null;
     }
   }
 
