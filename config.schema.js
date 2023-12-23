@@ -1,6 +1,5 @@
 /**
  * To run the Pixelic-API without any further problems it is recommended to fill out EVERY config field!
- *
  */
 export default {
   database: {
