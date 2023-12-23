@@ -8,8 +8,8 @@ import { ISOString } from "@pixelic/types";
 
 const parseNbt = util.promisify(nbt.parse);
 
-const addObjects = (objects: { [key: string]: number | object }[], ratios?: string[]): { [key: string]: number | object } => {
-  const result: { [key: string]: number | object } = {};
+const addObjects = (objects: { [key: string]: number | object }[]): { [key: string]: number | object } => {
+  const result: { [key: string]: any } = {};
 
   const addNestedObjects = (source: { [key: string]: number }, target: { [key: string]: number }) => {
     for (const key in source) {
@@ -17,8 +17,10 @@ const addObjects = (objects: { [key: string]: number | object }[], ratios?: stri
         if (target[key] === undefined) {
           target[key] = source[key];
         } else {
-          if (ratios?.includes(key)) {
-            target[key] = (source[key] + target[key]) / (objects.length + 1);
+          if (key === "winstreak") {
+            if (target[key] <= source[key]) {
+              target[key] = source[key];
+            }
           } else {
             target[key] += source[key];
           }
@@ -41,14 +43,54 @@ const addObjects = (objects: { [key: string]: number | object }[], ratios?: stri
           if (result[key] === undefined) {
             result[key] = obj[key];
           } else {
-            if (ratios?.includes(key)) {
-              // @ts-ignore
-              result[key] = (obj[key] + result[key]) / (objects.length + 1);
+            if (key === "winstreak") {
+              if (result[key] <= obj[key]) {
+                result[key] = obj[key];
+              }
             } else {
               // @ts-ignore
               result[key] += obj[key];
             }
           }
+        }
+      }
+    }
+  }
+
+  const calcNestedObjects = (res: { [key: string]: any }) => {
+    for (const key in res) {
+      if (res.hasOwnProperty(key)) {
+        if (typeof res[key] === "object") {
+          res[key] = calcNestedObjects(res[key]);
+        } else {
+          if (key === "WLR") {
+            res[key] = getRatio(res["wins"], res["losses"]);
+          } else if (key === "FKDR") {
+            res[key] = getRatio(res["finalKills"], res["finalDeaths"]);
+          } else if (key === "KDR") {
+            res[key] = getRatio(res["kills"], res["deaths"]);
+          } else if (key === "BBLR") {
+            res[key] = getRatio(res["bedsBroken"], res["bedsLost"]);
+          }
+        }
+      }
+    }
+
+    return res;
+  };
+
+  for (const key in result) {
+    if (result.hasOwnProperty(key)) {
+      if (typeof result[key] === "object") {
+      } else {
+        if (key === "WLR") {
+          result[key] = getRatio(result["wins"], result["losses"]);
+        } else if (key === "FKDR") {
+          result[key] = getRatio(result["finalKills"], result["finalDeaths"]);
+        } else if (key === "KDR") {
+          result[key] = getRatio(result["kills"], result["deaths"]);
+        } else if (key === "BBLR") {
+          result[key] = getRatio(result["bedsBroken"], result["bedsLost"]);
         }
       }
     }
@@ -177,6 +219,7 @@ const formatBedwars = (bedwars: any) => {
     quickbuy: ["wool", "stone_sword", "chainmail_boots", null, "bow", "speed_ii_potion_(45_seconds)", "tnt", "oak_wood_planks", "iron_sword", "iron_boots", "shears", "arrow", "jump_v_potion_(45_seconds)", "water_bucket", null, null, null, null, null, null, null],
     preferedSlots: [null, null, null, null, null, null, null, null, null],
     overall: getMode(""),
+    cores: addObjects([getMode("eight_one_"), getMode("eight_two_"), getMode("four_three_"), getMode("four_four_")]),
     solo: getMode("eight_one_"),
     doubles: getMode("eight_two_"),
     threes: getMode("four_three_"),
@@ -184,32 +227,32 @@ const formatBedwars = (bedwars: any) => {
     "4v4": getMode("two_four_"),
     dreams: {
       lucky: {
-        overall: addObjects([getMode("eight_two_lucky_"), getMode("four_four_lucky_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_lucky_"), getMode("four_four_lucky_")]),
         doubles: getMode("eight_two_lucky_"),
         fours: getMode("four_four_lucky_"),
       },
       rush: {
-        overall: addObjects([getMode("eight_two_rush_"), getMode("four_four_rush_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_rush_"), getMode("four_four_rush_")]),
         doubles: getMode("eight_two_rush_"),
         fours: getMode("four_four_rush_"),
       },
       ultimate: {
-        overall: addObjects([getMode("eight_two_ultimate_"), getMode("four_four_ultimate_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_ultimate_"), getMode("four_four_ultimate_")]),
         doubles: getMode("eight_two_ultimate_"),
         fours: getMode("four_four_ultimate_"),
       },
       armed: {
-        overall: addObjects([getMode("eight_two_armed_"), getMode("four_four_armed_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_armed_"), getMode("four_four_armed_")]),
         doubles: getMode("eight_two_armed_"),
         fours: getMode("four_four_armed_"),
       },
       voidless: {
-        overall: addObjects([getMode("eight_two_voidless_"), getMode("four_four_voidless_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_voidless_"), getMode("four_four_voidless_")]),
         doubles: getMode("eight_two_voidless_"),
         fours: getMode("four_four_voidless_"),
       },
       swap: {
-        overall: addObjects([getMode("eight_two_swap_"), getMode("four_four_swap_")], ["WLR", "FKDR", "KDR", "BBLR"]),
+        overall: addObjects([getMode("eight_two_swap_"), getMode("four_four_swap_")]),
         doubles: getMode("eight_two_swap_"),
         fours: getMode("four_four_swap_"),
       },
@@ -397,7 +440,7 @@ const formatDuels = (duels: any) => {
     bowspleef: getMode("bowspleef_duel"),
     boxing: getMode("boxing_duel"),
     bridge: {
-      overall: addObjects([getMode("bridge_duel"), getMode("bridge_doubles"), getMode("bridge_threes"), getMode("bridge_fours"), getMode("bridge_2v2v2v2"), getMode("bridge_3v3v3v3"), getMode("capture_threes")], ["WLR", "KDR"]),
+      overall: addObjects([getMode("bridge_duel"), getMode("bridge_doubles"), getMode("bridge_threes"), getMode("bridge_fours"), getMode("bridge_2v2v2v2"), getMode("bridge_3v3v3v3"), getMode("capture_threes")]),
       solo: getMode("bridge_duel"),
       doubles: getMode("bridge_doubles"),
       threes: getMode("bridge_threes"),
@@ -409,25 +452,25 @@ const formatDuels = (duels: any) => {
     classic: getMode("classic_duel"),
     combo: getMode("combo_duel"),
     megawalls: {
-      overall: addObjects([getMode("mw_duel"), getMode("mw_doubles")], ["WLR", "KDR"]),
+      overall: addObjects([getMode("mw_duel"), getMode("mw_doubles")]),
       solo: getMode("mw_duel"),
       doubles: getMode("mw_doubles"),
     },
     noDebuff: getMode("potion_duel"),
     op: {
-      overall: addObjects([getMode("op_duel"), getMode("op_doubles")], ["WLR", "KDR"]),
+      overall: addObjects([getMode("op_duel"), getMode("op_doubles")]),
       solo: getMode("op_duel"),
       doubles: getMode("op_doubles"),
     },
     parkour: getMode("parkour_eight"),
     skywars: {
-      overall: addObjects([getMode("sw_duel"), getMode("sw_doubles")], ["WLR", "KDR"]),
+      overall: addObjects([getMode("sw_duel"), getMode("sw_doubles")]),
       solo: getMode("sw_duel"),
       doubles: getMode("sw_doubles"),
     },
     sumo: getMode("sumo_duel"),
     uhc: {
-      overall: addObjects([getMode("uhc_duel"), getMode("uhc_doubles"), getMode("uhc_four"), getMode("uhc_meetup")], ["WLR", "KDR"]),
+      overall: addObjects([getMode("uhc_duel"), getMode("uhc_doubles"), getMode("uhc_four"), getMode("uhc_meetup")]),
       solo: getMode("uhc_duel"),
       doubles: getMode("uhc_doubles"),
       fours: getMode("uhc_four"),
@@ -670,7 +713,7 @@ const formatArena = (arena: any) => {
       slowing: arena?.rune_level_slowing || 0,
       speed: arena?.rune_level_speed || 0,
     },
-    overall: addObjects([getMode("1v1"), getMode("2v2"), getMode("4v4")], ["WLR", "KDR"]),
+    overall: addObjects([getMode("1v1"), getMode("2v2"), getMode("4v4")]),
     solo: getMode("1v1"),
     doubles: getMode("2v2"),
     "4v4": getMode("4v4"),
