@@ -1,14 +1,18 @@
 import express from "express";
+
 import minecraft from "./minecraft/index.js";
 import hypixel from "./hypixel/index.js";
 import wynncraft from "./wynncraft/index.js";
-import user from "./user.js";
+
 import stats from "./stats.js";
 
+import user from "./user.js";
 import OAuth2 from "./OAuth2.js";
+
+import PixelicOverlay from "./pixelic-overlay/index.js";
 
 const router = express.Router();
 
-router.use(minecraft, hypixel, wynncraft, user, stats, OAuth2);
+router.use(minecraft, hypixel, wynncraft, user, stats, OAuth2, PixelicOverlay);
 
 export default router;
