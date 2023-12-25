@@ -16,3 +16,7 @@ export const validateSkyblockItemID = (ID: string) => {
   if (typeof ID !== "string") return false;
   return /^[A-Z\d\_:]+$/.test(ID);
 };
+
+export const validateHexID = (ID: string, length: number) => {
+  return new RegExp(`^[a-fA-F0-9]{${length}}$`).test(ID);
+};
