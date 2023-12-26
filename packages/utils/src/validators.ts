@@ -20,3 +20,8 @@ export const validateSkyblockItemID = (ID: string) => {
 export const validateHexID = (ID: string, length: number) => {
   return new RegExp(`^[a-fA-F0-9]{${length}}$`).test(ID);
 };
+
+export const validateArray = <T>(array: T[], validatorFunction: (item: T, ...params: any[]) => boolean, ...params: any[]) => {
+  if (!Array.isArray(array)) return false;
+  return array.every((item) => validatorFunction(item, ...params));
+};
