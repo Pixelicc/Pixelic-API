@@ -1,12 +1,37 @@
 import express from "express";
 import * as Sentry from "@sentry/node";
-import { formatUUID, generateHexID, hashSHA512, validateHexID, validateUUID, validateUsername } from "@pixelic/utils";
+import { formatUUID, generateHexID, hashSHA512, validateArray, validateHexID, validateUUID } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import { PixelicOverlayBlacklistModel } from "@pixelic/mongo";
 import { APIKeyRedis, APIUser } from "@pixelic/types";
 import { ratelimit } from "@pixelic/middlewares";
 
 const router = express.Router();
+
+router.get("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, res) => {
+  try {
+    const key = (await redis.hgetall(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`)) as APIKeyRedis;
+    const user = (await redis.hgetall(`API:Users:${key.owner}`)) as APIUser;
+
+    if (!user.pixelicOverlayPersonalBlacklistID) {
+      user.pixelicOverlayPersonalBlacklistID = generateHexID(10);
+      await PixelicOverlayBlacklistModel.create({ _id: user.pixelicOverlayPersonalBlacklistID, owner: key.owner, timestamp: Math.floor(Date.now() / 1000), lastUpdated: Math.floor(Date.now() / 1000) });
+      await redis.hset(`API:Users:${key.owner}`, { pixelicOverlayPersonalBlacklistID: user.pixelicOverlayPersonalBlacklistID });
+    }
+
+    const blacklist = await PixelicOverlayBlacklistModel.findById(user.pixelicOverlayPersonalBlacklistID, ["-entries.timestamp"]);
+
+    return res.json({
+      success: true,
+      ID: blacklist?._id || null,
+      entries: blacklist?.entries || [],
+    });
+  } catch (e) {
+    console.log(e);
+    Sentry.captureException(e);
+    return res.status(500).json({ success: false });
+  }
+});
 
 router.get("/v2/pixelic-overlay/blacklist/:ID", ratelimit(), async (req, res) => {
   try {
@@ -26,28 +51,6 @@ router.get("/v2/pixelic-overlay/blacklist/:ID", ratelimit(), async (req, res) =>
   }
 });
 
-router.get("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, res) => {
-  try {
-    const key = (await redis.hgetall(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`)) as APIKeyRedis;
-    const user = (await redis.hgetall(`API:Users:${key.owner}`)) as APIUser;
-
-    if (!user.pixelicOverlayPersonalBlacklistID) {
-      await PixelicOverlayBlacklistModel.create({ _id: generateHexID(10), owner: key.owner, timestamp: Math.floor(Date.now() / 1000) });
-    }
-
-    const blacklist = await PixelicOverlayBlacklistModel.findById(user.pixelicOverlayPersonalBlacklistID, ["-entries.timestamp"]);
-
-    return res.json({
-      success: true,
-      ID: blacklist?._id || null,
-      entries: blacklist?.entries || [],
-    });
-  } catch (e) {
-    Sentry.captureException(e);
-    return res.status(500).json({ success: false });
-  }
-});
-
 router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, res) => {
   try {
     const key = (await redis.hgetall(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`)) as APIKeyRedis;
@@ -55,8 +58,8 @@ router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, r
 
     if (!user.pixelicOverlayPersonalBlacklistID) {
       user.pixelicOverlayPersonalBlacklistID = generateHexID(10);
-      await PixelicOverlayBlacklistModel.create({ _id: user.pixelicOverlayPersonalBlacklistID, owner: key.owner, timestamp: Math.floor(Date.now() / 1000) });
-      await redis.hset(`API:Users:${key.owner}`, { pixelicOverlayPersonalBlacklist: user.pixelicOverlayPersonalBlacklistID });
+      await PixelicOverlayBlacklistModel.create({ _id: user.pixelicOverlayPersonalBlacklistID, owner: key.owner, timestamp: Math.floor(Date.now() / 1000), lastUpdated: Math.floor(Date.now() / 1000) });
+      await redis.hset(`API:Users:${key.owner}`, { pixelicOverlayPersonalBlacklistID: user.pixelicOverlayPersonalBlacklistID });
     }
 
     const { UUID, reason } = req.body;
@@ -70,6 +73,43 @@ router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, r
             _id: formatUUID(UUID),
             reason,
             timestamp: Math.floor(Date.now() / 1000),
+          },
+        },
+        $set: { lastUpdated: Math.floor(Date.now() / 1000) },
+        $inc: { updates: 1 },
+      }
+    )
+      .then(() => {
+        return res.json({ success: true });
+      })
+      .catch(() => {
+        return res.status(500).json({ success: false });
+      });
+  } catch (e) {
+    Sentry.captureException(e);
+    return res.status(500).json({ success: false });
+  }
+});
+
+router.delete("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, res) => {
+  try {
+    const key = (await redis.hgetall(`API:Users:Keys:${hashSHA512(formatUUID(String(req.headers["x-api-key"])))}`)) as APIKeyRedis;
+    const user = (await redis.hgetall(`API:Users:${key.owner}`)) as APIUser;
+
+    if (!user.pixelicOverlayPersonalBlacklistID) return res.status(404).json({ success: false });
+
+    if (!validateArray(req.body, validateUUID)) {
+      return res.status(422).json({ success: false, cause: "Invalid Body" });
+    }
+
+    return await PixelicOverlayBlacklistModel.updateOne(
+      { _id: user.pixelicOverlayPersonalBlacklistID },
+      {
+        $pull: {
+          entries: {
+            _id: {
+              $in: req.body,
+            },
           },
         },
         $set: { lastUpdated: Math.floor(Date.now() / 1000) },
