@@ -54,7 +54,9 @@ router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, r
     const user = (await redis.hgetall(`API:Users:${key.owner}`)) as APIUser;
 
     if (!user.pixelicOverlayPersonalBlacklistID) {
-      await PixelicOverlayBlacklistModel.create({ _id: generateHexID(10), owner: key.owner, timestamp: Math.floor(Date.now() / 1000) });
+      user.pixelicOverlayPersonalBlacklistID = generateHexID(10);
+      await PixelicOverlayBlacklistModel.create({ _id: user.pixelicOverlayPersonalBlacklistID, owner: key.owner, timestamp: Math.floor(Date.now() / 1000) });
+      await redis.hset(`API:Users:${key.owner}`, { pixelicOverlayPersonalBlacklist: user.pixelicOverlayPersonalBlacklistID });
     }
 
     const { UUID, reason } = req.body;
@@ -65,7 +67,7 @@ router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, r
       {
         $push: {
           entries: {
-            _id: UUID,
+            _id: formatUUID(UUID),
             reason,
             timestamp: Math.floor(Date.now() / 1000),
           },
