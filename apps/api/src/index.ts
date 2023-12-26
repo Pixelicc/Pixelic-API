@@ -35,7 +35,7 @@ API.use(Sentry.Handlers.tracingHandler());
 
 API.disable("etag");
 
-API.use(mongoSanitize(), cors(), requestID, serverID(generateULID()), requestAnalytics, express.json(), JSONHandler, defaultNoCacheHeaders);
+API.use(mongoSanitize(), cors(), requestID, serverID(generateULID()), requestAnalytics, express.json({ limit: "1mb", strict: true }), JSONHandler, defaultNoCacheHeaders);
 
 API.use(router);
 
