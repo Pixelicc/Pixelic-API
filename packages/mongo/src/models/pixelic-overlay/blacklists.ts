@@ -1,11 +1,14 @@
 import { Schema } from "mongoose";
 import { client } from "../../index.js";
 
-const blacklistEntrySchema = new Schema({
-  _id: String,
-  reason: { type: String, enum: ["CHEATING", "SNIPING"], required: true },
-  timestamp: { type: Number, required: true },
-});
+const blacklistEntrySchema = new Schema(
+  {
+    UUID: { type: String, required: true, index: true },
+    reason: { type: String, enum: ["CHEATING", "SNIPING"], required: true },
+    timestamp: { type: Number, required: true },
+  },
+  { _id: false }
+);
 
 const blacklistSchema = new Schema(
   {

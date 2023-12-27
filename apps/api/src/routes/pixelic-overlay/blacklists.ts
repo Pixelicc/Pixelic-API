@@ -27,7 +27,6 @@ router.get("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, re
       entries: blacklist?.entries || [],
     });
   } catch (e) {
-    console.log(e);
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
   }
@@ -65,26 +64,32 @@ router.post("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, r
     const { UUID, reason } = req.body;
     if (!validateUUID(UUID) || !["CHEATING", "SNIPING"].includes(reason)) return res.status(422).json({ success: false, cause: "Invalid Body" });
 
-    return await PixelicOverlayBlacklistModel.updateOne(
-      { _id: user.pixelicOverlayPersonalBlacklistID },
-      {
-        $push: {
-          entries: {
-            _id: formatUUID(UUID),
-            reason,
-            timestamp: Math.floor(Date.now() / 1000),
+    const blacklist = await PixelicOverlayBlacklistModel.findById(user.pixelicOverlayPersonalBlacklistID);
+
+    if (!blacklist?.entries.some((entry) => entry.UUID === formatUUID(UUID))) {
+      return await PixelicOverlayBlacklistModel.updateOne(
+        { _id: user.pixelicOverlayPersonalBlacklistID },
+        {
+          $push: {
+            entries: {
+              UUID: formatUUID(UUID),
+              reason,
+              timestamp: Math.floor(Date.now() / 1000),
+            },
           },
-        },
-        $set: { lastUpdated: Math.floor(Date.now() / 1000) },
-        $inc: { updates: 1 },
-      }
-    )
-      .then(() => {
-        return res.json({ success: true });
-      })
-      .catch(() => {
-        return res.status(500).json({ success: false });
-      });
+          $set: { lastUpdated: Math.floor(Date.now() / 1000) },
+          $inc: { updates: 1 },
+        }
+      )
+        .then(() => {
+          return res.json({ success: true });
+        })
+        .catch(() => {
+          return res.status(500).json({ success: false });
+        });
+    }
+
+    return res.status(409).json({ success: false });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -107,7 +112,7 @@ router.delete("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req,
       {
         $pull: {
           entries: {
-            _id: {
+            UUID: {
               $in: req.body,
             },
           },
