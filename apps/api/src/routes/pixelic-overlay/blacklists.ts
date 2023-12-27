@@ -19,12 +19,12 @@ router.get("/v2/pixelic-overlay/blacklist/personal", ratelimit(), async (req, re
       await redis.hset(`API:Users:${key.owner}`, { pixelicOverlayPersonalBlacklistID: user.pixelicOverlayPersonalBlacklistID });
     }
 
-    const blacklist = await PixelicOverlayBlacklistModel.findById(user.pixelicOverlayPersonalBlacklistID, ["-entries.timestamp"]);
+    const blacklist = await PixelicOverlayBlacklistModel.findById(user.pixelicOverlayPersonalBlacklistID);
 
     return res.json({
       success: true,
       ID: blacklist?._id || null,
-      entries: blacklist?.entries || [],
+      entries: blacklist?.entries.reduce((acc, { UUID, reason, timestamp }) => ({ ...acc, [UUID]: { reason, timestamp } }), {}) || {},
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -36,13 +36,13 @@ router.get("/v2/pixelic-overlay/blacklist/:ID", ratelimit(), async (req, res) =>
   try {
     if (!validateHexID(req.params.ID, 10)) return res.status(422).json({ success: false, cause: "Invalid ID" });
 
-    const blacklist = await PixelicOverlayBlacklistModel.findById(req.params.ID, ["-entries.timestamp"]);
+    const blacklist = await PixelicOverlayBlacklistModel.findById(req.params.ID);
     if (blacklist === null) return res.status(422).json({ success: false, cause: "Invalid ID" });
 
     return res.json({
       success: true,
       ID: blacklist._id,
-      entries: blacklist?.entries || [],
+      entries: blacklist?.entries.reduce((acc, { UUID, reason, timestamp }) => ({ ...acc, [UUID]: { reason, timestamp } }), {}) || {},
     });
   } catch (e) {
     Sentry.captureException(e);
