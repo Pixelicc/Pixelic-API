@@ -3,24 +3,13 @@ import * as Sentry from "@sentry/node";
 import redis from "@pixelic/redis";
 import { formatUUID, validateUUID } from "@pixelic/utils";
 import { authorization } from "@pixelic/middlewares";
+import { PixelicOverlayTag, PixelicOverlayTagList } from "@pixelic/types";
 
 const router = express.Router();
 
-type Tag = {
-  text?: string;
-  tooltip?: string;
-  color?: string;
-  appendIcon?: string;
-  prependIcon?: string;
-};
-
-type UserTags = {
-  [key: string]: [Tag];
-};
-
 router.get("/v2/pixelic-overlay/tags", async (req, res) => {
   try {
-    const tags: UserTags = (JSON.parse((await redis.call("JSON.GET", "Pixelic-Overlay:Tags", "$")) as string) || [{}])[0];
+    const tags: PixelicOverlayTagList = (JSON.parse((await redis.call("JSON.GET", "Pixelic-Overlay:Tags", "$")) as string) || [{}])[0];
 
     return res.json({ success: true, tags });
   } catch (e) {
@@ -31,7 +20,7 @@ router.get("/v2/pixelic-overlay/tags", async (req, res) => {
 
 router.post("/v2/pixelic-overlay/tags", authorization({ role: "ADMIN", scope: "pixelic-overlay:createTag" }), async (req, res) => {
   try {
-    const { UUID, tag }: { UUID: string; tag: Tag } = req.body;
+    const { UUID, tag }: { UUID: string; tag: PixelicOverlayTag } = req.body;
 
     if (validateUUID(UUID) && tag !== null && tag.constructor.name === "Object") {
       if (!(await redis.exists("Pixelic-Overlay:Tags"))) {
