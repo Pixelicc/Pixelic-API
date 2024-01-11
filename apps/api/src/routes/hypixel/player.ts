@@ -7,25 +7,6 @@ import { getPlayer } from "@pixelic/hypixel";
 
 const router = express.Router();
 
-/**
- * Exposes the internal library for other self-developed projects to share the same backend
- *
- * MAKING PROXY ENDPOINTS PUBLICLY ACCESSIBLE IS NOT ALLOWED
- * https://developer.hypixel.net/policies
- */
-router.get("/v1/hypixel/proxy/player/:player", authorization({ role: "ADMIN", scope: "hypixel:proxy" }), async (req, res) => {
-  try {
-    const player = await getPlayer(req.params.player);
-    if (player === "This player never played on Hypixel") return res.status(404).json({ success: false });
-    if (player === null || player === "Invalid UUID or Username") return res.status(422).json({ success: false });
-
-    return res.json({ success: true, player });
-  } catch (e) {
-    Sentry.captureException(e);
-    return res.status(500).json({ success: false });
-  }
-});
-
 router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
   const UUID = await parseUUID(req.params.player);
   if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
