@@ -6,6 +6,11 @@ import { validateUUID } from "@pixelic/utils";
 
 const router = express.Router();
 
+/**
+ * THIS ENDPOINT IS PURELY MEANT FOR COMMUNICATING WITH THE PIXELIC-OVERLAY
+ * USING THIS ENDPOINT FOR ANY OTHER PURPOSE IS PROHIBITED AND ABUSE WILL GET
+ * YOUR API-KEY AND USER BANNED FROM THE PIXELIC-API
+ */
 router.get("/v2/pixelic-overlay/proxy/hypixel/player/:player", ratelimit("pixelicOverlayHypixelPlayerProxy", "5m", 200), async (req, res) => {
   try {
     if (!validateUUID(req.params.player)) return res.status(422).json({ success: false });
