@@ -8,7 +8,9 @@ import redis from "@pixelic/redis";
 import { formatUUID } from "@pixelic/utils";
 import { requestTracker } from "@pixelic/interceptors";
 
-axios.interceptors.response.use(requestTracker);
+const MojangAPI = axios.create();
+
+MojangAPI.interceptors.response.use(requestTracker);
 
 const limiter = new Bottleneck({
   reservoir: 60,
@@ -21,7 +23,7 @@ const limiter = new Bottleneck({
   clientOptions: config.database.redis,
 });
 
-axiosRetry(axios, {
+axiosRetry(MojangAPI, {
   retries: 5,
   retryDelay: (retryCount) => {
     log("Mojang", `Retrying to fetch Mojang Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2)}s)`, "warn");
@@ -45,8 +47,7 @@ export const requestUUID = async (username: string): Promise<string | null> => {
         redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
         return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
       }
-      return await axios
-        .get(`https://api.mojang.com/users/profiles/minecraft/${username}`)
+      return await MojangAPI.get(`https://api.mojang.com/users/profiles/minecraft/${username}`)
         .then(async (request) => {
           log("Mojang", `Fetched UUID (${username})`, "info");
           const data = { UUID: formatUUID(request.data.id), username: request.data.name };
@@ -82,8 +83,7 @@ export const requestUsername = async (UUID: string): Promise<string | null> => {
         redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
         return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
       }
-      return await axios
-        .get(`https://api.mojang.com/user/profile/${UUID}`)
+      return await MojangAPI.get(`https://api.mojang.com/user/profile/${UUID}`)
         .then(async (request) => {
           log("Mojang", `Fetched Username (${UUID})`, "info");
           const data = { UUID: formatUUID(request.data.id), username: request.data.name };
