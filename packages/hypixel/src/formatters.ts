@@ -1759,18 +1759,8 @@ const formatSkyblockAuctionNBT = (NBT: any) => {
   delete item.attributes.uuid;
 
   if (item?.attributes?.timestamp) {
-    /**
-     * Regex needed for older invalid formatted timestamp strings eg. "15/04/20 18:19"
-     */
-    if (/^(\d{2})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})$/.test(item.attributes.timestamp)) {
-      const [date, time] = item.attributes.timestamp.split(" ");
-      const [day, month, year] = date.split("/");
-      const [hours, minutes] = time.split(":");
-      item.timestamp = Math.floor(new Date(Number(`20${year}`), month - 1, day, hours, minutes).valueOf() / 1000);
-    } else {
-      item.timestamp = item.attributes.timestamp ? Math.floor(new Date(item.attributes.timestamp).valueOf() / 1000) : undefined;
-      if (isNaN(item.timestamp)) item.timestamp = undefined;
-    }
+    item.timestamp = item.attributes.timestamp ? Math.floor(new Date(Number(item.attributes.timestamp)).valueOf() / 1000) : undefined;
+    if (isNaN(item.timestamp)) item.timestamp = undefined;
     delete item.attributes.timestamp;
   }
   return item;
