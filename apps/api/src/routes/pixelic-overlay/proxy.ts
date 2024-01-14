@@ -16,10 +16,11 @@ router.get("/v2/pixelic-overlay/proxy/hypixel/player/:player", ratelimit("pixeli
     if (!validateUUID(req.params.player)) return res.status(422).json({ success: false });
 
     const player = await getPlayer(req.params.player);
-    if (player === "This player never played on Hypixel") return res.status(404).json({ success: false });
-    if (player === null || player === "Invalid UUID or Username") return res.status(422).json({ success: false });
+    if (player?.error === "Invalid Hypixel Player") return res.status(404).json({ success: false });
+    if (player?.error === "Invalid UUID" || player?.error === "Invalid Username" || player?.error === "Invalid Player") return res.status(422).json({ success: false });
+    if (player?.error === "Unkown") return res.status(500).json({ success: false });
 
-    return res.json({ success: true, player });
+    return res.json({ success: true, player: player.data });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

@@ -2,14 +2,14 @@ import express from "express";
 import * as Sentry from "@sentry/node";
 import { parseUUID } from "@pixelic/mojang";
 import { HypixelHistoricalPlayerModel, HypixelPlayerModel } from "@pixelic/mongo";
-import { authorization, ratelimit } from "@pixelic/middlewares";
-import { getPlayer } from "@pixelic/hypixel";
+import { ratelimit } from "@pixelic/middlewares";
 
 const router = express.Router();
 
 router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
-  const UUID = await parseUUID(req.params.player);
-  if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
+  const getUUID = await parseUUID(req.params.player);
+  if (getUUID?.error) return res.status(getUUID?.error === "Unkown" ? 500 : 422).json({ success: false, cause: getUUID.error });
+  const UUID = getUUID.data;
   try {
     const data = await HypixelPlayerModel.findOne({ _id: UUID }, ["-_id", "-__v"]).lean();
     if (Object.keys(data as object).length === 0) return res.status(404).json({ success: false, cause: "No Data Available" });
@@ -22,8 +22,9 @@ router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
 });
 
 router.get("/v1/hypixel/player/:player/history", ratelimit(), async (req, res) => {
-  const UUID = await parseUUID(req.params.player);
-  if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
+  const getUUID = await parseUUID(req.params.player);
+  if (getUUID?.error) return res.status(getUUID?.error === "Unkown" ? 500 : 422).json({ success: false, cause: getUUID.error });
+  const UUID = getUUID.data;
   try {
     const data = await HypixelHistoricalPlayerModel.find({ UUID }, ["-UUID", "-__v"]).sort({ _id: 1 }).lean();
     data.pop();

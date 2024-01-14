@@ -11,8 +11,8 @@ export default {
 
         if (!serverList) return;
 
-        for (const server of Object.values(serverList.servers)) {
-          for (const player of server.players as { UUID: string | null; username: string }[]) {
+        for (const server of Object.values(serverList.data.servers as { [key: string]: { playercount: number; players: { username: string; UUID: string }[] } })) {
+          for (const player of server.players) {
             /**
              * Checks the Wynncraft Stats of online players once per day to provide historical stats
              * Should only result in ~5-10 requests per minute after the inital start

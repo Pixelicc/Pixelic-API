@@ -4,7 +4,7 @@ import { config, deepCompare } from "@pixelic/utils";
 import { parseUUID } from "@pixelic/mojang";
 import redis from "@pixelic/redis";
 import { formatPlayer, formatGuild, formatSkyblockActiveAuction, formatSkyblockEndedAuction, formatSkyblockItems, formatSkyblockElection, formatSkyblockBazaar } from "./formatters.js";
-import { RequireOneObjParam } from "@pixelic/types";
+import { GetterResponse, RequireOneObjParam } from "@pixelic/types";
 import { HypixelGuildModel, HypixelHistoricalGuildModel, HypixelHistoricalPlayerModel, HypixelPlayerModel, HypixelSkyblockAuctionModel, HypixelSkyblockAuctionTrackingModel, HypixelSkyblockBazaarModel, HypixelSkyblockElectionModel } from "@pixelic/mongo";
 import { calculateSkyblockAuctionPrices } from "./calcs.js";
 
@@ -24,17 +24,19 @@ const getCache = async (key: string, options?: { raceCondition: boolean }): Prom
   return JSON.parse((await redis.get(key)) as string);
 };
 
-export const getPlayer = async (player: string) => {
-  const UUID = await parseUUID(player);
-  if (UUID === null) return "Invalid UUID or Username";
+export const getPlayer = async (player: string): Promise<GetterResponse<any, "Invalid UUID" | "Invalid Username" | "Invalid Player" | "Invalid Hypixel Player", boolean | null>> => {
+  const getUUID = await parseUUID(player);
+  if (getUUID?.error) return { error: getUUID.error, cached: getUUID.cached };
+  const UUID = getUUID.data;
   try {
-    if (await checkCache(`Hypixel:Cache:Players:${UUID}`)) return await getCache(`Hypixel:Cache:Players:${UUID}`);
+    if (await checkCache(`Hypixel:Cache:Players:${UUID}`)) return { data: await getCache(`Hypixel:Cache:Players:${UUID}`), cached: true };
+    // @ts-ignore
     return await Limiter.schedule(async () => {
-      if (await checkCache(`Hypixel:Cache:Players:${UUID}`)) return await getCache(`Hypixel:Cache:Players:${UUID}`, { raceCondition: true });
+      if (await checkCache(`Hypixel:Cache:Players:${UUID}`)) return { data: await getCache(`Hypixel:Cache:Players:${UUID}`, { raceCondition: true }), cached: true };
       return await HypixelAPI.get("/player", { params: { uuid: UUID } })
         .then(async (res) => {
           log("Hypixel", `Fetched Player (${UUID})`, "info");
-          if (res.data.player === null) return "This player never played on Hypixel";
+          if (res.data.player === null) return { error: "Invalid Hypixel Player", cached: false };
           const formattedData = await formatPlayer(res.data.player);
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Players:${UUID}`, 600, JSON.stringify(formattedData));
           if (config.hypixel.persistData) {
@@ -62,78 +64,79 @@ export const getPlayer = async (player: string) => {
               }
             }
           }
-          return formattedData;
+          return { data: formattedData, cached: false };
         })
         .catch(async () => {
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Players:${UUID}`, 300, JSON.stringify(null));
-          return null;
+          return { error: "Unkown", cached: false };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player?: string; ID?: string; name?: string }>) => {
+export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player?: string; ID?: string; name?: string }>): Promise<GetterResponse<any, "Invalid UUID" | "Invalid Username" | "Invalid Player" | "Player not in Guild" | "Invalid Guild ID" | "Invalid Guild Name" | "Invalid Guild", boolean | null>> => {
   try {
     var data: any;
     if (player) {
-      const UUID = await parseUUID(player);
-      if (UUID === null) return "Invalid UUID or Username";
+      const getUUID = await parseUUID(player);
+      if (getUUID?.error) return { error: getUUID.error, cached: getUUID.cached };
+      const UUID = getUUID.data;
       if (await checkCache(`Hypixel:Cache:Guilds:${UUID}`)) {
-        if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return null;
-        return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`);
+        if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return { error: "Player not in Guild", cached: true };
+        return { data: await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`), cached: true };
       }
       await Limiter.schedule(async () => {
         if (await checkCache(`Hypixel:Cache:Guilds:${UUID}`)) {
-          if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return null;
-          return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`, { raceCondition: true });
+          if ((await getCache(`Hypixel:Cache:Guilds:${UUID}`)) === null) return { error: "Player not in Guild", cached: true };
+          return { data: await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${UUID}`)}`, { raceCondition: true }), cached: true };
         }
         try {
           data = (await HypixelAPI.get("/guild", { params: { player: UUID } })).data;
         } catch {
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Guilds:${UUID}`, 300, JSON.stringify(null));
-          return null;
+          return { error: "Player not in Guild", cached: false };
         }
       });
       log("Hypixel", `Fetched Guild (${UUID})`, "info");
     }
     if (ID) {
-      if (!/^[0-9a-fA-F]{24}$/.test(ID)) return "Invalid Guild ID";
-      if (await checkCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`)) return await getCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`);
+      if (!/^[0-9a-fA-F]{24}$/.test(ID)) return { error: "Invalid Guild ID", cached: null };
+      if (await checkCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`)) return { data: await getCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`), cached: true };
       await Limiter.schedule(async () => {
-        if (await checkCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`)) return await getCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`, { raceCondition: true });
+        if (await checkCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`)) return { data: await getCache(`Hypixel:Cache:Guilds:${ID.toLowerCase()}`, { raceCondition: true }), cached: true };
         try {
           data = (await HypixelAPI.get("/guild", { params: { id: ID } })).data;
         } catch {
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Guilds:${ID}`, 300, JSON.stringify(null));
-          return null;
+          return { error: "Invalid Guild", cached: false };
         }
       });
       log("Hypixel", `Fetched Guild (${ID})`, "info");
     }
     if (name) {
-      if (!/^[a-zA-Z0-9_ ]{3,32}$/.test(name)) return "Invalid Guild Name";
+      if (!/^[a-zA-Z0-9_ ]{3,32}$/.test(name)) return { error: "Invalid Guild Name", cached: null };
       if (await checkCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) {
-        if ((await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) === null) return null;
-        return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`);
+        if ((await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) === null) return { error: "Invalid Guild", cached: true };
+        return { data: await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`), cached: true };
       }
       await Limiter.schedule(async () => {
         if (await checkCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) {
           if ((await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)) === null) return null;
-          return await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`, { raceCondition: true });
+          return { data: await getCache(`Hypixel:Cache:Guilds:${await getCache(`Hypixel:Cache:Guilds:${name.toLowerCase()}`)}`, { raceCondition: true }), cached: true };
         }
         try {
           data = (await HypixelAPI.get("/guild", { params: { name } })).data;
         } catch {
           if (config.hypixel.cache) await redis.setex(`Hypixel:Cache:Guilds:${name.toLowerCase()}`, 300, JSON.stringify(null));
-          return null;
+          return { error: "Invalid Guild", cached: false };
         }
       });
       log("Hypixel", `Fetched Guild (${name})`, "info");
     }
-    if (data.guild === null) return "This Guild does not exist";
+    if (data.guild === null) return { error: "Invalid Guild", cached: null };
     const formattedData = formatGuild(data.guild);
     if (config.hypixel.cache) {
       const pipeline = redis.pipeline();
@@ -173,19 +176,19 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
         }
       }
     }
-    return formattedData;
+    return { data: formattedData, cached: true };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
 /**
- * To get and query active auctions use the `queryActiveAuctions` function in combination with this function
+ * To retrieve and query active auctions use the `queryActiveAuctions` function in combination with this function
  *
- * This is a very resource heavy function and should be used appropriately
+ * This is a highly resource heavy function and should be used appropriately
  */
-export const getSkyblockActiveAuctions = async (): Promise<void> => {
+export const getSkyblockActiveAuctions = async () => {
   try {
     const UUIDs: string[] = [];
     const UUIDsBefore = await redis.smembers("Hypixel:Skyblock:Auctions:UUIDs");
@@ -228,7 +231,7 @@ export const getSkyblockActiveAuctions = async (): Promise<void> => {
   }
 };
 
-export const querySkyblockActiveAuctions = async (query: string, limit?: number) => {
+export const querySkyblockActiveAuctions = async (query: string, limit?: number): Promise<GetterResponse<{ count: number; matches: any[] }, "Unkown", null>> => {
   try {
     const result: any = await redis.call("FT.SEARCH", "Hypixel.Skyblock.Auction", query, "LIMIT", "0", limit ? String(limit) : "1000");
     const parsedMatches = [];
@@ -238,18 +241,21 @@ export const querySkyblockActiveAuctions = async (query: string, limit?: number)
     }
 
     return {
-      count: result[0],
-      matches: parsedMatches,
+      data: {
+        count: result[0],
+        matches: parsedMatches,
+      },
+      cached: null,
     };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockEndedAuctions = async () => {
+export const getSkyblockEndedAuctions = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockEndedAuctions"))) return JSON.parse((await redis.get("Hypixel:Cache:skyblockEndedAuctions")) as string);
+    if (config.hypixel.cache && (await redis.exists("Hypixel:Cache:skyblockEndedAuctions"))) return { data: JSON.parse((await redis.get("Hypixel:Cache:skyblockEndedAuctions")) as string), cached: true };
     const auctions: any[] = [];
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/skyblock/auctions_ended")).data.auctions;
     log("Hypixel", "Fetched Skyblock Ended Auctions", "info");
@@ -283,19 +289,19 @@ export const getSkyblockEndedAuctions = async () => {
     }
     await redis.set("Hypixel:Cache:skyblockEndedAuctionsLastState", JSON.stringify(data));
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
-    return auctions;
+    return { data: auctions, cached: false };
   } catch (e) {
     console.log(e);
     Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Skyblock Ended Auctions", "warn");
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) => {
+export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
     if (await checkCache("Hypixel:Cache:skyblockBazaar")) {
-      return itemInfo ? await formatSkyblockBazaar(await getCache("Hypixel:Cache:skyblockBazaar"), { itemInfo: true }) : await formatSkyblockBazaar(await getCache("Hypixel:Cache:skyblockBazaar"), { itemInfo: false });
+      return itemInfo ? { data: await formatSkyblockBazaar(await getCache("Hypixel:Cache:skyblockBazaar"), { itemInfo: true }), cached: true } : { data: await formatSkyblockBazaar(await getCache("Hypixel:Cache:skyblockBazaar"), { itemInfo: false }), cached: true };
     }
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/skyblock/bazaar")).data.products;
     log("Hypixel", "Fetched Skyblock Bazaar", "info");
@@ -314,31 +320,31 @@ export const getSkyblockBazaar = async ({ itemInfo }: { itemInfo?: boolean }) =>
         await redis.setex("Hypixel:lastSkyblockBazaarLongTermIngestion", 3595, "");
       }
     }
-    return formattedData;
+    return { data: formattedData, cached: false };
   } catch (e) {
     Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Skyblock Bazaar", "warn");
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockItems = async () => {
+export const getSkyblockItems = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:skyblockItems")) return await getCache("Hypixel:Cache:skyblockItems");
+    if (await checkCache("Hypixel:Cache:skyblockItems")) return { data: await getCache("Hypixel:Cache:skyblockItems"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/skyblock/items")).data.items;
     log("Hypixel", "Fetched Skyblock Items", "info");
     const formattedData = formatSkyblockItems(data);
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockItems", 1800, JSON.stringify(formattedData));
-    return formattedData;
+    return { data: formattedData, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockElection = async () => {
+export const getSkyblockElection = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:skyblockElection")) return await getCache("Hypixel:Cache:skyblockElection");
+    if (await checkCache("Hypixel:Cache:skyblockElection")) return { data: await getCache("Hypixel:Cache:skyblockElection"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/skyblock/election")).data;
     log("Hypixel", "Fetched Skyblock Election", "info");
     const formattedData = formatSkyblockElection(data);
@@ -348,126 +354,126 @@ export const getSkyblockElection = async () => {
         await HypixelSkyblockElectionModel.create({ _id: formattedData.lastElection.year, candidates: formattedData.lastElection.candidates, timestamp: Math.floor(Date.now() / 1000) }).catch(() => {});
       }
     }
-    return formattedData;
+    return { data: formattedData, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockCollections = async () => {
+export const getSkyblockCollections = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:skyblockCollections")) return await getCache("Hypixel:Cache:skyblockCollections");
+    if (await checkCache("Hypixel:Cache:skyblockCollections")) return { data: await getCache("Hypixel:Cache:skyblockCollections"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/skyblock/collections")).data.collections;
     log("Hypixel", "Fetched Skyblock Collections", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockCollections", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getSkyblockSkills = async () => {
+export const getSkyblockSkills = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:skyblockSkills")) return await getCache("Hypixel:Cache:skyblockSkills");
+    if (await checkCache("Hypixel:Cache:skyblockSkills")) return { data: await getCache("Hypixel:Cache:skyblockSkills"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/skyblock/skills")).data.skills;
     log("Hypixel", "Fetched Skyblock Skills", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockSkills", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getGames = async () => {
+export const getGames = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:games")) return await getCache("Hypixel:Cache:games");
+    if (await checkCache("Hypixel:Cache:games")) return { data: await getCache("Hypixel:Cache:games"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/games")).data.games;
     log("Hypixel", "Fetched Games", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:games", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getAchievements = async () => {
+export const getAchievements = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:achievements")) return await getCache("Hypixel:Cache:achievements");
+    if (await checkCache("Hypixel:Cache:achievements")) return { data: await getCache("Hypixel:Cache:achievements"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/achievements")).data.achievements;
     log("Hypixel", "Fetched Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:achievements", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getChallenges = async () => {
+export const getChallenges = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:challenges")) return await getCache("Hypixel:Cache:challenges");
+    if (await checkCache("Hypixel:Cache:challenges")) return { data: await getCache("Hypixel:Cache:challenges"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/challenges")).data.challenges;
     log("Hypixel", "Fetched Challenges", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:challenges", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getQuests = async () => {
+export const getQuests = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:quests")) return await getCache("Hypixel:Cache:quests");
+    if (await checkCache("Hypixel:Cache:quests")) return { data: await getCache("Hypixel:Cache:quests"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/quests")).data.quests;
     log("Hypixel", "Fetched Quests", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:quests", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getGuildAchievements = async () => {
+export const getGuildAchievements = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:guildAchievements")) return await getCache("Hypixel:Cache:guildAchievements");
+    if (await checkCache("Hypixel:Cache:guildAchievements")) return { data: await getCache("Hypixel:Cache:guildAchievements"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/guilds/achievements")).data;
     log("Hypixel", "Fetched Guild Achievements", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:guildAchievements", 600, JSON.stringify({ one_time: data.one_time, tiered: data.tiered }));
-    return { one_time: data.one_time, tiered: data.tiered };
+    return { data: { normal: data.one_time, tiered: data.tiered }, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getPets = async () => {
+export const getPets = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:pets")) return await getCache("Hypixel:Cache:pets");
+    if (await checkCache("Hypixel:Cache:pets")) return { data: await getCache("Hypixel:Cache:pets"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/vanity/pets")).data.types;
     log("Hypixel", "Fetched Pets", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:pets", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getCompanions = async () => {
+export const getCompanions = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Hypixel:Cache:companions")) return await getCache("Hypixel:Cache:companions");
+    if (await checkCache("Hypixel:Cache:companions")) return { data: await getCache("Hypixel:Cache:companions"), cached: true };
     const data = (await HypixelAPI.get("https://api.hypixel.net/v2/resources/vanity/companions")).data.types;
     log("Hypixel", "Fetched Companions", "info");
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:companions", 600, JSON.stringify(data));
-    return data;
+    return { data, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };

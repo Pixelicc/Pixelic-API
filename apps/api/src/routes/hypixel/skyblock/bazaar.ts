@@ -11,10 +11,10 @@ router.get("/v1/hypixel/skyblock/bazaar", async (req, res) => {
   try {
     res.set("Cache-Control", "public, max-age=60");
 
-    const data = await getSkyblockBazaar({ itemInfo: true });
-    if (!data) return res.status(500).json({ success: false });
+    const bazaar = await getSkyblockBazaar({ itemInfo: true });
+    if (bazaar?.error) return res.status(500).json({ success: false });
 
-    return res.json({ success: true, products: data });
+    return res.json({ success: true, products: bazaar.data });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
@@ -25,12 +25,12 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
   try {
     if (!validateSkyblockItemID(req.params.product)) return res.status(422).json({ success: false, cause: "Invalid Skyblock Item ID" });
 
-    const data = await getSkyblockBazaar({ itemInfo: true });
-    if (!data) return res.status(500).json({ success: false });
-    if (!data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
+    const bazaar = await getSkyblockBazaar({ itemInfo: true });
+    if (bazaar?.error) return res.status(500).json({ success: false });
+    if (!bazaar.data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
     res.set("Cache-Control", "public, max-age=60");
 
-    return res.json({ success: true, product: data[req.params.product] });
+    return res.json({ success: true, product: bazaar.data[req.params.product] });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

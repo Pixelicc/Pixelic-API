@@ -10,10 +10,10 @@ router.get("/v1/hypixel/skyblock/election", async (req, res) => {
   try {
     res.set("Cache-Control", "public, max-age=3600");
 
-    const data = await getSkyblockElection();
-    if (!data) return res.status(500).json({ success: false });
+    const election = await getSkyblockElection();
+    if (election?.error) return res.status(500).json({ success: false });
 
-    return res.json({ success: true, ...data });
+    return res.json({ success: true, ...election.data });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });

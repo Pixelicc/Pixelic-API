@@ -7,6 +7,7 @@ import { config, validateUUID, validateUsername } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import { formatUUID } from "@pixelic/utils";
 import { requestTracker } from "@pixelic/interceptors";
+import { GetterResponse } from "@pixelic/types";
 
 const MojangAPI = axios.create();
 
@@ -34,18 +35,19 @@ axiosRetry(MojangAPI, {
   },
 });
 
-export const requestUUID = async (username: string): Promise<string | null> => {
+export const requestUUID = async (username: string): Promise<GetterResponse<string, "Invalid Username" | "Invalid Player", boolean | null>> => {
+  if (!validateUsername(username)) return { error: "Invalid Username", cached: null };
   username = username.toLowerCase();
   if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${username}`))) {
     redis.hincrby("Mojang:Stats", "cachedRequests", 1);
-    return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
+    return { data: JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID, cached: true };
   }
   try {
     return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${username}`)) {
         limiter.incrementReservoir(1);
         redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
-        return JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID;
+        return { data: JSON.parse((await redis.get(`Mojang:Cache:${username}`)) as string).UUID, cached: true };
       }
       return await MojangAPI.get(`https://api.mojang.com/users/profiles/minecraft/${username}`)
         .then(async (request) => {
@@ -56,32 +58,33 @@ export const requestUUID = async (username: string): Promise<string | null> => {
             await redis.setex(`Mojang:Cache:${request.data.name.toLowerCase()}`, 86400 * 30, JSON.stringify(data));
             await redis.setex(`Mojang:Cache:${data.UUID}`, 86400 * 30, JSON.stringify(data));
           }
-          return data.UUID;
+          return { data: data.UUID, cached: false };
         })
         .catch(async () => {
           if (config.mojang.cache) await redis.setex(`Mojang:Cache:${username}`, 3600, JSON.stringify({ username, UUID: null }));
-          return null;
+          return { error: "Invalid Player", cached: false };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
     if (config.mojang.cache) await redis.setex(`Mojang:Cache:${username}`, 3600, JSON.stringify({ username, UUID: null }));
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const requestUsername = async (UUID: string): Promise<string | null> => {
+export const requestUsername = async (UUID: string): Promise<GetterResponse<string, "Invalid UUID" | "Invalid Player", boolean | null>> => {
+  if (!validateUUID(UUID)) return { error: "Invalid UUID", cached: null };
   UUID = formatUUID(UUID);
   if (config.mojang.cache && (await redis.exists(`Mojang:Cache:${UUID}`))) {
     redis.hincrby("Mojang:Stats", "cachedRequests", 1);
-    return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
+    return { data: JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username, cached: true };
   }
   try {
     return await limiter.schedule(async () => {
       if (await redis.exists(`Mojang:Cache:${UUID}`)) {
         limiter.incrementReservoir(1);
         redis.hincrby("Mojang:Stats", "raceConditionCachedRequests", 1);
-        return JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username;
+        return { data: JSON.parse((await redis.get(`Mojang:Cache:${UUID}`)) as string).username, cached: true };
       }
       return await MojangAPI.get(`https://api.mojang.com/user/profile/${UUID}`)
         .then(async (request) => {
@@ -92,23 +95,22 @@ export const requestUsername = async (UUID: string): Promise<string | null> => {
             await redis.setex(`Mojang:Cache:${request.data.name.toLowerCase()}`, 86400 * 30, JSON.stringify(data));
             await redis.setex(`Mojang:Cache:${UUID}`, 86400 * 30, JSON.stringify(data));
           }
-          return data.username;
+          return { data: data.username, cached: false };
         })
         .catch(async () => {
           if (config.mojang.cache) await redis.setex(`Mojang:Cache:${UUID}`, 3600, JSON.stringify({ username: null, UUID }));
-          return null;
+          return { error: "Invalid Player", cached: false };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
     if (config.mojang.cache) await redis.setex(`Mojang:Cache:${UUID}`, 3600, JSON.stringify({ username: null, UUID }));
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const parseUUID = async (player: string) => {
-  if (typeof player !== "string") return null;
-  if (validateUUID(player)) return formatUUID(player);
-  if (!validateUsername(player)) return null;
+export const parseUUID = async (player: string): Promise<GetterResponse<string, "Invalid Username" | "Invalid UUID" | "Invalid Player", boolean | null>> => {
+  if (validateUUID(player)) return { data: formatUUID(player), cached: null };
+  if (!validateUsername(player)) return { error: "Invalid Username", cached: null };
   return await requestUUID(player);
 };

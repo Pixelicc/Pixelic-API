@@ -16,6 +16,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/stats", async (req, res) => {
     for (var i = 0; i < tierStatsRaw.length; i += 2) {
       tierStats[tierStatsRaw[i]] = Number(tierStatsRaw[i + 1]);
     }
+    delete tierStats[""];
 
     const itemStats: { [key: string]: number } = {};
     const itemStatsRaw = await redis.zrevrange("Hypixel:Stats:Skyblock:AuctionsSoldByItem", 0, 100000, "WITHSCORES");
@@ -40,7 +41,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/stats", async (req, res) => {
       auctionsSoldByTier: tierStats,
       auctionsSoldByItem: itemStats,
       auctionVolumeByItem: volumeStats,
-      volumeStatsRaw,
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -90,7 +90,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
         tier,
         itemID,
       },
-      ...(await querySkyblockActiveAuctions(query.join(" "))),
+      ...(await querySkyblockActiveAuctions(query.join(" "))).data,
     });
   } catch (e) {
     Sentry.captureException(e);
@@ -100,8 +100,9 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
 
 router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(), async (req, res) => {
   try {
-    const UUID = await parseUUID(req.params.player);
-    if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
+    const getUUID = await parseUUID(req.params.player);
+    if (getUUID?.error) return res.status(getUUID?.error === "Unkown" ? 500 : 422).json({ success: false, cause: getUUID.error });
+    const UUID = getUUID.data;
     if (!req?.query?.data && !["sell", "buy"].includes(String(req.query.data))) return res.status(422).json({ success: false, cause: "Invalid Data Type" });
 
     res.set("Cache-Control", "public, max-age=300");
@@ -131,8 +132,9 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
 
 router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), async (req, res) => {
   try {
-    const UUID = await parseUUID(req.params.player);
-    if (UUID === null) return res.status(422).json({ success: false, cause: "Invalid Player" });
+    const getUUID = await parseUUID(req.params.player);
+    if (getUUID?.error) return res.status(getUUID?.error === "Unkown" ? 500 : 422).json({ success: false, cause: getUUID.error });
+    const UUID = getUUID.data;
     if (!req?.query?.data && !["sell", "buy"].includes(String(req.query.data))) return res.status(422).json({ success: false, cause: "Invalid Data Type" });
     if (req?.query?.page && isNaN(Number(req.query.page))) return res.status(422).json({ success: false, cause: "Invalid Page" });
 

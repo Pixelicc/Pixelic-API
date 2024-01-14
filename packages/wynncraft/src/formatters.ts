@@ -140,7 +140,7 @@ export const formatServerList = async (data: any, { UUIDs }: { UUIDs?: boolean }
 
     if (UUIDs) {
       parsedData.servers[server].players.push({
-        UUID: await requestUUID(player),
+        UUID: (await requestUUID(player))?.data || null,
         username: player,
       });
     } else {

@@ -4,7 +4,7 @@ import { formatGuild, formatPlayer, formatServerList, formatTerritoryList } from
 import { config, dashUUID, deepCompare } from "@pixelic/utils";
 import redis from "@pixelic/redis";
 import { WynncraftPlayerModel, WynncraftHistoricalPlayerModel, WynncraftGuildModel, WynncraftServerPlayercountModel } from "@pixelic/mongo";
-import { RequireOneObjParam } from "@pixelic/types";
+import { GetterResponse, RequireOneObjParam } from "@pixelic/types";
 import log from "@pixelic/logger";
 
 import { Limiter, WynncraftAPI } from "./requestHandler.js";
@@ -23,13 +23,14 @@ const getCache = async (key: string, options?: { raceCondition: boolean }): Prom
   return JSON.parse((await redis.get(key)) as string);
 };
 
-export const getPlayer = async (player: string) => {
-  const UUID = await parseUUID(player);
-  if (UUID === null) return "Invalid UUID or Username";
+export const getPlayer = async (player: string): Promise<GetterResponse<any, "Invalid UUID" | "Invalid Username" | "Invalid Player" | "Invalid Wynncraft Player", boolean | null>> => {
+  const getUUID = await parseUUID(player);
+  if (getUUID?.error) return { error: getUUID.error, cached: getUUID.cached };
+  const UUID = getUUID.data;
   try {
-    if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return await getCache(`Wynncraft:Cache:Players:${UUID}`);
+    if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return { data: await getCache(`Wynncraft:Cache:Players:${UUID}`), cached: true };
     return await Limiter.schedule(async () => {
-      if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return await getCache(`Wynncraft:Cache:Players:${UUID}`, { raceCondition: true });
+      if (await checkCache(`Wynncraft:Cache:Players:${UUID}`)) return { data: await getCache(`Wynncraft:Cache:Players:${UUID}`, { raceCondition: true }), cached: true };
       return await WynncraftAPI.get(`/v3/player/${dashUUID(UUID)}`, { params: { fullResult: "True" } })
         .then(async (res) => {
           log("Wynncraft", `Fetched Player (${UUID})`, "info");
@@ -64,50 +65,55 @@ export const getPlayer = async (player: string) => {
               }
             }
           }
-          return formattedData;
+          return { data: formattedData, cached: false };
         })
-        .catch(async () => {
-          if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(null));
-          return null;
+        .catch(async (e) => {
+          if (e?.status === 404) {
+            if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(null));
+            return { error: "Invalid Wynncraft Player", cached: false };
+          } else {
+            if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(null));
+            return { error: "Unkown", cached: false };
+          }
         });
     });
   } catch (e) {
     Sentry.captureException(e);
     if (config.wynncraft.cache) await redis.setex(`Wynncraft:Cache:Players:${UUID}`, 300, JSON.stringify(null));
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: string; prefix?: string }>) => {
+export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: string; prefix?: string }>): Promise<GetterResponse<any, "Invalid Guild Name" | "Invalid Guild Prefix" | "Invalid Guild", boolean | null>> => {
   try {
     var data: any;
     if (name) {
-      if (!/^[a-zA-Z ]{3,32}$/.test(name)) return "Invalid Guild Name";
-      if (await checkCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`)) return await getCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`);
+      if (!/^[a-zA-Z ]{3,32}$/.test(name)) return { error: "Invalid Guild Name", cached: null };
+      if (await checkCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`)) return { data: await getCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`), cached: true };
       await Limiter.schedule(async () => {
-        if (await checkCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`)) return await getCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`, { raceCondition: true });
+        if (await checkCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`)) return { data: await getCache(`Wynncraft:Cache:Guilds:${name.toLowerCase()}`, { raceCondition: true }), cached: true };
         try {
           data = (await WynncraftAPI.get(`/v3/guild/${name}`)).data;
         } catch {
-          return null;
+          return { error: "Invalid Guild", cached: false };
         }
       });
       log("Wynncraft", `Fetched Guild (${name})`, "info");
     }
     if (prefix) {
-      if (!/^[a-zA-Z]{3,4}$/.test(prefix)) return "Invalid Guild Prefix";
-      if (await checkCache(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)) return await getCache(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`);
+      if (!/^[a-zA-Z]{3,4}$/.test(prefix)) return { error: "Invalid Guild Prefix", cached: null };
+      if (await checkCache(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)) return { data: await getCache(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`), cached: true };
       await Limiter.schedule(async () => {
-        if (await checkCache(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)) return await getCache(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`, { raceCondition: true });
+        if (await checkCache(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)) return { data: await getCache(`Wynncraft:Cache:Guilds:${await redis.get(`Wynncraft:Cache:Guilds:${prefix.toLowerCase()}`)}`, { raceCondition: true }), cached: true };
         try {
           data = (await WynncraftAPI.get(`/v3/guild/prefix/${prefix}`)).data;
         } catch {
-          return null;
+          return { error: "Invalid Guild", cached: false };
         }
       });
       log("Wynncraft", `Fetched Guild (${prefix})`, "info");
     }
-    if (!data.name) return "This Guild does not exist";
+    if (!data.name) return { error: "Invalid Guild", cached: false };
     const formattedData = formatGuild(data);
     if (config.wynncraft.cache) {
       await redis.setex(`Wynncraft:Cache:Guilds:${formattedData.prefix.toLowerCase()}`, 600, formattedData.name.toLowerCase());
@@ -119,39 +125,39 @@ export const getGuild = async ({ name, prefix }: RequireOneObjParam<{ name?: str
         await WynncraftGuildModel.updateOne({ _id: formattedData.name.toUpperCase() }, { $set: { timestamp: Math.floor(Date.now() / 1000) } });
       }
     }
-    return formattedData;
+    return { data: formattedData, cached: false };
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getGuildList = async () => {
+export const getGuildList = async (): Promise<GetterResponse<{ guildcount: number; guilds: any[] }, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Wynncraft:Cache:guildList")) return await getCache("Wynncraft:Cache:guildList");
+    if (await checkCache("Wynncraft:Cache:guildList")) return { data: await getCache("Wynncraft:Cache:guildList"), cached: true };
     return await Limiter.schedule(async () => {
-      if (await checkCache("Wynncraft:Cache:guildList")) return await getCache("Wynncraft:Cache:guildList", { raceCondition: true });
+      if (await checkCache("Wynncraft:Cache:guildList")) return { data: await getCache("Wynncraft:Cache:guildList", { raceCondition: true }), cached: true };
       return await WynncraftAPI.get("/v3/guild/list/guild")
         .then(async (res) => {
           log("Wynncraft", "Fetched Guild List", "info");
           if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:guildList", 300, JSON.stringify({ guildcount: res.data.length, guilds: res.data }));
-          return { guildcount: res.data.length, guilds: res.data };
+          return { data: { guildcount: res.data.length, guilds: res.data }, cached: false };
         })
         .catch(() => {
-          return null;
+          return { error: "Unkown", cached: null };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
+export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Wynncraft:Cache:serverList")) return await formatServerList(await getCache("Wynncraft:Cache:serverList"), { UUIDs });
+    if (await checkCache("Wynncraft:Cache:serverList")) return { data: await formatServerList(await getCache("Wynncraft:Cache:serverList"), { UUIDs }), cached: true };
     return await Limiter.schedule(async () => {
-      if (await checkCache("Wynncraft:Cache:serverList")) return await formatServerList(await getCache("Wynncraft:Cache:serverList", { raceCondition: true }), { UUIDs });
+      if (await checkCache("Wynncraft:Cache:serverList")) return { data: await formatServerList(await getCache("Wynncraft:Cache:serverList", { raceCondition: true }), { UUIDs }), cached: true };
       return await WynncraftAPI.get("/v3/player")
         .then(async (res) => {
           log("Wynncraft", "Fetched Wynncraft Server List", "info");
@@ -170,36 +176,36 @@ export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }) => {
               await redis.setex("Wynncraft:lastServerListLongTermIngestion", 3595, "");
             }
           }
-          return formattedData;
+          return { data: formattedData, cached: false };
         })
         .catch(() => {
-          return null;
+          return { error: "Unkown", cached: null };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
 
-export const getTerritoryList = async () => {
+export const getTerritoryList = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
   try {
-    if (await checkCache("Wynncraft:Cache:territoryList")) return await getCache("Wynncraft:Cache:territoryList");
+    if (await checkCache("Wynncraft:Cache:territoryList")) return { data: await getCache("Wynncraft:Cache:territoryList"), cached: true };
     return await Limiter.schedule(async () => {
-      if (await checkCache("Wynncraft:Cache:territoryList")) return await getCache("Wynncraft:Cache:territoryList", { raceCondition: true });
+      if (await checkCache("Wynncraft:Cache:territoryList")) return { data: await getCache("Wynncraft:Cache:territoryList", { raceCondition: true }), cached: true };
       return await WynncraftAPI.get("/v3/guild/list/territory")
         .then(async (res) => {
           log("Wynncraft", "Fetched Territory List", "info");
           const formattedData = formatTerritoryList(res.data);
           if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:territoryList", 300, JSON.stringify(formattedData));
-          return formattedData;
+          return { data: formattedData, cached: false };
         })
         .catch(() => {
-          return null;
+          return { error: "Unkown", cached: null };
         });
     });
   } catch (e) {
     Sentry.captureException(e);
-    return null;
+    return { error: "Unkown", cached: null };
   }
 };
