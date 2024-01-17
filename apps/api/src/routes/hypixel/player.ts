@@ -12,7 +12,7 @@ router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
   const UUID = getUUID.data;
   try {
     const data = await HypixelPlayerModel.findOne({ _id: UUID }, ["-_id", "-__v"]).lean();
-    if (Object.keys(data as object).length === 0) return res.status(404).json({ success: false, cause: "No Data Available" });
+    if (data === null) return res.status(404).json({ success: false, cause: "No Data Available" });
 
     return res.json({ success: true, player: { UUID, ...data } });
   } catch (e) {

@@ -11,6 +11,7 @@ router.get("/v2/pixelic-overlay/tags", async (req, res) => {
   try {
     const tags: PixelicOverlayTagList = (JSON.parse((await redis.call("JSON.GET", "Pixelic-Overlay:Tags", "$")) as string) || [{}])[0];
 
+    res.set("Cache-Control", "public, max-age=300");
     return res.json({ success: true, tags });
   } catch (e) {
     Sentry.captureException(e);

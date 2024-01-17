@@ -20,6 +20,7 @@ router.get("/v2/pixelic-overlay/proxy/hypixel/player/:player", ratelimit("pixeli
     if (player?.error === "Invalid UUID" || player?.error === "Invalid Username" || player?.error === "Invalid Player") return res.status(422).json({ success: false });
     if (player?.error === "Unkown") return res.status(500).json({ success: false });
 
+    res.set("Cache-Control", "public, max-age=300");
     return res.json({ success: true, player: player.data });
   } catch (e) {
     Sentry.captureException(e);

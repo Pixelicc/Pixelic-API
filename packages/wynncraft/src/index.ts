@@ -209,3 +209,24 @@ export const getTerritoryList = async (): Promise<GetterResponse<any, "Unkown", 
     return { error: "Unkown", cached: null };
   }
 };
+
+export const getItems = async (): Promise<GetterResponse<any, "Unkown", boolean | null>> => {
+  try {
+    if (await checkCache("Wynncraft:Cache:items")) return { data: await getCache("Wynncraft:Cache:items"), cached: true };
+    return await Limiter.schedule(async () => {
+      if (await checkCache("Wynncraft:Cache:items")) return { data: await getCache("Wynncraft:Cache:items", { raceCondition: true }), cached: true };
+      return await WynncraftAPI.get("/v3/item/database", { params: { fullResult: "True" } })
+        .then(async (res) => {
+          log("Wynncraft", "Fetched Items", "info");
+          if (config.wynncraft.cache) await redis.setex("Wynncraft:Cache:items", 300, JSON.stringify(res.data));
+          return { data: res.data, cached: false };
+        })
+        .catch(() => {
+          return { error: "Unkown", cached: null };
+        });
+    });
+  } catch (e) {
+    Sentry.captureException(e);
+    return { error: "Unkown", cached: null };
+  }
+};

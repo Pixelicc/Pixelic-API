@@ -54,7 +54,6 @@ router.get("/v1/minecraft/server/:server/history", async (req, res) => {
     const date = new Date();
     date.setHours(new Date().getHours() + 1, 0, 30, 0);
     res.set("Expires", date.toUTCString());
-
     return res.json({
       success: true,
       history: formatTimeseries(await MinecraftServerPlayercountModel.longTerm.find({ meta: req.params.server }, ["-meta", "-_id", "-__v"]).lean()),

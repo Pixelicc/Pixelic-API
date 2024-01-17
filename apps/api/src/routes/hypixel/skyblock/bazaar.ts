@@ -9,11 +9,10 @@ const router = express.Router();
 
 router.get("/v1/hypixel/skyblock/bazaar", async (req, res) => {
   try {
-    res.set("Cache-Control", "public, max-age=60");
-
     const bazaar = await getSkyblockBazaar({ itemInfo: true });
     if (bazaar?.error) return res.status(500).json({ success: false });
 
+    res.set("Cache-Control", "public, max-age=60");
     return res.json({ success: true, products: bazaar.data });
   } catch (e) {
     Sentry.captureException(e);
@@ -28,8 +27,8 @@ router.get("/v1/hypixel/skyblock/bazaar/:product", async (req, res) => {
     const bazaar = await getSkyblockBazaar({ itemInfo: true });
     if (bazaar?.error) return res.status(500).json({ success: false });
     if (!bazaar.data[req.params.product]) return res.status(422).json({ success: false, cause: "Invalid Bazaar Product" });
-    res.set("Cache-Control", "public, max-age=60");
 
+    res.set("Cache-Control", "public, max-age=60");
     return res.json({ success: true, product: bazaar.data[req.params.product] });
   } catch (e) {
     Sentry.captureException(e);
@@ -45,7 +44,6 @@ router.get("/v1/hypixel/skyblock/bazaar/:id/history", ratelimit(), async (req, r
     const date = new Date();
     date.setHours(new Date().getHours() + 1, 0, 0, 0);
     res.set("Expires", date.toUTCString());
-
     return res.json({
       success: true,
       history: formatTimeseries(await HypixelSkyblockBazaarModel.longTerm.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),

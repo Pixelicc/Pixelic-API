@@ -31,7 +31,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/stats", async (req, res) => {
     }
 
     res.set("Cache-Control", "public, max-age=300");
-
     return res.json({
       success: true,
       auctionsSold: Number(await redis.hget("Hypixel:Stats:Skyblock:Auctions", "sold")),
@@ -69,7 +68,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
     if (validateSkyblockItemID(itemID)) query.push(`@itemID:{${itemID}}`);
 
     res.set("Cache-Control", "public, max-age=300");
-
     return res.json({
       success: true,
       filter: {
@@ -105,7 +103,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
     const UUID = getUUID.data;
     if (!req?.query?.data && !["sell", "buy"].includes(String(req.query.data))) return res.status(422).json({ success: false, cause: "Invalid Data Type" });
 
-    res.set("Cache-Control", "public, max-age=300");
     const auctions: any[] = [];
     (
       await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-__v"])
@@ -120,6 +117,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player/recent", ratelimit(
         auctions.push({ UUID: auctionUUID, ...auction });
       });
 
+    res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
       auctions,
@@ -138,7 +136,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
     if (!req?.query?.data && !["sell", "buy"].includes(String(req.query.data))) return res.status(422).json({ success: false, cause: "Invalid Data Type" });
     if (req?.query?.page && isNaN(Number(req.query.page))) return res.status(422).json({ success: false, cause: "Invalid Page" });
 
-    res.set("Cache-Control", "public, max-age=300");
     const auctions: any[] = [];
     (
       await HypixelSkyblockAuctionModel.find(req.query.data === "sell" ? { seller: UUID } : { buyer: UUID }, ["-__v"])
@@ -152,6 +149,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/player/:player", ratelimit(), asyn
       auctions.push({ UUID: auctionUUID, ...auction });
     });
 
+    res.set("Cache-Control", "public, max-age=300");
     return res.json({
       success: true,
       auctions,
@@ -200,7 +198,6 @@ router.get("/v1/hypixel/skyblock/auctionhouse/:id/price/history", ratelimit(), a
     const date = new Date();
     date.setHours(new Date().getHours() + 1, 0, 0, 0);
     res.set("Expires", date.toUTCString());
-
     return res.json({
       success: true,
       history: formatTimeseries(await HypixelSkyblockAuctionhouseModel.find({ meta: req.params.id }, ["-meta", "-_id", "-__v"]).lean()),

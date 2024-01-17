@@ -8,11 +8,10 @@ const router = express.Router();
 
 router.get("/v1/hypixel/skyblock/election", async (req, res) => {
   try {
-    res.set("Cache-Control", "public, max-age=3600");
-
     const election = await getSkyblockElection();
     if (election?.error) return res.status(500).json({ success: false });
 
+    res.set("Cache-Control", "public, max-age=3600");
     return res.json({ success: true, ...election.data });
   } catch (e) {
     Sentry.captureException(e);
@@ -22,14 +21,13 @@ router.get("/v1/hypixel/skyblock/election", async (req, res) => {
 
 router.get("/v1/hypixel/skyblock/election/history", ratelimit(), async (req, res) => {
   try {
-    res.set("Cache-Control", "public, max-age=3600");
-
     const data = await HypixelSkyblockElectionModel.find({}, ["-__v"]).lean();
     const formattedData = [];
     for (const election of data) {
       formattedData.push({ year: election._id, candidates: election.candidates, timestamp: election.timestamp });
     }
 
+    res.set("Cache-Control", "public, max-age=3600");
     return res.json({ success: true, history: formattedData });
   } catch (e) {
     Sentry.captureException(e);
