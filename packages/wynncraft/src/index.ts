@@ -144,7 +144,7 @@ export const getGuildList = async (): Promise<GetterResponse<{ guildcount: numbe
           return { data: { guildcount: res.data.length, guilds: res.data }, cached: false };
         })
         .catch(() => {
-          return { error: "Unkown", cached: null };
+          return { error: "Unkown", cached: false };
         });
     });
   } catch (e) {
@@ -179,7 +179,7 @@ export const getServerList = async ({ UUIDs }: { UUIDs?: boolean }): Promise<Get
           return { data: formattedData, cached: false };
         })
         .catch(() => {
-          return { error: "Unkown", cached: null };
+          return { error: "Unkown", cached: false };
         });
     });
   } catch (e) {
