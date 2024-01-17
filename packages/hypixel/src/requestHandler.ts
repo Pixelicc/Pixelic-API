@@ -26,7 +26,6 @@ axiosRetry(HypixelAPI, {
       log("Hypixel", `Retrying to fetch Hypixel Data... (Attempt : ${retryCount} | Retrying in : ${Number(error.response.headers["ratelimit-reset"]) * 1000}s)`, "warn");
       return Number(error.response.headers["ratelimit-reset"]) * 1000;
     }
-    console.log(error);
     log("Hypixel", `Retrying to fetch Hypixel Data... (Attempt : ${retryCount} | Retrying in : ${Math.pow(retryCount, 2) * 5}s)`, "warn");
     return Math.pow(retryCount, 2) * 1000;
   },

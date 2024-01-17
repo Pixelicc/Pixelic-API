@@ -291,7 +291,6 @@ export const getSkyblockEndedAuctions = async (): Promise<GetterResponse<any, "U
     if (config.hypixel.cache) await redis.setex("Hypixel:Cache:skyblockEndedAuctions", 55, JSON.stringify(auctions));
     return { data: auctions, cached: false };
   } catch (e) {
-    console.log(e);
     Sentry.captureException(e);
     log("Hypixel", "Failed to fetch Skyblock Ended Auctions", "warn");
     return { error: "Unkown", cached: null };
