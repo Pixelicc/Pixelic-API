@@ -14,10 +14,10 @@
     "@pixelic/mongo": "*",
     "@pixelic/redis": "*",
     "@pixelic/utils": "*",
-    "axios": "^1.6.2",
+    "axios": "^1.6.5",
     "axios-retry": "^4.0.0",
     "bottleneck": "^2.19.5",
     "minecraft-items": "^0.4.3",
-    "prismarine-nbt": "^2.2.1"
+    "prismarine-nbt": "^2.5.0"
   }
 }

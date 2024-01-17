@@ -10,8 +10,8 @@
   "dependencies": {
     "@pixelic/logger": "*",
     "ioredis": "^5.3.2",
-    "minecraft-protocol": "^1.44.0",
-    "prismarine-nbt": "^2.2.1",
+    "minecraft-protocol": "^1.45.0",
+    "prismarine-nbt": "^2.5.0",
     "ulidx": "^2.2.1",
     "uuid": "^9.0.1"
   },
