@@ -1563,8 +1563,6 @@ export const formatPlayer = async (player: any) => {
     lastModePlayed: player?.mostRecentGameType || null,
     language: player?.userLanguage || "ENGLISH",
     chatChannel: player?.channel || "ALL",
-    giftsSent: player?.giftingMeta?.realBundlesGiven || 0,
-    giftsReceived: player?.giftingMeta?.realBundlesReceived || 0,
     ranksGifted: player?.giftingMeta?.ranksGiven || 0,
     APISettings: {
       onlineStatus: player?.lastLogin !== undefined,
@@ -1812,7 +1810,7 @@ export const formatSkyblockEndedAuction = async (auction: any) => {
 };
 
 export const formatSkyblockBazaar = async (bazaar: any, { itemInfo }: { itemInfo?: boolean }) => {
-  const skyblockItems = itemInfo ? await getSkyblockItems() : {};
+  const skyblockItems = itemInfo ? (await getSkyblockItems())?.data : {};
   const formattedData: any = {};
   for (const product of Object.keys(bazaar)) {
     formattedData[product] = {
