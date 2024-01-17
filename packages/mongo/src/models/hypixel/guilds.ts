@@ -44,81 +44,95 @@ const achievementsSchema = new Schema(
 );
 
 const guildSchema = new Schema({
-  name: {
+  _id: {
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  tag: {
-    type: String,
-    required: true,
-  },
-  tagColor: {
-    type: String,
-    required: true,
-  },
-  EXP: {
-    type: Number,
-    required: true,
-  },
-  level: {
-    type: Number,
-    required: true,
-  },
-  publiclyListed: {
-    type: Boolean,
-    required: true,
-  },
-  weeklyEXP: {
-    type: Number,
-    required: true,
-  },
-  cappedWeeklyEXP: {
-    type: Number,
-    required: true,
-  },
-  EXPHistory: {
-    type: Object,
-    required: true,
-  },
-  cappedEXPHistory: {
-    type: Object,
-    required: true,
-  },
-  created: {
-    type: Number,
-    required: true,
-  },
-  ranks: {
-    type: [rankSchema],
-    required: true,
-  },
-  memberCount: {
-    type: Number,
-    required: true,
-  },
-  members: {
-    type: [memberSchema],
-    required: true,
-  },
-  preferredGames: {
-    type: Array,
-    required: true,
-  },
-  EXPPerGame: {
-    type: Object,
-    required: true,
-  },
-  achievements: {
-    type: achievementsSchema,
-    required: true,
+  guild: {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    tag: {
+      type: String,
+      required: true,
+    },
+    tagColor: {
+      type: String,
+      required: true,
+    },
+    EXP: {
+      type: Number,
+      required: true,
+    },
+    level: {
+      type: Number,
+      required: true,
+    },
+    publiclyListed: {
+      type: Boolean,
+      required: true,
+    },
+    weeklyEXP: {
+      type: Number,
+      required: true,
+    },
+    cappedWeeklyEXP: {
+      type: Number,
+      required: true,
+    },
+    EXPHistory: {
+      type: Object,
+      required: true,
+    },
+    cappedEXPHistory: {
+      type: Object,
+      required: true,
+    },
+    created: {
+      type: Number,
+      required: true,
+    },
+    ranks: {
+      type: [rankSchema],
+      required: true,
+    },
+    memberCount: {
+      type: Number,
+      required: true,
+    },
+    members: {
+      type: [memberSchema],
+      required: true,
+    },
+    preferredGames: {
+      type: Array,
+      required: true,
+    },
+    EXPPerGame: {
+      type: Object,
+      required: true,
+    },
+    achievements: {
+      type: achievementsSchema,
+      required: true,
+    },
   },
   timestamp: {
     type: Number,
     required: true,
+  },
+  lastUpdated: {
+    type: Number,
+    required: true,
+  },
+  updates: {
+    type: Number,
+    default: 0,
   },
   /**
    * Shows wether the current data was ingested by the libary itself or a third-party source

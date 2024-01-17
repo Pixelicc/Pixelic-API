@@ -160,6 +160,7 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
       });
 
       const lastDataPoint = await HypixelHistoricalGuildModel.findOne({
+        ID: formattedData.ID,
         isFullData: true,
       }).lean();
 
@@ -176,7 +177,7 @@ export const getGuild = async ({ player, ID, name }: RequireOneObjParam<{ player
         }
       }
     }
-    return { data: formattedData, cached: true };
+    return { data: formattedData, cached: false };
   } catch (e) {
     Sentry.captureException(e);
     return { error: "Unkown", cached: null };

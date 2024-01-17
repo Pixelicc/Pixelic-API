@@ -181,111 +181,121 @@ const playerSchema = new Schema({
     type: String,
     required: true,
   },
-  username: {
-    type: String,
-    required: true,
-  },
-  rank: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  plusColor: {
-    type: String,
-    required: true,
-  },
-  plusPlusColor: {
-    type: String,
-    required: true,
-  },
-  APISettings: {
-    type: APISettingsSchema,
-    required: true,
-  },
-  EXP: {
-    type: Number,
-    required: true,
-  },
-  level: {
-    type: Number,
-    required: true,
-  },
-  karma: {
-    type: Number,
-    required: true,
-  },
-  achievementPoints: {
-    type: Number,
-    required: true,
-  },
-  questsCompleted: {
-    type: Number,
-    required: true,
-  },
-  challengesCompleted: {
-    type: Number,
-    required: true,
-  },
-  online: {
-    type: Boolean,
-    required: true,
-  },
-  firstLogin: {
-    type: Number,
-    required: true,
-  },
-  lastLogin: {
-    type: Number,
-    required: true,
-  },
-  lastLogout: {
-    type: Number,
-    required: true,
-  },
-  lastModePlayed: {
-    type: String,
-    required: true,
-  },
-  language: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  chatChannel: {
-    type: String,
-    required: true,
-  },
-  giftsSent: {
-    type: Number,
-    required: true,
-  },
-  giftsReceived: {
-    type: Number,
-    required: true,
-  },
-  ranksGifted: {
-    type: Number,
-    required: true,
-  },
-  rewards: {
-    type: rewardSchema,
-    required: true,
-  },
-  socialMedia: {
-    type: socialMediaSchema,
-    required: true,
-  },
-  tourney: {
-    type: tourneySchema,
-    required: true,
-  },
-  stats: {
-    type: statsSchema,
-    required: true,
+  player: {
+    username: {
+      type: String,
+      required: true,
+    },
+    rank: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    plusColor: {
+      type: String,
+      required: true,
+    },
+    plusPlusColor: {
+      type: String,
+      required: true,
+    },
+    APISettings: {
+      type: APISettingsSchema,
+      required: true,
+    },
+    EXP: {
+      type: Number,
+      required: true,
+    },
+    level: {
+      type: Number,
+      required: true,
+    },
+    karma: {
+      type: Number,
+      required: true,
+    },
+    achievementPoints: {
+      type: Number,
+      required: true,
+    },
+    questsCompleted: {
+      type: Number,
+      required: true,
+    },
+    challengesCompleted: {
+      type: Number,
+      required: true,
+    },
+    online: {
+      type: Boolean,
+      required: true,
+    },
+    firstLogin: {
+      type: Number,
+      required: true,
+    },
+    lastLogin: {
+      type: Number,
+      required: true,
+    },
+    lastLogout: {
+      type: Number,
+      required: true,
+    },
+    lastModePlayed: {
+      type: String,
+      required: true,
+    },
+    language: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    chatChannel: {
+      type: String,
+      required: true,
+    },
+    giftsSent: {
+      type: Number,
+      required: true,
+    },
+    giftsReceived: {
+      type: Number,
+      required: true,
+    },
+    ranksGifted: {
+      type: Number,
+      required: true,
+    },
+    rewards: {
+      type: rewardSchema,
+      required: true,
+    },
+    socialMedia: {
+      type: socialMediaSchema,
+      required: true,
+    },
+    tourney: {
+      type: tourneySchema,
+      required: true,
+    },
+    stats: {
+      type: statsSchema,
+      required: true,
+    },
   },
   timestamp: {
     type: Number,
     required: true,
+  },
+  lastUpdated: {
+    type: Number,
+    required: true,
+  },
+  updates: {
+    type: Number,
+    default: 0,
   },
   /**
    * Shows wether the current data was ingested by the libary itself or a third-party source
