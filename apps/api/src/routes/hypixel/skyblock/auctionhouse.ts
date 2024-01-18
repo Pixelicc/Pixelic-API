@@ -55,7 +55,7 @@ router.get("/v1/hypixel/skyblock/auctionhouse/query", authorization({ role: ["ST
 
     const sanitize = (str: string) => str.replace(/[&<>"'/]/g, "");
 
-    if (validateUUID(seller) || validateUsername(seller)) query.push(`@seller:{${await parseUUID(seller)}}`);
+    if (validateUUID(seller) || validateUsername(seller)) query.push(`@seller:{${(await parseUUID(seller))?.data}}`);
     if (validateUUID(seller)) query.push(`@sellerProfile:{${formatUUID(seller)}}`);
     if (["true", "false"].includes(coop)) query.push(`@coop:{${coop}}`);
     if (["WEAPON", "ARMOR", "ACCESSORIES", "CONSUMABLES", "BLOCKS", "MISC"].includes(category)) query.push(`@category:{${category}}`);
