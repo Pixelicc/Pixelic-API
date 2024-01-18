@@ -206,9 +206,6 @@ importers:
       '@pixelic/logger':
         specifier: '*'
         version: link:../logger
-      '@pixelic/mojang':
-        specifier: '*'
-        version: link:../mojang
       '@pixelic/mongo':
         specifier: '*'
         version: link:../mongo
