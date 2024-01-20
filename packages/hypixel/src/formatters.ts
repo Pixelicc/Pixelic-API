@@ -71,6 +71,10 @@ const addObjects = (objects: { [key: string]: number | object }[]): { [key: stri
             res[key] = getRatio(res["kills"], res["deaths"]);
           } else if (key === "BBLR") {
             res[key] = getRatio(res["bedsBroken"], res["bedsLost"]);
+          } else if (key === "AHMR") {
+            res[key] = getRatio(res["arrowsShot"], res["arrowsHit"]);
+          } else if (key === "KWR") {
+            res[key] = getRatio(res["kills"], res["wins"]);
           }
         }
       }
