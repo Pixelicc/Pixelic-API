@@ -153,39 +153,19 @@ const parsePlusPlusColor = (plusPlusColor: string | null, rank: string | null) =
 };
 
 const formatBedwars = (bedwars: any) => {
-  const easyLevels = 4;
-  const easyLevelsEXP = 7000;
-  const XPPerPrestige = 96 * 5000 + easyLevelsEXP;
-  const levelsPerPrestige = 100;
-  const highestPrestige = 50;
-
-  const getEXPForLevel = (level: number) => {
-    if (level === 0) return 0;
-    const respectedLevel = getLevelRespectingPrestige(level);
-    if (respectedLevel > easyLevels) return 5000;
-    if (respectedLevel === 1) return 1000;
-    if (respectedLevel === 2) return 2000;
-    if (respectedLevel === 3) return 3500;
-    if (respectedLevel === 4) return 500;
-    return 5000;
-  };
-
-  const getLevelRespectingPrestige = (level: number) => {
-    if (level > highestPrestige * levelsPerPrestige) return level - highestPrestige * levelsPerPrestige;
-    return level % levelsPerPrestige;
-  };
-
   const getLevelForEXP = (EXP: number) => {
-    const prestiges = Math.floor(EXP / XPPerPrestige);
-    var level = prestiges * levelsPerPrestige;
-    var EXPWithoutPrestiges = EXP - prestiges * XPPerPrestige;
-    for (let i = 1; i <= easyLevels; ++i) {
-      const EXPForEasyLevel = getEXPForLevel(i);
-      if (EXPWithoutPrestiges < EXPForEasyLevel) break;
-      level++;
-      EXPWithoutPrestiges -= EXPForEasyLevel;
-    }
-    return level + EXPWithoutPrestiges / 5000;
+    var level = Math.floor(EXP / 487000) * 100;
+    EXP = EXP % 487000;
+    if (EXP < 500) return level + EXP / 500;
+    level++;
+    if (EXP < 1500) return level + (EXP - 500) / 1000;
+    level++;
+    if (EXP < 3500) return level + (EXP - 1500) / 2000;
+    level++;
+    if (EXP < 7000) return level + (EXP - 3500) / 3500;
+    level++;
+    EXP -= 7000;
+    return level + EXP / 5000;
   };
 
   const getStat = (prefix: string, stat: string) => bedwars?.[`${prefix}${stat}`] || 0;
