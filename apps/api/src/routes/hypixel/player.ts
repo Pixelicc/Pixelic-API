@@ -14,7 +14,7 @@ router.get("/v1/hypixel/player/:player", ratelimit(), async (req, res) => {
     const data = await HypixelPlayerModel.findOne({ _id: UUID }, ["-_id", "-__v"]).lean();
     if (data === null) return res.status(404).json({ success: false, cause: "No Data Available" });
 
-    return res.json({ success: true, player: { UUID, ...data } });
+    return res.json({ success: true, player: { UUID, ...data.player } });
   } catch (e) {
     Sentry.captureException(e);
     return res.status(500).json({ success: false });
