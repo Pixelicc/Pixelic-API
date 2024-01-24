@@ -76,6 +76,7 @@ const historicalPlayerSchema = new Schema(
       index: true,
     },
     data: {
+      UUID: String,
       username: String,
       rank: String,
       plusColor: String,
@@ -113,7 +114,11 @@ const historicalPlayerSchema = new Schema(
       type: String,
       index: { sparse: true },
     },
-    isFullData: {
+    isFirst: {
+      type: Boolean,
+      index: { sparse: true },
+    },
+    isLast: {
       type: Boolean,
       index: { sparse: true },
     },

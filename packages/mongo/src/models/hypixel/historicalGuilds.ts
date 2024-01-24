@@ -18,6 +18,7 @@ const historicalGuildSchema = new Schema(
       index: true,
     },
     data: {
+      ID: String,
       name: String,
       tag: String,
       tagColor: String,
@@ -47,7 +48,11 @@ const historicalGuildSchema = new Schema(
       type: String,
       index: { sparse: true },
     },
-    isFullData: {
+    isFirst: {
+      type: Boolean,
+      index: { sparse: true },
+    },
+    isLast: {
       type: Boolean,
       index: { sparse: true },
     },

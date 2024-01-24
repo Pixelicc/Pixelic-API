@@ -49,18 +49,22 @@ export const getPlayer = async (player: string): Promise<GetterResponse<any, "In
           if (config.hypixel.persistHistoricalData) {
             const lastDataPoint = await WynncraftHistoricalPlayerModel.findOne({
               UUID,
-              isFullData: true,
+              isLast: true,
             }).lean();
 
             if (lastDataPoint === null) {
-              await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
+              await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFirst: true, isLast: true });
             } else {
               if (lastDataPoint?._id.getTimestamp().toISOString().slice(0, 10) !== new Date().toISOString().slice(0, 10)) {
                 const difference = deepCompare(lastDataPoint.data, formattedData);
                 if (Object.keys(difference).length !== 0) {
-                  await WynncraftHistoricalPlayerModel.create({ UUID, data: difference, timestamp: Math.floor(Date.now() / 1000), isFullData: undefined });
-                  await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isFullData: true });
-                  await WynncraftHistoricalPlayerModel.deleteOne({ _id: lastDataPoint?._id });
+                  await WynncraftHistoricalPlayerModel.create({ UUID, data: difference, timestamp: Math.floor(Date.now() / 1000) });
+                  await WynncraftHistoricalPlayerModel.create({ UUID, data: formattedData, timestamp: Math.floor(Date.now() / 1000), isLast: true });
+                  if (!lastDataPoint.isFirst) {
+                    await WynncraftHistoricalPlayerModel.deleteOne({ _id: lastDataPoint?._id });
+                  } else {
+                    await WynncraftHistoricalPlayerModel.updateOne({ _id: lastDataPoint?._id }, { $unset: { isLast: 1 } });
+                  }
                 }
               }
             }

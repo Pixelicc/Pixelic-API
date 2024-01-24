@@ -9,6 +9,7 @@ const historicalPlayerSchema = new Schema(
       index: true,
     },
     data: {
+      UUID: String,
       username: String,
       playtime: Number,
       firstLogin: Number,
@@ -26,7 +27,11 @@ const historicalPlayerSchema = new Schema(
       type: Number,
       required: true,
     },
-    isFullData: {
+    isFirst: {
+      type: Boolean,
+      index: { sparse: true },
+    },
+    isLast: {
       type: Boolean,
       index: { sparse: true },
     },
