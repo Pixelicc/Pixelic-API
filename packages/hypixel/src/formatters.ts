@@ -866,8 +866,9 @@ const formatMurderMystery = (murderMystery: any) => {
     stats[pixelicModes[mode]]["timesHero"] = murderMystery?.[`was_hero${hypixelModes[mode]}`] || 0;
   }
 
-  stats["overall"]["murdererChance"] = murderMystery?.[`murderer_chance`] || 0;
-  stats["overall"]["detectiveChance"] = murderMystery?.[`detective_chance`] || 0;
+  stats["murdererChance"] = murderMystery?.["murderer_chance"] || 0;
+  stats["detectiveChance"] = murderMystery?.["detective_chance"] || 0;
+  stats["alphaChance"] = murderMystery?.["alpha_chance"] || 0;
 
   return stats;
 };
