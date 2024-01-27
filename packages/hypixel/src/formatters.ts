@@ -852,7 +852,7 @@ const formatMurderMystery = (murderMystery: any) => {
     stats[pixelicModes[mode]] = {};
     stats[pixelicModes[mode]]["gamesPlayed"] = murderMystery?.[`games${hypixelModes[mode]}`] || 0;
     stats[pixelicModes[mode]]["wins"] = murderMystery?.[`wins${hypixelModes[mode]}`] || 0;
-    stats[pixelicModes[mode]]["murderWins"] = murderMystery?.[`murderer_wins${hypixelModes[mode]}`] || 0;
+    stats[pixelicModes[mode]]["murdererWins"] = murderMystery?.[`murderer_wins${hypixelModes[mode]}`] || 0;
     stats[pixelicModes[mode]]["detectiveWins"] = murderMystery?.[`detective_wins${hypixelModes[mode]}`] || 0;
     stats[pixelicModes[mode]]["losses"] = stats[pixelicModes[mode]]["gamesPlayed"] - stats[pixelicModes[mode]]["wins"];
     stats[pixelicModes[mode]]["WLR"] = getRatio(stats[pixelicModes[mode]]["wins"], stats[pixelicModes[mode]]["losses"]);
