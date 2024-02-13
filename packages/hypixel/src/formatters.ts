@@ -840,8 +840,8 @@ const formatTKR = (gingerBread: any) => {
 };
 
 const formatMurderMystery = (murderMystery: any) => {
-  const hypixelModes = ["", "_MURDER_CLASSIC", "_MURDER_DOUBLE_UP", "_MURDER_ASSASSINS", "_MURDER_INFECTION"];
-  const pixelicModes = ["overall", "classic", "doubleUp", "assassins", "infection"];
+  const hypixelModes = ["", "_MURDER_CLASSIC", "_MURDER_DOUBLE_UP"];
+  const pixelicModes = ["overall", "classic", "doubleUp"];
 
   const stats: any = {};
 
@@ -865,6 +865,27 @@ const formatMurderMystery = (murderMystery: any) => {
     stats[pixelicModes[mode]]["KDR"] = getRatio(stats[pixelicModes[mode]]["kills"], stats[pixelicModes[mode]]["deaths"]);
     stats[pixelicModes[mode]]["timesHero"] = murderMystery?.[`was_hero${hypixelModes[mode]}`] || 0;
   }
+
+  stats["assassins"] = {
+    gamesPlayed: murderMystery?.[`games_MURDER_ASSASSINS`] || 0,
+    wins: murderMystery?.[`wins_MURDER_ASSASSINS`] || 0,
+    kills: murderMystery?.[`kills_MURDER_ASSASSINS`] || 0,
+    knifeKills: murderMystery?.[`knife_kills_MURDER_ASSASSINS`] || 0,
+    thrownKnifeKills: murderMystery?.[`thrown_knife_kills_MURDER_ASSASSINS`] || 0,
+    trapKills: murderMystery?.[`games_MURDER_ASSASSINS`] || 0,
+    bowKills: murderMystery?.[`bow_kills_MURDER_ASSASSINS`] || 0,
+    deaths: murderMystery?.[`deaths_MURDER_ASSASSINS`] || 0,
+    KDR: getRatio(murderMystery?.[`kills_MURDER_ASSASSINS`] || 0, murderMystery?.[`deaths_MURDER_ASSASSINS`] || 0),
+  };
+  stats["infection"] = {
+    gamesPlayed: murderMystery?.[`games_MURDER_INFECTION`] || 0,
+    infectedWins: murderMystery?.[`wins_MURDER_INFECTION`] || 0,
+    survivorWins: murderMystery?.[`survivor_wins_MURDER_INFECTION`] || 0,
+    infectedKills: murderMystery?.[`kills_as_infected_MURDER_INFECTION`] || 0,
+    survivorKills: murderMystery?.[`kills_as_survivor_MURDER_INFECTION`] || 0,
+    deaths: murderMystery?.["deaths_MURDER_INFECTION"] || 0,
+    timesLastAlive: murderMystery?.[`last_one_alive_MURDER_INFECTION`] || 0,
+  };
 
   stats["murdererChance"] = murderMystery?.["murderer_chance"] || 0;
   stats["detectiveChance"] = murderMystery?.["detective_chance"] || 0;
