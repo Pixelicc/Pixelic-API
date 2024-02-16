@@ -4,14 +4,11 @@ export const docs = {
     title: "Documentation",
     description:
       "# Introduction\nThis is the official Pixelic-API documentation. The Pixelic-API provides Minecraft related data.\n\nPowered by: `TypeScript` `MongoDB` `Redis` `Cloudflare`\n\n## Limits\n\nThe API has a ratelimit of **60 requests/minute** per API-Key by default. Hitting an cached endpoint **DOES NOT** count towards the rate limit.\n\nEndpoints which require the usage of an API-Key will also respond with headers to assist with managing the ratelimit:\n- `X-RateLimit-Limit` - The limit of requests per period for the provided API-Key.\n- `X-RateLimit-Remaining` - The remaining amount of requests allowed for the current period.\n- `X-RateLimit-Reset` - The amount of seconds until the next period and the reset of the API-Key usage.\n\n## Rules\n\n**Usage of this API requires giving credit!**\n\n**Any abuse of the API will lead to your API key being reset/banned.**\n## Notes\n\n### Cached Responses\nMost endpoints will be cached by Cloudflare for faster response times. Hitting an cached Endpoint can be seen via the `CF-Cache-Status` Header.\n\n### UUIDs\nUUIDs are stored/returned without dashes.\n\n### Hypixel Skyblock IDs\nCustom Skyblock IDs are used for Pets, Potions and Runes eg. PET_ELEPHANT, POTION_SPEED & RUNE_MAGIC \n\n### Dates and Time\nTimestamps are stored/returned as Unix timestamps in seconds.\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
-    /**
-     * TODO: Add ToS
-     */
-    termsOfService: "",
+    termsOfService: "https://api.pixelic.app/legal/tos",
   },
   servers: [
     {
-      url: "https://api.pixelic.de/",
+      url: "https://api.pixelic.app/",
     },
   ],
   components: {
@@ -20,7 +17,7 @@ export const docs = {
         type: "apiKey",
         in: "header",
         name: "X-API-Key",
-        description: "To generate an API-Key click here: [CREATE](https://api.pixelic.de/oauth/discord?action=user.create)\n\nTo regenerate your API-Key click here: [REGENERATE](https://api.pixelic.de/oauth/discord?action=user.key.regenerate)",
+        description: "To generate an API-Key click here: [CREATE](https://api.pixelic.app/oauth/discord?action=user.create)\n\nTo regenerate your API-Key click here: [REGENERATE](https://api.pixelic.app/oauth/discord?action=user.key.regenerate)",
       },
     },
     headers: {
