@@ -17,7 +17,7 @@ export const docs = {
         type: "apiKey",
         in: "header",
         name: "X-API-Key",
-        description: "To generate an API-Key click here: [CREATE](https://api.pixelic.app/oauth/discord?action=user.create)\n\nTo regenerate your API-Key click here: [REGENERATE](https://api.pixelic.app/oauth/discord?action=user.key.regenerate)",
+        description: "To generate an API-Key click here: [CREATE](https://discord.com/api/oauth2/authorize?client_id=1176611079560904744&response_type=code&redirect_uri=https%3A%2F%2Fapi.pixelic.app%2Foauth%2Fdiscord%3Faction%3Duser.create&scope=identify)\n\nTo regenerate your API-Key click here: [REGENERATE](https://discord.com/api/oauth2/authorize?client_id=1176611079560904744&response_type=code&redirect_uri=https%3A%2F%2Fapi.pixelic.app%2Foauth%2Fdiscord%3Faction%3Duser.key.regenerate&scope=identify)",
       },
     },
     headers: {
