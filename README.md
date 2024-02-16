@@ -17,8 +17,8 @@ An API focused on Minecraft related data and powering other related Pixelic-Serv
 
 ## 📗 Usage
 
-- Most Endpoints require usage of an [`API-Key`](https://docs.pixelic.de/docs/#section/Authentication)
-- All production-ready endpoints can be found in the [`Documentation`](https://docs.pixelic.de)
+- Most Endpoints require usage of an [`API-Key`](https://api.pixelic.app/#section/Authentication)
+- All production-ready endpoints can be found in the [`Documentation`](https://api.pixelic.app)
 
 ## 💻 Developing
 
