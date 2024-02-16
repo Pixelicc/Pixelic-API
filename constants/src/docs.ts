@@ -1,4 +1,4 @@
-export default {
+export const docs = {
   openapi: "3.1.0",
   info: {
     title: "Documentation",

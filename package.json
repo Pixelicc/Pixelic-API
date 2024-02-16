@@ -10,10 +10,9 @@
   "scripts": {
     "start": "pnpm build && pnpm pm2 start pm2.json && pnpm pm2 logs --raw",
     "stop": "pnpm pm2 stop all",
-    "build": "turbo run build --filter=!documentation --parallel --cache-dir=.turbo --no-daemon",
+    "build": "turbo run build  --parallel --cache-dir=.turbo --no-daemon",
     "api": "pnpm --filter api",
-    "collector": "pnpm --filter collector",
-    "web:docs": "pnpm --filter documentation"
+    "collector": "pnpm --filter collector"
   },
   "devDependencies": {
     "@pixelic/types": "*",
