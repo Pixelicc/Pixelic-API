@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
   </style>
   </head>
   <body>
-  <redoc spec-url="http://localhost:3000/docs"></redoc>
+  <redoc spec-url="https://api.pixelic.app/docs"></redoc>
   <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
   </body>
   </html>
