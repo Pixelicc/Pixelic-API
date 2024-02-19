@@ -71,7 +71,7 @@ const regenerateUserKey = async (user: DiscordSnowflake) => {
 };
 
 router.get("/oauth/discord", async (req, res) => {
-  if (req.query.action !== "user.create" && req.query.action === "user.key.regenerate") res.status(422).send("Invalid Action");
+  if (req.query.action !== "user.create" && req.query.action !== "user.key.regenerate") res.status(422).send("Invalid Action");
   axios
     .post("https://discord.com/api/oauth2/token", { client_id: config.API.OAuth2.discord.clientID, client_secret: config.API.OAuth2.discord.clientSecret, code: req.query.code, grant_type: "authorization_code", redirect_uri: req.query.action === "user.create" ? config.API.OAuth2.discord.redirectURLs.userCreate : config.API.OAuth2.discord.redirectURLs.userKeyRegenerate, scope: "identify" }, { headers: { "Content-Type": "application/x-www-form-urlencoded" } })
     .then((oauth2) => {
@@ -94,7 +94,7 @@ router.get("/oauth/discord", async (req, res) => {
               .catch(() => {
                 return res.status(522).send("This Discord Account already has an API User linked to it. If you think this is an error please contact an Admin!");
               });
-          } else {
+          } else if (req.query.action === "user.key.regenerate") {
             await regenerateUserKey(user.data.id)
               .then((regeneratedKey) => {
                 return res.send(`Your new Pixelic API-Key: <b>${regeneratedKey.key}</b><br><br>This is the last time you'll be able to see your API-Key without regenerating it again!</br>So please copy and paste it somewhere safe!`);
