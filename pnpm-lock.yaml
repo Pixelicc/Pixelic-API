@@ -65,7 +65,7 @@ importers:
         version: link:../../packages/wynncraft
       axios:
         specifier: ^1.6.5
-        version: 1.6.5
+        version: 1.6.7
       cloc:
         specifier: 1.98.0-cloc
         version: 1.98.0-cloc
@@ -140,10 +140,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.5
+        version: 1.6.7
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.5)
+        version: 4.0.0(axios@1.6.7)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -162,7 +162,7 @@ importers:
     devDependencies:
       axios:
         specifier: ^1.6.5
-        version: 1.6.5
+        version: 1.6.7
 
   packages/logger:
     dependencies:
@@ -211,10 +211,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.5
+        version: 1.6.7
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.5)
+        version: 4.0.0(axios@1.6.7)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -290,10 +290,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.5
+        version: 1.6.7
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.5)
+        version: 4.0.0(axios@1.6.7)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -945,12 +945,12 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  /axios-retry@4.0.0(axios@1.6.5):
+  /axios-retry@4.0.0(axios@1.6.7):
     resolution: {integrity: sha512-F6P4HVGITD/v4z9Lw2mIA24IabTajvpDZmKa6zq/gGwn57wN5j1P3uWrAV0+diqnW6kTM2fTqmWNfgYWGmMuiA==}
     peerDependencies:
       axios: 0.x || 1.x
     dependencies:
-      axios: 1.6.5
+      axios: 1.6.7
       is-retry-allowed: 2.2.0
     dev: false
 
@@ -962,8 +962,8 @@ packages:
       - debug
     dev: false
 
-  /axios@1.6.5:
-    resolution: {integrity: sha512-Ii012v05KEVuUoFWmMW/UQv9aRIc3ZwkWDcM+h5Il8izZCtRVpDUfwpoFf7eOtajT3QiGR4yDUx7lPqHJULgbg==}
+  /axios@1.6.7:
+    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
     dependencies:
       follow-redirects: 1.15.5(debug@4.3.4)
       form-data: 4.0.0
