@@ -259,7 +259,7 @@ importers:
         version: 2.5.0
       ulidx:
         specifier: ^2.2.1
-        version: 2.2.1
+        version: 2.3.0
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
@@ -3402,8 +3402,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ulidx@2.2.1:
-    resolution: {integrity: sha512-DU9F5t1tihdafuNyW3fIrXUFHHiHxmwuQSGVGIbSpqkc93IH4P0dU8nPhk0gOW7ARxaFu4+P/9cxVwn6PdnIaQ==}
+  /ulidx@2.3.0:
+    resolution: {integrity: sha512-36piWNqcdp9hKlQewyeehCaALy4lyx3FodsCxHuV6i0YdexSkjDOubwxEVr2yi4kh62L/0MgyrxqG4K+qtovnw==}
     engines: {node: '>=16'}
     dependencies:
       layerr: 2.0.1
