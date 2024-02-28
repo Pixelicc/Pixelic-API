@@ -61,7 +61,7 @@ router.get("/legal/tos", async (req, res) => {
     If you wish to review any END USER DATA we store on yourself please visit: https://api.pixelic.app/v1/user
 
     GDPR Right to erasure ("right to be forgotten"):
-    If you wish to delete any END USER DATA we store on yourself please do this with the /api-key command in our discord support server or by sending an request to the https://api.pixelic.app/v1/user Endpoint with the DELETE Method
+    If you wish to delete any END USER DATA we store on yourself please do this by sending an request to the https://api.pixelic.app/v1/user Endpoint with the DELETE Method or contacting an Admin
     
     To speak to a member of staff please join our discord support server through: https://discord.com/invite/2vAuyVvdwj
   </strong>
