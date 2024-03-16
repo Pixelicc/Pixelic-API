@@ -65,7 +65,7 @@ importers:
         version: link:../../packages/wynncraft
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.8
       cloc:
         specifier: 1.98.0-cloc
         version: 1.98.0-cloc
@@ -140,10 +140,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.8
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.7)
+        version: 4.0.0(axios@1.6.8)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -162,7 +162,7 @@ importers:
     devDependencies:
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.8
 
   packages/logger:
     dependencies:
@@ -211,10 +211,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.8
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.7)
+        version: 4.0.0(axios@1.6.8)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -290,10 +290,10 @@ importers:
         version: link:../utils
       axios:
         specifier: ^1.6.5
-        version: 1.6.7
+        version: 1.6.8
       axios-retry:
         specifier: ^4.0.0
-        version: 4.0.0(axios@1.6.7)
+        version: 4.0.0(axios@1.6.8)
       bottleneck:
         specifier: ^2.19.5
         version: 2.19.5
@@ -932,27 +932,27 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  /axios-retry@4.0.0(axios@1.6.7):
+  /axios-retry@4.0.0(axios@1.6.8):
     resolution: {integrity: sha512-F6P4HVGITD/v4z9Lw2mIA24IabTajvpDZmKa6zq/gGwn57wN5j1P3uWrAV0+diqnW6kTM2fTqmWNfgYWGmMuiA==}
     peerDependencies:
       axios: 0.x || 1.x
     dependencies:
-      axios: 1.6.7
+      axios: 1.6.8
       is-retry-allowed: 2.2.0
     dev: false
 
   /axios@0.21.4(debug@4.3.4):
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.5(debug@4.3.4)
+      follow-redirects: 1.15.6(debug@4.3.4)
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /axios@1.6.7:
-    resolution: {integrity: sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==}
+  /axios@1.6.8:
+    resolution: {integrity: sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==}
     dependencies:
-      follow-redirects: 1.15.5(debug@4.3.4)
+      follow-redirects: 1.15.6(debug@4.3.4)
       form-data: 4.0.0
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -1613,7 +1613,7 @@ packages:
   /extrareqp2@1.0.0(debug@4.3.4):
     resolution: {integrity: sha512-Gum0g1QYb6wpPJCVypWP3bbIuaibcFiJcpuPM10YSXp/tzqi84x9PJageob+eN4xVRIOto4wjSGNLyMD54D2xA==}
     dependencies:
-      follow-redirects: 1.15.5(debug@4.3.4)
+      follow-redirects: 1.15.6(debug@4.3.4)
     transitivePeerDependencies:
       - debug
     dev: false
@@ -1716,8 +1716,8 @@ packages:
     resolution: {integrity: sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==}
     dev: false
 
-  /follow-redirects@1.15.5(debug@4.3.4):
-    resolution: {integrity: sha512-vSFWUON1B+yAw1VN4xMfxgn5fTUiaOzAJCKBwIIgT/+7CuGy9+r+5gITvP62j3RmaD5Ph65UaERdOSRGUzZtgw==}
+  /follow-redirects@1.15.6(debug@4.3.4):
+    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
